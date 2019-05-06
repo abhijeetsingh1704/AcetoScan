@@ -1,5 +1,5 @@
 ## AcetoScan
-## Last modified: mån maj 06, 2019  04:07
+## Last modified: mån maj 06, 2019  05:02
 ## Version: 0.1
 ## Johan.Nylander\@nbis.se
 
@@ -37,9 +37,12 @@ RUN \
     rm -rf vsearch-2.13.1-linux-x86_64/bin/vsearch vsearch-2.13.1-linux-x86_64.tar.gz
 
 # Install acetoscan from github (from https for now/testing)
-RUN \
-    wget -O /usr/local/bin/acetoscan "https://www.abc.se/~nylander/pub/AcetoScan-JN" && \
-    chmod +x /usr/local/bin/acetoscan
+#RUN \
+#    wget -O /usr/local/bin/acetoscan "https://www.abc.se/~nylander/pub/AcetoScan-JN" && \
+#    chmod +x /usr/local/bin/acetoscan
+
+#    wget "https://www.abc.se/~nylander/pub/AcetoScan-JN.tgz" && \
+#    tar xzf AcetoScan-JN.tgz
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
