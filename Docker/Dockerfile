@@ -1,5 +1,5 @@
 ## AcetoScan
-## Last modified: mån maj 06, 2019  03:18
+## Last modified: mån maj 06, 2019  04:07
 ## Version: 0.1
 ## Johan.Nylander\@nbis.se
 
@@ -27,9 +27,7 @@ RUN \
         r-cran-plotly \
         r-cran-rcolorbrewer \
         r-cran-plyr \
-        r-cran-dplyr \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        r-cran-dplyr
 
 # Install vsearch binary from github
 RUN \
@@ -39,12 +37,9 @@ RUN \
     rm -rf vsearch-2.13.1-linux-x86_64/bin/vsearch vsearch-2.13.1-linux-x86_64.tar.gz
 
 # Install acetoscan from github (from https for now/testing)
-#RUN \
-#    wget -O /usr/local/bin/acetoscan "https://www.abc.se/~nylander/pub/AcetoScan-JN" && \
-#    chmod +x /usr/local/bin/acetoscan
-
-
-
+RUN \
+    wget -O /usr/local/bin/acetoscan "https://www.abc.se/~nylander/pub/AcetoScan-JN" && \
+    chmod +x /usr/local/bin/acetoscan
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
