@@ -1,0 +1,376 @@
+#!/bin/bash
+
+clear
+echo " 
+   ██                   █            ▓███▒                     
+   ██                   █           █▓  ░█                     
+  ▒██▒   ▓██▒   ███   █████   ███   █       ▓██▒  ░███░  █▒██▒ 
+  ▓▒▒▓  ▓█  ▓  ▓▓ ▒█    █    █▓ ▓█  █▓░    ▓█  ▓  █▒ ▒█  █▓ ▒█ 
+  █░░█  █░     █   █    █    █   █   ▓██▓  █░         █  █   █ 
+  █  █  █      █████    █    █   █      ▓█ █      ▒████  █   █ 
+ ▒████▒ █░     █        █    █   █       █ █░     █▒  █  █   █ 
+ ▓▒  ▒▓ ▓█  ▓  ▓▓  █    █░   █▓ ▓█  █░  ▓█ ▓█  ▓  █░ ▓█  █   █ 
+ █░  ░█  ▓██▒   ███▒    ▒██   ███   ▒████░  ▓██▒  ▒██▒█  █   █"
+
+echo "
+###	Dependencies
+###	------------
+###	1. Cutadapt(1.18+)	2. Vsearch (v2.13.0)
+###	3. EMBOSS (6.6.0.0)	4. NCBI BLAST+ (2.8.1+)
+###	5. R (3.5.2) (libraries - phyloseq, ggplot2, plotly, 
+	   RColorBrewer, randomcoloR, plyr, dplyr)"
+
+
+###	Introduction
+
+echo ""
+echo "¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤"
+echo ""
+echo "> AcetoScan is written by Abhijeet Singh (abhijeetsingh.aau@gmail.com)"
+echo "> Version - AcetoScan_V1.0"
+echo "> Program for the analysis of FTHFS amplicon sequencing data from 
+ Illumina MiSeq platform(2*300bp)
+> The Input data must be in fastq.gz format 
+> AcetoScan only processes the forward reads 
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.=========================
+Forward reads files must be *_R1_001.fastq.gz format
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.========================="
+echo "¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤"
+
+###	getting current working directory
+
+export CDIR=`pwd`
+set -e
+
+###	Checking dependencies
+
+echo "Performing dependencies check"
+echo ""
+bash $CDIR/SCRIPTS/Software_check.sh
+
+###	User input to set the path
+
+echo ""
+echo "----->>>>> $CDIR"
+
+echo ""
+echo "Is \"AcetoScan\" your WORKING DIRECTORY in above path?"
+read -p "[y/n]: " REP_1
+echo ""
+
+###	getting absolute path in case working directory is different
+
+if [ "$REP_1" = "y" ]; then
+	echo "" >/dev/null
+else
+	echo "Provide absolute path to directory named \"AcetoScan\"
+	"
+	read -e -p "Absolute path for the AcetoScan directory (use tab-autocompletion): " PIPELINE
+fi
+
+###	Checking if path is correct
+
+if [ "$REP_1" = "n" ];then
+	if [[ -d "${PIPELINE}/SCRIPTS" ]];then
+		echo "" >/dev/null
+	else
+		echo "Incorrect path, Aborting !!!" ; exit 1
+	fi
+else
+	echo "" >/dev/null
+fi
+
+###	setting woring directory according to user input
+
+if [ "$REP_1" = "y" ]; then
+	echo "" >/dev/null
+else
+	export CDIR=$PIPELINE
+fi
+
+###	getting path for the raw illumina data
+
+echo "#Please provide the absolute path of the raw illumina reads"
+read -e -p "Path to Illumina directory (use tab-autocompletion): " READ_PATH
+
+###	Recording the time whent he script was started
+start=`date +%s` #start time of script
+
+
+###	Checking if the entered path for pipeline is correct
+
+if [[ -d "${READ_PATH}" ]];then
+	echo "" >/dev/null
+else
+	echo "Incorrect path, Aborting !!!"
+	exit 1
+fi
+
+###	Defining clustering threshold
+
+echo ""
+echo "#Please provide clustering threshold - (0.95)"
+read -e -p "Value - (0.0 to 1.0) : " CLUST_THRESHOLD
+
+
+###	Checking threshold validity
+
+MAXTHRESHOLD=1.0
+
+if (( ${CLUST_THRESHOLD%%.*} < ${MAXTHRESHOLD%%.*} || ( ${CLUST_THRESHOLD%%.*} == ${MAXTHRESHOLD%%.*} \
+	&& ${CLUST_THRESHOLD##*.} < ${MAXTHRESHOLD##*.} ) )) >/dev/null ; then    
+    echo "" >/dev/null
+else
+	echo "Invalid threshold: value must be between 0.0 and 1.0" && exit 1
+fi
+
+###	Getting processors information
+
+THREADS=`grep -c ^processor /proc/cpuinfo`
+
+###	Removing old directories
+
+rm -rf $CDIR/INPUT_DATA
+rm -rf $CDIR/OUTPUT_DATA
+rm -rf $CDIR/ACETOSCAN_RESULT
+
+###	find illumina raw reads and making soft links to the data
+
+mkdir -p $CDIR/INPUT_DATA
+cd $CDIR/INPUT_DATA/
+find $READ_PATH/* -name '*_R1_001.fastq.gz' -exec ln -s {} $CDIR/INPUT_DATA/ \; 2>/dev/null
+
+###	Checking if link exist
+
+if ls $CDIR/INPUT_DATA/*_R1_001.fastq.gz 1> /dev/null 2>&1; then
+    echo "" >/dev/null
+else
+    echo "Input files \"*_R1_001.fastq.gz\" not found in 
+$CDIR/INPUT_DATA/, Aborting !!!" && exit 1
+fi
+
+
+###	Adapter trimming and quality filtering of the raw reads
+
+
+mkdir -p $CDIR/OUTPUT_DATA
+echo ""
+echo "Performing adapters trimming and quality filtering"
+bash $CDIR/SCRIPTS/cutadapt_illumina.sh
+echo "Cutadapt report: -->> cutadapt.out in $CDIR/OUTPUT_DATA/"
+
+###	Unzipping and preparing variables file
+
+cd $CDIR/OUTPUT_DATA/trimmed
+
+# force extracting 
+gunzip -f *.fastq.gz
+
+# variable file
+ls *trimmed_R1.fastq | while read FASTA_names
+do
+	echo ${FASTA_names%%.*}
+done > FASTA_names.txt
+
+
+
+
+### FastQ to FastA by EMBOSS
+
+echo ""
+echo "Converting FastQ to FastA"
+mkdir -p $CDIR/OUTPUT_DATA/trimmed/FASTA
+for FASTQ in $(cat FASTA_names.txt)
+do
+seqret -sequence ${FASTQ}.fastq -auto Y -warning N -outseq $CDIR/OUTPUT_DATA/trimmed/FASTA/${FASTQ}.fasta
+done
+
+
+
+###	Longest best frame analysis
+
+# preparing variable file
+
+cd $CDIR/OUTPUT_DATA/trimmed/FASTA
+ls *trimmed_R1.fasta > FRAME_INPUTfile.txt
+
+# analysis
+
+for FRAME_INPUT in $(cat FRAME_INPUTfile.txt)
+do
+bash $CDIR/SCRIPTS/LongestBestFrame.sh $FRAME_INPUT
+done
+
+###	Preprocessing for Clustering
+
+# preparing variable file
+
+ls Best_*.fasta | while read bestname
+do
+	echo ${bestname%%.*}
+done > file_bestname.txt
+
+# replace fasta header to file name
+
+for i in $(cat file_bestname.txt)
+do 
+awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' ${i}.fasta
+done > pre_All_best.fasta.tmp
+
+# editing fasta headers
+
+sed 's/-/_/g;s/ /_/g;s/:/_/g;s/Best_//g' pre_All_best.fasta.tmp > pre_All_best.fasta
+
+# formating input for vsearch
+
+seqret -sequence pre_All_best.fasta -auto Y -warning N -outseq All_best.fasta
+
+###	Clustering with Vsearch (v2.13.0_linux_x86_64)
+
+mkdir -p $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH
+
+# dereplication 
+
+echo "Performing dereplication on fasta sequences"
+vsearch --derep_fulllength $CDIR/OUTPUT_DATA/trimmed/FASTA/All_best.fasta --output $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/best_derep.fasta --minseqlength 150 --sizeout --minuniquesize 2 --relabel Unique --uc $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/derep.uc --log=$CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/derep_log
+echo ""
+
+# removing chimeras
+
+echo "Removing chimeras from dereplicated fasta sequences"
+vsearch --uchime_denovo $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/best_derep.fasta --sizein --sizeout --chimeras $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/chimera.fasta --nonchimeras $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/nonchimera.fasta --log=$CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/chimera_log.txt
+echo ""
+
+# Clustering OTUs
+
+echo "Removing chimeras from dereplicated fasta sequences"
+vsearch --cluster_size $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/nonchimera.fasta  --id $CLUST_THRESHOLD --centroid $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta --otutabout $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/classic_pre_otu_table.txt --uc $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/clustering_result --sizein --sizeout --relabel OTU_ --biomout $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTUtable.biom.json
+echo ""
+
+# Preparing input file for filtering of non target sequences
+
+perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | sed '/^$/d' > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta.tmp
+
+###	Filtering non target sequences with BlastX
+
+echo "Filtering non target OTUs"
+
+
+###	BlastX from NCBI Blast+ (2.8.1)
+
+blastx -query $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta.tmp -db $CDIR/ACETOBASE_DB_DIR/AcetoBaseV1 -task blastx -max_target_seqs 1 -num_threads $THREADS -evalue 1e-9 -out $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/blast_results_for_filtering -outfmt "7 qseqid"
+
+# processing blast result file
+
+sed '/^#/d' ./VSEARCH/blast_results_for_filtering > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU_list.txt
+
+# Extracting target sequences
+
+
+for OTU in $(cat $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU_list.txt)
+do
+grep -A 1 "OTU" $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta.tmp > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta.tmp
+done 
+
+# processign filtered OTU multifasta file
+
+sed 's/-//g' $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta.tmp | sed '/^#/d' > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta
+
+###	Generating OTU table with filtered/target OTUs
+
+echo ""
+echo "Generating OTU table"
+vsearch --usearch_global $CDIR/OUTPUT_DATA/trimmed/FASTA/All_best.fasta -db $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta --id 0.95 --otutabout $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.tmp
+sed -e 's/_trimmed_R1//g' $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.tmp > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.pre
+echo ""
+
+###	Sorting OTUs in assending order
+
+cat $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.pre | sed 's/#OTU ID/ID/' | sed 's/OTU_//' | sort -n | sed 's/^/OTU_/' > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt
+
+###	Assigning taxonomy 
+
+echo ""
+echo "Searching for taxonomy"
+cut -d ";" -f1 $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta
+blastx -query $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta -db $CDIR/ACETOBASE_DB_DIR/AcetoBaseV1 -task blastx -max_target_seqs 1 -num_threads $THREADS -evalue 1e-9 -out $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/OTUblast.txt.tmp -outfmt "6 qseqid saccver pident"
+
+###	Preparing OTU taxonomy table
+
+sed 's/;tax=/,/g' $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/OTUblast.txt.tmp | sed '1s/^/#OTU,Subject_Accession,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity\n/' > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_pre
+
+#	making tab to comma
+
+cat $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_pre | sed 's/\t/,/g' > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_full.csv
+
+
+###	Translating OTU nucleotide sequence to Amino acid based on best frame analysis
+
+rm -rf $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation
+mkdir -p $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation
+cd $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation
+cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta .
+bash $CDIR/SCRIPTS/Translation_LBF.sh FTHFS_OTU.fasta
+
+###	fixing taxonomy to OTU fasta header 
+
+cd $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/
+cat OTUblast.txt.tmp | sed 's/;tax=/\t/g' | awk -F "\t" '{print $1,$3,$4}' | sed  '1s/^/OTU_ID,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity \n/' | sed 's/ /,/g' > FTHFS_TAX_table.txt
+
+###	Preparing the input for R analysis
+
+sed 's/,/\t/g' $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table.txt | awk 'NF{NF--};1' | sed 's/ /\t/g'> $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_R.txt
+cat $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt > $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table_R.txt 
+
+###	R analysis
+
+mkdir $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION
+cd $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION
+cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table_R.txt .
+cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_R.txt .
+
+#cp $CDIR/SCRIPTS/AcetoScan_Visualization.R .
+
+RPATH=`which R`
+for l in {1..3}; do echo ""; done
+echo "Preparing graphics"
+for l in {1..3}; do echo ""; done
+$RPATH --slave --no-restore --silent --quiet --file=$CDIR/SCRIPTS/AcetoScan_Visualization.R >/dev/null
+
+
+###	Puting everything together in a Result DIRECTORY
+
+mkdir $CDIR/ACETOSCAN_RESULT
+cd $CDIR/ACETOSCAN_RESULT
+cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta .
+cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt .
+cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_full.csv .
+cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table.txt .
+cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation/Translation*.fasta .
+
+if [ -f $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/Barplot_Phylum_Absolute_abundance.pdf ];then
+	cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*Barplot*.pdf .
+	cp $CDIR/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*Heatmap*.pdf .
+else
+	echo "" >/dev/null
+fi
+
+###	Getting final information
+
+end=`date +%s` #end time of script
+runtime=$(((end - start))) #calculate runtime
+
+DATASIZE=`du $READ_PATH/* -ch | grep "total" | sed 's/total//'`
+
+echo ""
+echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
+echo "Final results are in Directory \"ACETOSCAN_RESULT\" in path $CDIR/ACETOSCAN_RESULT"
+echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
+echo ""
+echo "$DATASIZE of data processed in $runtime seconds"
+
+# 	Print blank lines
+for l in {1..3}; do echo ""; done
+
+###	End of script
+
