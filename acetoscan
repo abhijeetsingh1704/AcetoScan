@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: tis maj 07, 2019  02:22
+# Last modified: tis maj 07, 2019  05:29
 # Sign: JN
 
 set -euo pipefail
@@ -50,7 +50,7 @@ export CDIR=$(pwd)
 echo "Performing dependencies check"
 echo ""
 
-bash "${CDIR}/SCRIPTS/Software_check.sh"
+bash "${CDIR}/SCRIPTS/Software_check.sh" # <======== External script
 
 ###    User input to set the path
 echo ""
@@ -62,8 +62,8 @@ read -p "[y/n]: " REP_1
 echo ""
 
 ###    getting absolute path in case working directory is different
-if [ "${REP_1}" = "y" ]; then
-    echo "" > /dev/null
+if [ "${REP_1}" == "y" ]; then
+    echo "yes" > /dev/null
 else
     echo "Provide absolute path to directory named \"AcetoScan\"
     "
@@ -71,7 +71,7 @@ else
 fi
 
 ###    Checking if path is correct
-if [ "${REP_1}" = "n" ]; then
+if [ "${REP_1}" == "n" ]; then
     if [[ -d "${PIPELINE}/SCRIPTS" ]]; then
         echo "" > /dev/null
     else
@@ -82,7 +82,7 @@ else
 fi
 
 ###    setting woring directory according to user input
-if [ "${REP_1}" = "y" ]; then
+if [ "${REP_1}" == "y" ]; then
     echo "" > /dev/null
 else
     export CDIR="${PIPELINE}"
@@ -127,17 +127,16 @@ rm -rf "${CDIR}/OUTPUT_DATA"
 rm -rf "${CDIR}/ACETOSCAN_RESULT"
 
 ###    find illumina raw reads and making soft links to the data
-mkdir -p "${CDIR}/INPUT_DATA"
+mkdir -v -p "${CDIR}/INPUT_DATA"
 cd "${CDIR}/INPUT_DATA/"
-find "${READ_PATH}/*" -name '*_R1_001.fastq.gz' -exec ln -s {} "${CDIR}/INPUT_DATA/" \; 2> /dev/null
+find "${READ_PATH}" -name '*_R1_001.fastq.gz' -exec ln -s {} "${CDIR}/INPUT_DATA/" \; 2> /dev/null
 
 ###    Checking if link exist
-if ls "${CDIR}/INPUT_DATA/*_R1_001.fastq.gz" 1> /dev/null 2>&1; then
-    echo "" > /dev/null
-else
-    echo "Input files \"*_R1_001.fastq.gz\" not found in 
-${CDIR}/INPUT_DATA/, Aborting !!!" && exit 1
+if [ ! -n "$(find "${CDIR}/INPUT_DATA/" -maxdepth 1 -type l -name '*_R1_001.fastq.gz' -print -quit)" ] ; then
+    echo "Input files \"*_R1_001.fastq.gz\" not found in ${CDIR}/INPUT_DATA/, Aborting !!!"
+    exit 1
 fi
+
 
 ###    Adapter trimming and quality filtering of the raw reads
 # TODO: make sure the trimmed folder is created by mother script,
@@ -147,58 +146,64 @@ mkdir -p "${CDIR}/OUTPUT_DATA/trimmed"
 echo ""
 echo "Performing adapters trimming and quality filtering"
 
-bash "${CDIR}/SCRIPTS/cutadapt_illumina.sh"
+bash "${CDIR}/SCRIPTS/cutadapt_illumina.sh" # <================= external script
+
 echo "Cutadapt report: -->> cutadapt.out in ${CDIR}/OUTPUT_DATA/"
 
 ###    Unzipping and preparing variables file
 cd "${CDIR}/OUTPUT_DATA/trimmed"
 
 # Begin fastq2fasta
-    # TODO: stub for alternative fastq.gz to fasta conversion
-    #find "${CDIR}/OUTPUT_DATA/trimmed" \
-    #    -name '*trimmed_R1.fastq.gz' \
-    #    -exec cutadapt -o ${CDIR}/OUTPUT_DATA/trimmed/FASTA/{}.fasta \;
-
-    # force extracting 
-    # TODO: Do we really need to uncompress? cutadapt can take compressed input
-    gunzip -f ./*.fastq.gz
-
-    # variable file
-    # TODO: Use find instead of ls
-    ls *trimmed_R1.fastq | while read FASTA_names
-    do
-        echo "${FASTA_names%%.*}"
-    done > FASTA_names.txt
-
-    ### FastQ to FastA by EMBOSS
-    # TODO: replace seqret with, e.g., cutadapt:
-    #    cutadapt -o output.fasta input.fastq.gz
-    echo ""
-    echo "Converting FastQ to FastA"
-    mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA"
+# @@@@@@@@@@@@@@@@@@@@@@ tis  7 maj 2019 17:27:26 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# TODO: stub for alternative fastq.gz to fasta conversion
+find "${CDIR}/OUTPUT_DATA/trimmed" -name '*trimmed_R1.fastq.gz' \
+    -exec sh -c 'f="{}"; cutadapt -o "${CDIR}/OUTPUT_DATA/trimmed/FASTA/${f%.fastq.gz}.fasta"' \;
     
-    for FASTQ in $(cat FASTA_names.txt)
-    do
-        seqret \
-            -sequence "${FASTQ}.fastq" \
-            -auto Y \
-            -warning N \
-            -outseq "${CDIR}/OUTPUT_DATA/trimmed/FASTA/${FASTQ}.fasta"
-    done
+    ## force extracting 
+    ## TODO: Do we really need to uncompress? cutadapt can take compressed input
+    #gunzip -f ./*.fastq.gz
+
+    ## variable file
+    ## TODO: Use find instead of ls
+    #ls *trimmed_R1.fastq | while read FASTA_names
+    #do
+    #    echo "${FASTA_names%%.*}"
+    #done > FASTA_names.txt
+
+    #### FastQ to FastA by EMBOSS
+    ## TODO: replace seqret with, e.g., cutadapt:
+    ##    cutadapt -o output.fasta input.fastq.gz
+    #echo ""
+    #echo "Converting FastQ to FastA"
+    #mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA"
+    #
+    #for FASTQ in $(cat FASTA_names.txt)
+    #do
+    #    seqret \
+    #        -sequence "${FASTQ}.fastq" \
+    #        -auto Y \
+    #        -warning N \
+    #        -outseq "${CDIR}/OUTPUT_DATA/trimmed/FASTA/${FASTQ}.fasta"
+    #done
 ## End of fastq2fasta
 
-###    Longest best frame analysis
-# preparing variable file
-cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA"
 
-# TODO: use find or shell expansion instead of ls and cat
-ls *trimmed_R1.fasta > FRAME_INPUTfile.txt
+## Begin Longest best frame analysis
+    ###    Longest best frame analysis
+    # preparing variable file
+    cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA"
 
-# analysis
-for FRAME_INPUT in $(cat FRAME_INPUTfile.txt)
-do
-    bash "${CDIR}/SCRIPTS/LongestBestFrame.sh" "${FRAME_INPUT}"
-done
+    # TODO: use find or shell expansion instead of ls and cat
+    ls *trimmed_R1.fasta > FRAME_INPUTfile.txt
+
+    # analysis
+    for FRAME_INPUT in $(cat FRAME_INPUTfile.txt)
+    do
+        bash "${CDIR}/SCRIPTS/LongestBestFrame.sh" "${FRAME_INPUT}"   # <============= external script
+    done
+## End Longest best frame analysis
+
+
 
 ###    Preprocessing for Clustering
 # preparing variable file
@@ -361,7 +366,7 @@ mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation"
 cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation"
 cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta" .
 
-bash "${CDIR}/SCRIPTS/Translation_LBF.sh" FTHFS_OTU.fasta
+bash "${CDIR}/SCRIPTS/Translation_LBF.sh" FTHFS_OTU.fasta  # <============== external script
 
 ###    fixing taxonomy to OTU fasta header 
 cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/"

@@ -1,5 +1,5 @@
 ## AcetoScan
-## Last modified: tis maj 07, 2019  03:38
+## Last modified: tis maj 07, 2019  04:53
 ## Version: 0.1
 ## Johan.Nylander\@nbis.se
 
@@ -9,11 +9,13 @@ LABEL version="1.0" description="AcetoScan" maintainer="Abhijeet Singh <abhijeet
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+WORKDIR /AcetoScan
+
 ENV PATH="/AcetoScan/SCRIPTS:${PATH}"
 
 CMD ["/sbin/my_init"]
 
-# Set up and use apt-get
+# Set up and use apt-get for installation
 RUN \
     apt clean \
     && sed -i -e 's|http://archive|http://se.archive|g' /etc/apt/sources.list \
@@ -47,12 +49,12 @@ RUN \
     && wget "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz" \
     && tar xzf vsearch-2.13.1-linux-x86_64.tar.gz \
     && cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch \
-    && rm -rf vsearch-2.13.1-linux-x86_64/bin/vsearch vsearch-2.13.1-linux-x86_64.tar.gz \
+    && rm -rf vsearch-2.13.1-linux-x86_64/ vsearch-2.13.1-linux-x86_64.tar.gz \
     && wget https://www.abc.se/~nylander/pub/AcetoScan.tgz \
     && tar xzf AcetoScan.tgz \
     && rm AcetoScan.tgz \
     && cp AcetoScan/acetoscan /usr/local/bin/acetoscan \
-    && chmod +x /usr/local/bin/acetoscan
+    && chmod +x /usr/local/bin/acetoscan \
 
 RUN \
     apt-get clean \

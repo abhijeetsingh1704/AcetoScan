@@ -1,6 +1,6 @@
 # README AcetoScan Docker
 
-- Last modified: mån maj 06, 2019  05:02
+- Last modified: tis maj 07, 2019  04:57
 - SIgn: JN
 
 ## Notes
@@ -27,13 +27,12 @@ Use phusion/baseimage. See <https://github.com/phusion/baseimage-docker/>
     docker history acetoscan:0.1
     docker tag acetoscan nylander/acetoscan
     docker push nylander/acetoscan:0.1
-    docker run --rm -it acetoscan:0.1 /sbin/my_init -- acetoscan
-    docker run --rm -it acetoscan:0.1 /sbin/my_init -- bash -l
 
 
 ## Run AceoScan from the docker
 
     docker run --rm -it acetoscan:0.1 /sbin/my_init -- acetoscan
+    docker run --rm -it acetoscan:0.1 /sbin/my_init -- bash -l
 
     docker run acetoscan:0.1 /sbin/my_init
     docker ps
