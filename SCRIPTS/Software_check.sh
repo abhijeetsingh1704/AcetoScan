@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # File: Software_check.sh
-# Last modified: tis maj 07, 2019  10:52
+# Last modified: tis maj 07, 2019  12:17
 # Sign: JN
 
 ###	Checking if cutadapt is installed
-if ! command -v "cutadapt" > /dev/null ;then
+if ! command -v "cutadapt" > /dev/null ; then
 	echo "cutadapt not found, Aborting !!!"
     exit 1
 fi
 
 ###	Checking if vsearch is installed
-if command -v "vsearch" > /dev/null ;then
+if ! command -v "vsearch" > /dev/null ; then
 	echo "vsearch not found, Aborting !!!"
     exit 1
 fi
@@ -28,12 +28,12 @@ if ! command -v "blastx" > /dev/null ; then
     exit 1
 fi
 
-###	Checking if R is installed
-if ! command -v "R" > /dev/null ;then
+###	Checking if R and Rscript are installed
+if ! command -v "R" > /dev/null ; then
 	echo "R not found, Aborting !!!"
     exit 1
 fi
-if ! command -v "Rscript" > /dev/null ;then
+if ! command -v "Rscript" > /dev/null ; then
 	echo "Rscript not found, Aborting !!!"
     exit 1
 fi
