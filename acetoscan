@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# AcetoScan
-# Last modified: mån maj 06, 2019  05:02
+# File: AcetoScan
+# Last modified: tis maj 07, 2019  10:44
 # Sign: JN
 
 set -euo pipefail
@@ -46,7 +46,7 @@ echo "¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 ###    getting current working directory
 
 export CDIR=$(pwd)
-set -e
+#set -e
 
 ###    Checking dependencies
 
@@ -311,7 +311,6 @@ sed '/^#/d' ./VSEARCH/blast_results_for_filtering > ${CDIR}/OUTPUT_DATA/trimmed/
 
 # Extracting target sequences
 
-
 for OTU in $(cat ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU_list.txt)
 do
     grep -A 1 "OTU" ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta.tmp > ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta.tmp
@@ -429,7 +428,7 @@ cp ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_full.csv .
 cp ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table.txt .
 cp ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation/Translation*.fasta .
 
-if [ -f "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/Barplot_Phylum_Absolute_abundance.pdf" ];then
+if [ -f "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/Barplot_Phylum_Absolute_abundance.pdf" ]; then
     cp ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*Barplot*.pdf .
     cp ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*Heatmap*.pdf .
 else
@@ -438,8 +437,8 @@ fi
 
 ###    Getting final information
 
-end=$(date +%s) #end time of script
-runtime=$(((end - start))) #calculate runtime
+end=$(date +%s) # end time of script
+runtime=$(((end - start))) # calculate runtime
 
 DATASIZE=$(du $READ_PATH/* -ch | grep "total" | sed 's/total//')
 

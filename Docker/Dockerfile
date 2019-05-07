@@ -1,5 +1,5 @@
 ## AcetoScan
-## Last modified: mån maj 06, 2019  05:02
+## Last modified: tis maj 07, 2019  11:01
 ## Version: 0.1
 ## Johan.Nylander\@nbis.se
 
@@ -38,11 +38,17 @@ RUN \
 
 # Install acetoscan from github (from https for now/testing)
 #RUN \
+#    wget https://www.abc.se/~nylander/pub/acetoscan.tgz
 #    wget -O /usr/local/bin/acetoscan "https://www.abc.se/~nylander/pub/AcetoScan-JN" && \
 #    chmod +x /usr/local/bin/acetoscan
 
-#    wget "https://www.abc.se/~nylander/pub/AcetoScan-JN.tgz" && \
-#    tar xzf AcetoScan-JN.tgz
+#    wget "https://www.abc.se/~nylander/pub/AcetoScan.tgz" && \
+#    tar xzf AcetoScan.tgz
+#
+
+ENV PATH="/AcetoScan/SCRIPTS:${PATH}"
+
+
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
