@@ -1,7 +1,7 @@
 # AcetoScan
 
 - Version: 0.1 (20190423)
-- Last modified: mån maj 06, 2019  03:31
+- Last modified: tis maj 07, 2019  11:16
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -9,15 +9,15 @@
 The pipeline directory AcetoScan contains scripts for the MiSeq illumina data
 analysis for the FTHFS amplicon sequencing.
 
-The main script is `AcetoScan`.
+The main script is `acetoscan`.
 
 ## Dependencies
 
 1. Cutadapt
-2. Emboss (version 6.6.0.0)
-3. Vsearch (version 2.13.0)
-4. NCBI BLAST+ (2.8.1+)
-5. R (3.5.2) (libraries - phyloseq, ggplot2, plotly, RColorBrewer, randomcoloR, plyr, dplyr)
+2. Emboss (v.6.6.0.0)
+3. Vsearch (v.2.13.0)
+4. NCBI BLAST+ (v.2.8.1+)
+5. R (v.3.5.2) (libraries: phyloseq, ggplot2, plotly, RColorBrewer, randomcoloR, plyr, dplyr)
 
 ## Contents of pipeline
 
@@ -28,12 +28,12 @@ The main script is `AcetoScan`.
 	a. OTU sequences
 	b. OTU table
 	c. TAX table
-	d. translation of OTUs
+	d. Translation of OTUs
 
 
-## Usagex
+## Usage
 
-	$ bash AcetoScan
+	$ bash acetoscan
 		
 The script is interactive and will ask for the absolute path to Illumina rawdata.
 
