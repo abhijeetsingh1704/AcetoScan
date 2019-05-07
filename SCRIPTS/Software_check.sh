@@ -1,34 +1,34 @@
 #!/bin/bash
 
 # File: Software_check.sh
-# Last modified: tis maj 07, 2019  12:20
+# Last modified: tis maj 07, 2019  12:21
 # Sign: JN
 
-###    Checking if cutadapt is installed
+### Checking if cutadapt is installed
 if ! command -v "cutadapt" > /dev/null ; then
     echo "cutadapt not found, Aborting !!!"
     exit 1
 fi
 
-###    Checking if vsearch is installed
+### Checking if vsearch is installed
 if ! command -v "vsearch" > /dev/null ; then
     echo "vsearch not found, Aborting !!!"
     exit 1
 fi
 
-###    Checking if getorf from Emboss is installed
+### Checking if getorf from Emboss is installed
 if ! command -v "getorf" > /dev/null ;then
     echo "EMBOSS not found, Aborting !!!"
     exit 1
 fi
 
-###    Checking if Blast is installed
+### Checking if Blast is installed
 if ! command -v "blastx" > /dev/null ; then
     echo "NCBI Blast+ (blastx) not found, Aborting !!!"
     exit 1
 fi
 
-###    Checking if R and Rscript are installed
+### Checking if R and Rscript are installed
 if ! command -v "R" > /dev/null ; then
     echo "R not found, Aborting !!!"
     exit 1
