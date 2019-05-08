@@ -1,23 +1,26 @@
-## AcetoScan
-## Last modified: tis maj 07, 2019  04:53
+## File: Dockerfile for AcetoScan
+## Last modified: ons maj 08, 2019  02:01
 ## Version: 0.1
-## Johan.Nylander\@nbis.se
+## Sign: JN
 
 FROM phusion/baseimage:0.11
 
-LABEL version="1.0" description="AcetoScan" maintainer="Abhijeet Singh <abhijeet.singh@slu.se>"
+LABEL version="0.1" description="AcetoScan" maintainer="Abhijeet Singh <abhijeet.singh@slu.se>"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /AcetoScan
 
-ENV PATH="/AcetoScan/SCRIPTS:${PATH}"
+ENV PATH="/AcetoScan/AcetoScan/SCRIPTS:${PATH}"
 
 CMD ["/sbin/my_init"]
 
-# Set up and use apt-get for installation
+VOLUME "/AcetoScan/indata"
+
+VOLUME "/AcetoScan/outdata"
+
 RUN \
-    apt clean \
+    apt-get clean \
     && sed -i -e 's|http://archive|http://se.archive|g' /etc/apt/sources.list \
     && apt-get update \
     && apt-get upgrade -y \
@@ -39,7 +42,7 @@ RUN \
         tree \
         wget
 
-# Install additional software
+# Install additional software and do additional setup.
 # Install acetoscan from github (from www for now while testing)
 # Note: the internal folder structure of AcetoScan is not checked/set at the moment.
 # Need to make sure the user have access to db, and that output folders are
@@ -53,10 +56,9 @@ RUN \
     && wget https://www.abc.se/~nylander/pub/AcetoScan.tgz \
     && tar xzf AcetoScan.tgz \
     && rm AcetoScan.tgz \
-    && cp AcetoScan/acetoscan /usr/local/bin/acetoscan \
-    && chmod +x /usr/local/bin/acetoscan \
-
-RUN \
-    apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /tmp/Rtmp* 
+    && chmod +x /AcetoScan/AcetoScan/SCRIPTS/* /AcetoScan/AcetoScan/acetoscan \
+    && ln -s /AcetoScan/AcetoScan/acetoscan /AcetoScan/AcetoScan/SCRIPTS/acetoscan \
+    && mkdir -p /AcetoScan/indata /AcetoScan/outdata \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /tmp/Rtmp*
 

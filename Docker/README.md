@@ -1,6 +1,6 @@
 # README AcetoScan Docker
 
-- Last modified: tis maj 07, 2019  04:57
+- Last modified: ons maj 08, 2019  03:23
 - SIgn: JN
 
 ## Notes
@@ -31,12 +31,16 @@ Use phusion/baseimage. See <https://github.com/phusion/baseimage-docker/>
 
 ## Run AceoScan from the docker
 
-    docker run --rm -it acetoscan:0.1 /sbin/my_init -- acetoscan
+    #docker run --rm -it acetoscan:0.1 /sbin/my_init -- acetoscan
     docker run --rm -it acetoscan:0.1 /sbin/my_init -- bash -l
 
-    docker run acetoscan:0.1 /sbin/my_init
-    docker ps
-    docker exec YOUR-CONTAINER-ID acetoscan
-    docker exec -t -i YOUR-CONTAINER-ID bash -l
-
+    host_indata_folder=
+    host_outdata_folder=
+    docker run \
+        --net=host \
+        -v "$host_indata_folder":/AcetoScan/indata \
+        -v "$host_outdata_folder":/NBIS_3080/outdata \
+        -v "$host_sandbox_folder":/NBIS_3080/sandbox \
+        -v "$host_refpkg_data_folder":/NBIS_3080/refpkg-data \
+        -it nylander/nbis3080:1.4
 
