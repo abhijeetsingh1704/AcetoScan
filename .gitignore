@@ -7,3 +7,5 @@ Docker/doc/
 Docker/indata/
 DOcker/outdata/
 Docker/tmp/
+INPUT_DATA/
+OUTPUT_DATA/

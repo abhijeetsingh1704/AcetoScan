@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: cutadapt_illumina.sh
-# Last modified: tis maj 07, 2019  01:27
+# Last modified: mån maj 13, 2019  10:27
 # Sign: JN
 
 # Cutadapt script for cleaning ILLUMINA forward read data (R1), 
@@ -16,13 +16,10 @@ trap 'exec 2>&4 1>&3' 0 1 2 3
 
 exec 1> "${CDIR}/OUTPUT_DATA/cutadapt.out" 2>&1
 
-# TODO: avoid creating directories by a worker script
 mkdir -p "${CDIR}/OUTPUT_DATA/trimmed"
 
 #module load cutadapt
 
-# TODO: Why can't we use $file directly?
-# Aren't $file == $FwdIn ? 
 for file in *_R1_001.fastq.gz; do
 
     prefix="${file%_R1_001.fastq.gz}"
