@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: cutadapt_illumina.sh
-# Last modified: mån maj 13, 2019  10:47
+# Last modified: mån maj 20, 2019  01:17
 # Sign: JN
 
 # Cutadapt script for cleaning ILLUMINA forward read data (R1), 
@@ -34,10 +34,10 @@ for FwdIn in *_R1_001.fastq.gz; do
     else
         FwdOut="${FwdIn%%_*}_trimmed_R1.fastq.gz"
         cutadapt \
-            -b CCNACNCCNNNNGGNGANGGNAA \
-            -b GGNTGNGGNNNNCCNCTNCCNTT \
-            -b ATNTTNGCNAANGGNCCNNCNTG \
-            -b TANAANCGNTTNCCNGGNNGNAC \
+            -b "CCNACNCCNNNNGGNGANGGNAA" \
+            -b "GGNTGNGGNNNNCCNCTNCCNTT" \
+            -b "ATNTTNGCNAANGGNCCNNCNTG" \
+            -b "TANAANCGNTTNCCNGGNNGNAC" \
             --max-n 0 \
             --maximum-length 277 \
             --minimum-length 150 \

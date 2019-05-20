@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # File: LongestBestFrame.sh
-# Last modified: mån maj 13, 2019  01:51
+# Last modified: mån maj 20, 2019  01:44
 # Sign: JN
 
 # setting current directory as working directory
@@ -13,7 +13,6 @@ if [ "$#" -gt 0 ]; then
 else
     echo "Enter your multifasta file name:"
     read -p 'Filename: ' infile
-
 fi
 
 # Checking if input file is accessible
@@ -203,5 +202,6 @@ fi
 rm -rf "${DIR}/LBF_analysis_pseodox214"
 
 echo -e "\n\n"
+echo "End of script"
 # end
 

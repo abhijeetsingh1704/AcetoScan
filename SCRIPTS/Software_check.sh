@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: Software_check.sh
-# Last modified: tis maj 07, 2019  04:24
+# Last modified: mån maj 20, 2019  01:13
 # Sign: JN
 
 ### Checking if cutadapt is installed
@@ -39,7 +39,6 @@ if ! command -v "Rscript" > /dev/null ; then
 fi
 
 ### Check if R packages are installed (ad hoc way)
-
 ret=$(Rscript --default-packages=phyloseq,ggplot2,plotly,RColorBrewer,randomcoloR,plyr,dplyr -e 'q()' 2>&1 | grep -v 'Loading required package')
 if [ ! -z "$ret" ] ; then
     echo "Error: Missing R package(s):"

@@ -1,7 +1,7 @@
 #! make
 
 # File: Makefile
-# Last modified: ons maj 08, 2019  02:18
+# Last modified: mån maj 20, 2019  01:06
 # Sign: JN
 
 SHELL=/bin/bash
@@ -23,7 +23,8 @@ down:
 	docker rm -vf AcetoScan
 
 browse: up
-	docker exec -it AcetoScan /sbin/my_init -- bash
+	docker exec -it AcetoScan /sbin/my_init -- acetoscan
+	#docker exec -it AcetoScan /sbin/my_init -- bash
 	#docker exec -it acetoscan:0.1 /sbin/my_init -- bash
 	#docker exec -it acetoscan:0.1 /sbin/my_init -- bash -l
 

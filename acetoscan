@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: mån maj 13, 2019  01:07
+# Last modified: mån maj 20, 2019  05:09
 # Sign: JN
 
 set -euo pipefail
@@ -174,7 +174,6 @@ if ! cd "${CDIR}/OUTPUT_DATA/trimmed" ; then
 fi
 
 # Begin fastq2fasta
-# TODO: stub for alternative fastq.gz to fasta conversion
 find "${CDIR}/OUTPUT_DATA/trimmed" -name '*_trimmed_R1.fastq.gz' \
     -exec sh -c 'f="{}"; b=$(basename "${f}" .fastq.gz); cutadapt -o "${CDIR}/OUTPUT_DATA/trimmed/FASTA/${b}.fasta" "$f"' \;
 
@@ -208,102 +207,107 @@ find "${CDIR}/OUTPUT_DATA/trimmed" -name '*_trimmed_R1.fastq.gz' \
 
 
 ## Begin Longest best frame analysis
-# TODO: Use find instead of ls and cat:
-# Stub:
-#    find "${CDIR}/OUTPUT_DATA/trimmed/FASTA" -name '*_trimmed_R1.fasta' \
-#        -exec LongestBestFrame.sh {} \;
-# @@@@@@@@@@@@@@@@@@@@@@ ons  8 maj 2019 15:35:32 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+### Mon 20 maj 2019 17:05:50: Try BioPerl script. 
+### TODO: If BioPerl is going to be used, make sure it is installed.
+find "${CDIR}/OUTPUT_DATA/trimmed/FASTA" -name '*_trimmed_R1.fasta' \
+    -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); longorf-acetoscan.pl --filter "$f" > "Best_${b}.fas"' \; # <============= external script
 
-    ###    Longest best frame analysis
-    # preparing variable file
-    if ! cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA" ; then
-        echo "Error: could not cd to ${CDIR}/OUTPUT_DATA/trimmed/FASTA"
-        exit 1
-    fi
-
-    # TODO: use find or shell expansion instead of ls and cat
-    ls *trimmed_R1.fasta > FRAME_INPUTfile.txt
-
-    # analysis
-    for FRAME_INPUT in $(cat FRAME_INPUTfile.txt)
-    do
-        LongestBestFrame.sh "${FRAME_INPUT}"   # <============= external script
-        #bash "${CDIR}/SCRIPTS/LongestBestFrame.sh" "${FRAME_INPUT}"   # <============= external script
-    done
+#    ###    Longest best frame analysis
+#    # preparing variable file
+#    if ! cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA" ; then
+#        echo "Error: could not cd to ${CDIR}/OUTPUT_DATA/trimmed/FASTA"
+#        exit 1
+#    fi
+#
+#    ls *trimmed_R1.fasta > FRAME_INPUTfile.txt
+#
+#    # analysis
+#    for FRAME_INPUT in $(cat FRAME_INPUTfile.txt)
+#    do
+#        #bash "${CDIR}/SCRIPTS/LongestBestFrame.sh" "${FRAME_INPUT}" # <============= external script
+#    done
 ## End Longest best frame analysis
 
 
-
+#########  Mon 20 maj 2019 17:03:43 ##################################
+## Begin Preprocessing for Clustering
 ###    Preprocessing for Clustering
-# preparing variable file
-# TODO: use find or shell expansion instead of ls and cat
-ls Best_*.fasta | while read bestname
-do
-    echo "${bestname%%.*}"
-done > file_bestname.txt
+    # preparing variable file
+    # TODO: use find or shell expansion instead of ls and cat
+    ls Best_*.fasta | while read bestname
+    do
+        echo "${bestname%%.*}"
+    done > file_bestname.txt
 
-# replace fasta header to file name
-# TODO: use find or shell expansion instead of ls and cat
-for i in $(cat file_bestname.txt)
-do 
-    awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' "${i}.fasta"
-done > pre_All_best.fasta.tmp
+    # replace fasta header to file name
+    # TODO: use find or shell expansion instead of ls and cat
+    for i in $(cat file_bestname.txt)
+    do 
+        awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' "${i}.fasta"
+    done > pre_All_best.fasta.tmp
 
-# editing fasta headers
-#sed 's/-/_/g;s/ /_/g;s/:/_/g;s/Best_//g' pre_All_best.fasta.tmp > pre_All_best.fasta
-sed -e 's/-/_/g' \
-    -e 's/ /_/g' \
-    -e 's/:/_/g' \
-    -e 's/Best_//g' pre_All_best.fasta.tmp > pre_All_best.fasta
+    # editing fasta headers
+    # TODO: this filtering are potentially done above by the BioPerl script (except the s/Best_//g).
+    #sed 's/-/_/g;s/ /_/g;s/:/_/g;s/Best_//g' pre_All_best.fasta.tmp > pre_All_best.fasta
+    sed -e 's/-/_/g' \
+        -e 's/ /_/g' \
+        -e 's/:/_/g' \
+        -e 's/Best_//g' pre_All_best.fasta.tmp > pre_All_best.fasta
 
-# formating input for vsearch
-# TODO: check what this step is doing
-seqret \
-    -sequence pre_All_best.fasta \
-    -auto Y \
-    -warning N \
-    -outseq All_best.fasta
+    # formating input for vsearch
+    # TODO: check what this step is doing. Need specific version of seqret!
+    seqret \
+        -sequence pre_All_best.fasta \
+        -auto Y \
+        -warning N \
+        -outseq All_best.fasta
+## End Preprocessing for Clustering
 
-###    Clustering with Vsearch (v2.13.0_linux_x86_64)
-mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH"
 
-# dereplication 
-echo "Performing dereplication on fasta sequences"
-vsearch \
-    --derep_fulllength "${CDIR}/OUTPUT_DATA/trimmed/FASTA/All_best.fasta" \
-    --output "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/best_derep.fasta" \
-    --minseqlength 150 \
-    --sizeout \
-    --minuniquesize 2 \
-    --relabel Unique \
-    --uc "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/derep.uc" \
-    --log="${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/derep_log"
-echo ""
+## Begin clustering with VSEARCH
+    ###    Clustering with Vsearch (v2.13.0_linux_x86_64)
+    mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH"
 
-# removing chimeras
-echo "Removing chimeras from dereplicated fasta sequences"
-vsearch \
-    --uchime_denovo "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/best_derep.fasta" \
-    --sizein \
-    --sizeout \
-    --chimeras "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/chimera.fasta" \
-    --nonchimeras "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/nonchimera.fasta" \
-    --log="${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/chimera_log.txt"
-echo ""
+    # dereplication 
+    echo "Performing dereplication on fasta sequences"
+    vsearch \
+        --derep_fulllength "${CDIR}/OUTPUT_DATA/trimmed/FASTA/All_best.fasta" \
+        --output "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/best_derep.fasta" \
+        --minseqlength 150 \
+        --sizeout \
+        --minuniquesize 2 \
+        --relabel Unique \
+        --uc "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/derep.uc" \
+        --log="${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/derep_log"
+    echo ""
 
-# Clustering OTUs
-echo "Removing chimeras from dereplicated fasta sequences"
-vsearch \
-    --cluster_size "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/nonchimera.fasta" \
-    --id "${CLUST_THRESHOLD}" \
-    --centroid "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta" \
-    --otutabout "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/classic_pre_otu_table.txt" \
-    --uc "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/clustering_result" \
-    --sizein \
-    --sizeout \
-    --relabel 'OTU_' \
-    --biomout "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTUtable.biom.json"
-echo ""
+    # removing chimeras
+    echo "Removing chimeras from dereplicated fasta sequences"
+    vsearch \
+        --uchime_denovo "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/best_derep.fasta" \
+        --sizein \
+        --sizeout \
+        --chimeras "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/chimera.fasta" \
+        --nonchimeras "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/nonchimera.fasta" \
+        --log="${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/chimera_log.txt"
+    echo ""
+
+    # Clustering OTUs
+    echo "Removing chimeras from dereplicated fasta sequences"
+    vsearch \
+        --cluster_size "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/nonchimera.fasta" \
+        --id "${CLUST_THRESHOLD}" \
+        --centroid "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta" \
+        --otutabout "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/classic_pre_otu_table.txt" \
+        --uc "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/clustering_result" \
+        --sizein \
+        --sizeout \
+        --relabel 'OTU_' \
+        --biomout "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTUtable.biom.json"
+    echo ""
+## End clustering with VSEARCH
+
+
 
 # Preparing input file for filtering of non target sequences
 perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
@@ -313,7 +317,7 @@ perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
 echo "Filtering non target OTUs"
 
 ###    BlastX from NCBI Blast+ (2.8.1)
-# TODO: use diamond:
+# TODO: use diamond?
 #    diamond makedb --in db.fas -d db
 #    diamond blastx -d db -q query.fas -a diamond.hits -p 4
 #    diamond view -a diamond.hits.daa -o diamond.hits.m8
@@ -337,7 +341,7 @@ do
     grep -A 1 "OTU" "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta.tmp" > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta.tmp"
 done 
 
-# processign filtered OTU multifasta file
+# processing filtered OTU multifasta file
 sed 's/-//g' "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta.tmp" | \
     sed '/^#/d' > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta"
 
