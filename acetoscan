@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: mån maj 20, 2019  05:09
+# Last modified: ons maj 22, 2019  10:35
 # Sign: JN
 
 set -euo pipefail
@@ -368,7 +368,7 @@ cat "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.pre" | \
     sed -e 's/#OTU ID/ID/' | \
     sed -e 's/OTU_//' | \
     sort -n | \
-    sed -e 's/^/OTU_/' > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt"
+        sed -e 's/^/OTU_/' > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt"
 
 ###    Assigning taxonomy 
 echo ""
