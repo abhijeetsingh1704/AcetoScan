@@ -1,0 +1,67 @@
+# INSTALL for AcetoScan
+
+- Last modified: tor maj 23, 2019  12:38
+- Sign: JN
+
+## Installation
+
+#### Dependencies
+
+Make sure the external dependencies are installed:
+
+1. Cutadapt (v.X.X.X)
+2. Vsearch (v.2.13.0)
+3. NCBI BLAST+ (v.2.8.1+)
+4. R (v.3.5.2), with libraries:
+    - phyloseq
+    - ggplot2
+    - plotly
+    - RColorBrewer
+    - randomcoloR
+    - plyr
+    - dplyr
+
+For example, on a Ubuntu-based Linux system, this could be done using:
+
+**Note tor 23 maj 2019:** The versions on Ubuntu's central repositories
+are not the latest (cutadapt, vsearch).
+
+TODO: Need to test the pipeline with/without those versions.
+
+    sudo apt install -y \
+        cutadapt \
+        ncbi-blast+ \
+        vsearch \
+        libv8-dev \
+        r-base \
+        r-base-dev \
+        r-bioc-phyloseq \
+        r-cran-dplyr \
+        r-cran-ggplot2 \
+        r-cran-plotly \
+        r-cran-plyr \
+        r-cran-rcolorbrewer
+
+    Rscript -e "install.packages('randomcoloR', dependencies=TRUE, repos='https://ftp.acc.umu.se/mirror/CRAN/')"
+
+If later version of Vsearch is needed, it can be installed from GitHub:
+
+    wget "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
+    tar xzf vsearch-2.13.1-linux-x86_64.tar.gz
+    sudo cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch
+
+#### Scripts
+
+Add the path to folder `AcetoScan/SCRIPTS` to your PATH (or add the scripts in the folder `SCRIPTS` to
+your PATH). For example:
+
+    export PATH="/path/to/AcetoScan/SCRIPTS:${PATH}"
+
+#### Blast data base
+
+Make sure you have access to the [AcetoBase]() data base. Can be retrieved by:
+
+        wget "https://www.someserver.se/path/to/ACETOBASE_DB_DIR.tgz"
+        tar xvzf ACETOBASE_DB_DIR.tgz
+
+TODO: add instructions on where to place this data base

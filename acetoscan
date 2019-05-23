@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: ons maj 22, 2019  10:35
+# Last modified: tor maj 23, 2019  12:08
 # Sign: JN
 
 set -euo pipefail
@@ -44,7 +44,7 @@ echo "¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
 ###    getting current working directory
 # TODO: Since the INPUT_DATA and OUTPUT_DATA folders are created by the script,
-# there is no reason for making sure the cwd is the "AcetoScan direcory". The
+# there is no reason for making sure the cwd is the "AcetoScan directory". The
 # only issue to solve is to make sure the helper scripts in "SCRIPTS" are found:
 # Find a good way to add them to the PATH!
 
@@ -255,7 +255,10 @@ find "${CDIR}/OUTPUT_DATA/trimmed/FASTA" -name '*_trimmed_R1.fasta' \
         -e 's/Best_//g' pre_All_best.fasta.tmp > pre_All_best.fasta
 
     # formating input for vsearch
-    # TODO: check what this step is doing. Need specific version of seqret!
+    # TODO: check what this step is doing. Also: Need specific version of seqret!
+    # If wrapping fasta sequences is the aim, there is no need for seqret. One
+    # example (change '60' to whatever width you need):
+    # perl -npe 'if(!/^>/){s/\S{60}/$&\n/g}'  pre_All_best.fasta > All_best.fasta
     seqret \
         -sequence pre_All_best.fasta \
         -auto Y \
