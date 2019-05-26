@@ -22,9 +22,9 @@ echo "
 ###    Dependencies
 ###    ------------
 ###    1. Cutadapt(1.18+)    2. Vsearch (v2.13.0)
-###    3. EMBOSS (6.6.0.0)   4. NCBI BLAST+ (2.8.1+)
-###    5. R (3.5.2) (libraries - phyloseq, ggplot2, plotly, 
-       RColorBrewer, randomcoloR, plyr, dplyr)"
+###    3. NCBI BLAST+ (2.8.1+)
+###    4. R (3.5.2) (libraries - phyloseq, ggplot2, plotly, 
+       RColorBrewer, plyr, dplyr)"
 
 
 ###    Introduction
@@ -473,6 +473,8 @@ cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation/Translation*.fasta" .
 if [ -f "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/Barplot_Phylum_Absolute_abundance.pdf" ]; then
     cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*Barplot*.pdf" .
     cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*Heatmap*.pdf" .
+    cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/Phyloseq_object_processing_info.txt" .
+    cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*.html" .
 else
     echo "" > /dev/null
 fi
