@@ -11,8 +11,7 @@ tax_file <- "FTHFS_TAX_table_R.txt"
 
 getwd()
 
-list.files()
-
+# Load required packages
 suppressPackageStartupMessages(library("phyloseq"))
 suppressPackageStartupMessages(library("ggplot2"))
 suppressPackageStartupMessages(library("plotly"))
@@ -54,18 +53,27 @@ TAX_data_subset_mat
 TAX_data_mat_table <- tax_table(TAX_data_subset_mat)
 TAX_data_mat_table
 
-#
+# Making phyloseq object from the tax table and OTU table
 ps <- phyloseq(OTU_data_subset_mat_table, TAX_data_mat_table)
-ps
+# Save infor of phyloseq object
+sink("Phyloseq_object_processing_info.txt")
+paste("phyloseq_object: ")
+print(ps)
+sink()
 
-#
-sample_names(ps)
-nsamples(ps)
-ntaxa(ps)
+# Visualize phyloseq object details
+#sample_names(ps)
+#nsamples(ps)
+#ntaxa(ps)
 
-#
+# phylum detail
 ps_table <- table(tax_table(ps)[, "Phylum"], exclude = NULL)
-ps_table
+# save phylum detail
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("phyloseq_phylum_table: ")
+print(ps_table)
+sink()
 
 # Compute prevalence of each feature, store as data.frame
 prevalence_dataframe <- apply(X = otu_table(ps),
@@ -82,26 +90,30 @@ prevalence_table <- plyr::ddply(prevalence_dataframe, "Phylum", function(df1) {
                stringsAsFactors = FALSE)
 })
 
-# save the prevalance table as text file
-write.table(prevalence_table, "prevalence_table_normalized.txt", sep = "\t", row.names = TRUE)
-
-# Write the details of taxa to file
-sink("taxa_details.txt")
-paste("number_of_Phylum: - ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
-paste("number_of_Class: - ", length(get_taxa_unique(ps, taxonomic.rank = "Class")))
-paste("number_of_Order: - ", length(get_taxa_unique(ps, taxonomic.rank = "Order")))
-paste("number_of_Family: - ", length(get_taxa_unique(ps, taxonomic.rank = "Family")))
-paste("number_of_Genus: - ", length(get_taxa_unique(ps, taxonomic.rank = "Genus")))
-paste("number_of_Species: - ", length(get_taxa_unique(ps, taxonomic.rank = "Species")))
+# #save the prevalance table as text file
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("Phylum_prevalence_table: ")
+print(prevalence_table)
 sink()
 
+# Write the details of taxa to file
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("number_of_Phylum: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
+paste("number_of_Class: ", length(get_taxa_unique(ps, taxonomic.rank = "Class")))
+paste("number_of_Order: ", length(get_taxa_unique(ps, taxonomic.rank = "Order")))
+paste("number_of_Family: ", length(get_taxa_unique(ps, taxonomic.rank = "Family")))
+paste("number_of_Genus: ", length(get_taxa_unique(ps, taxonomic.rank = "Genus")))
+paste("number_of_Species: ", length(get_taxa_unique(ps, taxonomic.rank = "Species")))
+sink()
+
+########### Fixing functions
 ##Calculate abundance of different ranks
-##use filtered phylum file
 #   taxonomy table   
 tax.tab <- tibble(tax_table(ps))
-tax.tab
 
-#function for the modification of OTU table
+# function for the modification of OTU table
 ModifyTax <- function(x, ind) {
     #   xth row in the dataframe
     #   ind taxonomy level to change
@@ -113,6 +125,10 @@ ModifyTax <- function(x, ind) {
         x[ind] <- x[ind]
     }
 }
+
+##  Making manual and distinctive colour palette
+colour_palette = brewer.pal.info[brewer.pal.info$category == 'qual',]
+my_colours = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
 
 ######################  Phylum Absolute abundance
 Phylum_Absolute_abundance <- plot_bar(ps, fill = "Phylum") + 
@@ -126,90 +142,29 @@ Phylum_Absolute_abundance <- plot_bar(ps, fill = "Phylum") +
     theme(axis.line.y.left = element_line(colour = "black")) +
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 12)) +
+    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
     theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    ylab("Absolute Abundance (counts)")
-
-Phylum_Absolute_abundance
+    ylab("Absolute Abundance (counts)")+
+    ggtitle("Phylum absolute abundance")+
+    theme(plot.title = element_text(size = 10, face = "bold"))
 
 # save plot as pdf
 pdf("Barplot_Phylum_Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
 plot(Phylum_Absolute_abundance)
 dev.off()
 
+# saving Total_Phylum_numbers_in_absolute abundance_barplot
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("Total Phylum numbers in absolute abundance_barplot: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
+sink()
+
 # save plot as html widget
-#Phylum_Absolute_abundance_gg <- ggplotly(Phylum_Absolute_abundance)
-#htmlwidgets::saveWidget(as_widget(Phylum_Absolute_abundance_gg), "Barplot_Phylum_Absolute_abundance.html")
-
-# transformation of the sample counts of a taxa abundance matrix according 
-# to the function/Normalizing
-ps_transformed <- transform_sample_counts(ps, function(x) x/sum(x)*100)
-ps_transformed
-
-# psmelt command for melting and merging the phyloseq classes, 
-# to be used for graphics in ggplot2
-ps_transformed_psmelt <- psmelt(ps_transformed)
-# visualize the melted and merged file which has minor phylum
-ps_transformed_psmelt
-
-# this command is to convert the numeric attributes of phylum 
-# information in melted-merged file to convert into characters, 
-# thus easier to merge the minor phylum information for abundance calculation
-ps_transformed_psmelt$Phylum <- as.character(ps_transformed_psmelt$Phylum)
-
-# plotting the data in bar plot, colour should be according to the number of phylym you wanted to plot in the graph
-ps_transformed_psmelt_ggplot <- ggplot(data = ps_transformed_psmelt, 
-        aes(x = Sample, y = Abundance, fill = Phylum)) + 
-    geom_bar(aes(), stat = "identity", position = "stack") + 
-    scale_fill_manual(values = distinctColorPalette(length(unique(ps_transformed_psmelt)))) +
-    theme(legend.position = "bottom") +
-    guides(fill = guide_legend(nrow=3)) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black"))
-
-ps_transformed_psmelt_ggplot
+Phylum_Absolute_abundance_gg <- ggplotly(Phylum_Absolute_abundance)
+htmlwidgets::saveWidget(as_widget(Phylum_Absolute_abundance_gg), "Barplot_Phylum_Absolute_abundance.html")
 
 ################################################
 ########################## VISUALIZATION PART / MAKING MAIN PLOTS
-# Kingdom level
-Kingdom_level <-tax_glom(ps, taxrank = "Kingdom", is.na("Kingdom"))
-# visualise the filtered taxa at Kingdom level
-Kingdom_level
-# transform the taxa(Kingdom) information in the 100% stacked table
-Kingdom_level_transformed <- transform_sample_counts(Kingdom_level, function(x) {x/sum(x)}*100)
-# melting the transforming Kingdom data
-Kingdom_level_transformed_psmelt <- psmelt(Kingdom_level_transformed)
-# converting the Kingdom information as character
-Kingdom_level_transformed_psmelt$Kingdom <- as.character(Kingdom_level_transformed_psmelt$Kingdom)
-# PLOT THE KINGDOM GRAPH
-Kingdom_level_transformed_psmelt_barplot <- ggplot(data = Kingdom_level_transformed_psmelt, 
-        aes(x = Sample, y = Abundance, fill = Kingdom)) + 
-    theme(legend.position = "bottom") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black")) +
-    geom_bar(aes(fill = Kingdom), linetype = "blank", stat = "identity", position = "stack") +
-    theme(legend.position = "bottom") +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(legend.key.height = unit(0.4, "cm"), legend.key.width = unit(0.4, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black"))
-  
-Kingdom_level_transformed_psmelt_barplot
-
 #####################################################################
 #Phylum level
 #   replace the NA taxonomy with the highest known taxonomy
@@ -217,23 +172,19 @@ tax_table(ps)[, 2] <- apply(tax.tab, 1, ModifyTax, ind = 2)
 # prepare the phylum level data file
 phylum_level <-tax_glom(ps, taxrank = "Phylum", is.na("Phylum"))
 # visualise the filtered taxa at phylum level
-phylum_level
+#phylum_level
 # transform the taxa(phylum) information in the 100% stacked table
 phylum_level_transformed <- transform_sample_counts(phylum_level, function(x) {x/sum(x)}*100)
 # melting the transforming phylum data
 phylum_level_transformed_psmelt <- psmelt(phylum_level_transformed)
 # converting the phylum information as character
 phylum_level_transformed_psmelt$Phylum <- as.character(phylum_level_transformed_psmelt$Phylum)
-# https://www.r-bloggers.com/how-to-expand-color-palette-with-ggplot-and-rcolorbrewer/
-# count the number of phylum which will be in plot
-Total_Phylum_numbers_for_plot <- length(unique(phylum_level_transformed_psmelt$Phylum))
-Total_Phylum_numbers_for_plot
 
-#
-phylum_level_barplot <- ggplot(data = phylum_level_transformed_psmelt,
+# Phylum level barplot
+Phylum_level_barplot <- ggplot(data = phylum_level_transformed_psmelt,
         aes(x = Sample, y = Abundance, fill = Phylum)) + 
     geom_bar(aes(fill = Phylum), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = distinctColorPalette(length(unique(phylum_level_transformed_psmelt)))) +
+    scale_fill_manual(values = my_colours)+
     theme(legend.position = "bottom") +
     guides(fill = guide_legend(nrow = 3)) +
     theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
@@ -247,18 +198,24 @@ phylum_level_barplot <- ggplot(data = phylum_level_transformed_psmelt,
     theme(axis.line.y.left = element_line(colour = "black")) +
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
-    theme(legend.title = element_text(size = 10, face = "bold", colour = "black"))
-
-phylum_level_barplot
+    theme(legend.title = element_text(size = 10, face = "bold", colour = "black"))+
+    ggtitle("Phylum level")+
+    theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
-pdf("phylum_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
-plot(phylum_level_barplot)
+pdf("Phylum_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
+plot(Phylum_level_barplot)
 dev.off()
 
+# saving Phylum number in phylum level barplot
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("Phylum number in phylum level barplot: ", length(unique(phylum_level_transformed_psmelt$Phylum)))
+sink()
+
 #saving plot as html widget
-#barplot_phylum<-ggplotly(phylum_level_barplot)
-#htmlwidgets::saveWidget(as_widget(barplot_phylum), "Barplot_phylum.html")
+barplot_phylum<-ggplotly(Phylum_level_barplot)
+htmlwidgets::saveWidget(as_widget(barplot_phylum), "Barplot_phylum_level.html")
 
 #####################################################################################################
 
@@ -268,7 +225,7 @@ tax_table(ps)[, 3] <- apply(tax.tab, 1, ModifyTax, ind = 3)
 ## prepare the class level data file
 class_level <-tax_glom(ps, taxrank = "Class", NArm = T)
 # print class level data file info
-class_level
+#class_level
 # transform
 class_level_transformed <- transform_sample_counts(class_level, function(x) {x/sum(x)}*100)
 # melting the transforming class data
@@ -277,15 +234,12 @@ class_level_transformed_psmelt <- psmelt(class_level_transformed)
 class_level_transformed_psmelt$Class <- as.character(class_level_transformed_psmelt$Class)
 # merge the class with abundance less than 1
 class_level_transformed_psmelt$Class[class_level_transformed_psmelt$Abundance < 0.25] <- "x-Minor class (<0.25)"
-# count the number of phylum which will be in plot
-Total_Class_numbers_for_plot <- length(unique(class_level_transformed_psmelt$Class))
-Total_Class_numbers_for_plot
 
-# Plot the bar-plot at class level
-class_level_barplot <- ggplot(data = class_level_transformed_psmelt,
+# Class level barplot
+Class_level_barplot <- ggplot(data = class_level_transformed_psmelt,
         aes(x = Sample, y = Abundance, fill = Class)) +
     geom_bar(aes(fill = Class), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = distinctColorPalette(length(unique(class_level_transformed_psmelt$Class)))) +
+    scale_fill_manual(values = my_colours)+
     theme(legend.position = "bottom") +
     guides(fill = guide_legend(nrow = 5)) +
     guides(fill = guide_legend(title = "Class", title.position = "top", title.theme = element_text(face = "bold"))) +
@@ -299,18 +253,24 @@ class_level_barplot <- ggplot(data = class_level_transformed_psmelt,
     theme(axis.line.y.left = element_line(colour = "black")) +
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")
-
-class_level_barplot
+    ylab("Relative Abundance (%)")+
+    ggtitle("Class level (> 0.25%)")+
+    theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
-pdf("class_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
-plot(class_level_barplot)
+pdf("Class_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
+plot(Class_level_barplot)
 dev.off()
 
+# saving Class numbers in Class level barplot
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("Class number in Class level barplot (> 0.25%): ", length(unique(class_level_transformed_psmelt$Class)))
+sink()
+
 # saving plot as html widget
-#barplot_class<-ggplotly(class_level_barplot)
-#htmlwidgets::saveWidget(as_widget(barplot_class), "Barplot_class.html")
+barplot_class<-ggplotly(Class_level_barplot)
+htmlwidgets::saveWidget(as_widget(barplot_class), "Barplot_class_level.html")
 
 #####################################################################################################
 
@@ -320,7 +280,7 @@ tax_table(ps)[, 4] <- apply(tax.tab, 1, ModifyTax, ind = 4)
 # prepare the order level data file
 order_level <-tax_glom(ps, taxrank = "Order", is.na("Order"))
 # print order level data file info
-order_level
+#order_level
 # transform
 order_level_transformed <- transform_sample_counts(order_level, function(x) {x/sum(x)}*100)
 # melting the transforming order data
@@ -329,15 +289,12 @@ order_level_transformed_psmelt <- psmelt(order_level_transformed)
 order_level_transformed_psmelt$Order <- as.character(order_level_transformed_psmelt$Order)
 # merge the order with abundance less than 1
 order_level_transformed_psmelt$Order[order_level_transformed_psmelt$Abundance < 0.25] <- "x-Minor order(<0.25)"
-# count the number of phylum which will be in plot
-Total_Order_numbers_for_plot <- length(unique(order_level_transformed_psmelt$Order))
-Total_Order_numbers_for_plot
 
-# Plot the bar-plot at order level
-order_level_barplot <- ggplot(data = order_level_transformed_psmelt,
+# Order level barplot
+Order_level_barplot <- ggplot(data = order_level_transformed_psmelt,
         aes(x = Sample, y = Abundance, fill = Order)) + 
     geom_bar(aes(fill=Order), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = distinctColorPalette(length(unique(order_level_transformed_psmelt$Order)))) +
+    scale_fill_manual(values = my_colours)+
     theme(legend.position = "bottom") +
     guides(fill=guide_legend(nrow = 5)) +
     guides(fill=guide_legend(title = "Order", title.position = "top", title.theme = element_text(face = "bold"))) +
@@ -351,18 +308,24 @@ order_level_barplot <- ggplot(data = order_level_transformed_psmelt,
     theme(axis.line.y.left = element_line(colour = "black")) +
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")
-
-order_level_barplot
+    ylab("Relative Abundance (%)")+
+    ggtitle("Order level (> 0.25%)")+
+    theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
-pdf("order_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
-plot(order_level_barplot)
+pdf("Order_level_barplot.pdf", width = 28, height = 18, paper = "a4r")
+plot(Order_level_barplot)
 dev.off()
 
+# saving Order number in order level barplot
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("Order number in order level barplot (> 0.25%): ", length(unique(order_level_transformed_psmelt$Order)))
+sink()
+
 #saving plot as html widget
-#barplot_order<-ggplotly(order_level_barplot)
-#htmlwidgets::saveWidget(as_widget(barplot_order), "Barplot_order.html")
+barplot_order<-ggplotly(Order_level_barplot)
+htmlwidgets::saveWidget(as_widget(barplot_order), "Barplot_order.html")
 #
 
 ################################################################################################
@@ -373,7 +336,7 @@ tax_table(ps)[, 5] <- apply(tax.tab, 1, ModifyTax, ind = 5)
 ## prepare the family level data file
 family_level <-tax_glom(ps, taxrank = "Family", is.na("Family"))
 # print family level data file info
-family_level
+#family_level
 # transform
 family_level_transformed <- transform_sample_counts(family_level, function(x) {x/sum(x)}*100)
 # melting the transforming family data
@@ -383,15 +346,11 @@ family_level_transformed_psmelt$Family <- as.character(family_level_transformed_
 # merge the family with abundance less than 1
 family_level_transformed_psmelt$Family[family_level_transformed_psmelt$Abundance < 0.5] <- "x-Minor family(<0.5)"
 
-# count the number of phylum which will be in plot
-Total_Family_numbers_for_plot <- length(unique(family_level_transformed_psmelt$Family))
-Total_Family_numbers_for_plot
-
-# Plot the bar-plot at family level
-family_level_barplot <- ggplot(data = family_level_transformed_psmelt,
+# Family level barplot
+Family_level_barplot <- ggplot(data = family_level_transformed_psmelt,
         aes(x = Sample, y = Abundance, fill = Family)) + 
     geom_bar(aes(fill = Family), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = distinctColorPalette(length(unique(family_level_transformed_psmelt$Family)))) +
+    scale_fill_manual(values = my_colours)+
     theme(legend.position = "bottom") +
     guides(fill=guide_legend(title = "Family", title.position = "top", title.theme = element_text(face = "bold"))) +
     theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
@@ -404,18 +363,24 @@ family_level_barplot <- ggplot(data = family_level_transformed_psmelt,
     theme(axis.line.y.left = element_line(colour = "black")) +
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")
-
-family_level_barplot
+    ylab("Relative Abundance (%)")+
+    ggtitle("Family level (> 0.5%)")+
+    theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
-pdf("family_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
-plot(family_level_barplot)
+pdf("Family_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
+plot(Family_level_barplot)
 dev.off()
 
+# saving Family number in family level barplot
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("Family number in family level barplot(> 0.5%): ", length(unique(family_level_transformed_psmelt$Family)))
+sink()
+
 #saving plot as html widget
-#barplot_family<-ggplotly(family_level_barplot)
-#htmlwidgets::saveWidget(as_widget(barplot_family), "Barplot_family.html")
+barplot_family<-ggplotly(Family_level_barplot)
+htmlwidgets::saveWidget(as_widget(barplot_family), "Barplot_family.html")
 
 
 ############################################################################################################
@@ -426,7 +391,7 @@ family_level_transformed_forheatmap <- transform_sample_counts(family_level, fun
 family_level_transformed_forheatmap_morethan0.5 <- filter_taxa(family_level_transformed_forheatmap, function(x) sum(x) > 0.5, TRUE)
 
 Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan0.5, 
-    taxa.label = "Family", title = "Family level heatmap (> 0.5 % abundance)",
+    taxa.label = "Family", title = "Family level (> 0.5 %)",
         low = "grey80", high = "grey10", na.value = "white") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
     theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
@@ -441,16 +406,14 @@ Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan0.5,
     theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8)) +
     theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10))
 
-Heatmap_family 
-
 #saving plot in pdf
 pdf("Heatmap_family.pdf", width = 28, height = 18, paper = "a4r")
 plot(Heatmap_family)
 dev.off()
 
 # saving plot as html widget
-#family_heatmap<-ggplotly(Heatmap_family)
-#htmlwidgets::saveWidget(as_widget(family_heatmap), "Family_Heatmap.html")
+family_heatmap<-ggplotly(Heatmap_family)
+htmlwidgets::saveWidget(as_widget(family_heatmap), "Family_Heatmap.html")
 
 #############################################################################################################################
 
@@ -460,7 +423,7 @@ tax_table(ps)[, 6] <- apply(tax.tab, 1, ModifyTax, ind = 6)
 # prepare the genus level data file
 genus_level <-tax_glom(ps, taxrank = "Genus", is.na("Genus"))
 # print genus level data file info
-genus_level
+#genus_level
 # transform
 genus_level_transformed <- transform_sample_counts(genus_level, function(x) {x/sum(x)}*100)
 # melting the transforming genus data
@@ -470,15 +433,11 @@ genus_level_transformed_psmelt$Genus <- as.character(genus_level_transformed_psm
 # merge the genus with abundance less than 1
 genus_level_transformed_psmelt$Genus[genus_level_transformed_psmelt$Abundance < 0.5] <- "x-Minor genus(<0.5)"
 
-#count the number of phylum which will be in plot
-Total_Genus_numbers_for_plot <- length(unique(genus_level_transformed_psmelt$Genus))
-Total_Genus_numbers_for_plot
-
-#Plot the bar-plot at genus level
-genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt, 
+# Genus level barplot
+Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt, 
         aes(x = Sample, y = Abundance, fill = Genus)) + 
     geom_bar(aes(color = Genus, fill = Genus), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = distinctColorPalette(length(unique(genus_level_transformed_psmelt$Genus)))) +
+    scale_fill_manual(values = my_colours)+
     theme(legend.position = "bottom") +
     guides(fill=guide_legend(title = "Genus", title.position = "top", title.theme = element_text(face = "bold"))) +
     theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
@@ -491,18 +450,24 @@ genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt,
     theme(axis.line.y.left = element_line(colour = "black")) +
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")
-
-genus_level_barplot
+    ylab("Relative Abundance (%)")+
+    ggtitle("Genus level (> 0.5%)")+
+    theme(plot.title = element_text(size = 10, face = "bold"))                                                     
 
 #saving plot in pdf
-pdf("genus_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
-plot(genus_level_barplot)
+pdf("Genus_level_barplott.pdf", width = 28, height = 18, paper = "a4r")
+plot(Genus_level_barplot)
 dev.off()
+                                                               
+# saving Genus number in genus level barplot
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("Genus number in genus level barplot(> 0.5%): ", length(unique(genus_level_transformed_psmelt$Genus)))
+sink()                                                               
 
 #saving plot as html widget
-#barplot_genus<-ggplotly(genus_level_barplot)
-#htmlwidgets::saveWidget(as_widget(barplot_genus), "Barplot_genus.html")
+barplot_genus<-ggplotly(Genus_level_barplot)
+htmlwidgets::saveWidget(as_widget(barplot_genus), "Barplot_genus.html")
   
 ###########
 
@@ -514,7 +479,7 @@ genus_level_transformed_forheatmap_morethan0.5 <- filter_taxa(genus_level_transf
 Heatmap_Genus <- plot_heatmap(genus_level_transformed_forheatmap_morethan0.5, 
         taxa.label = "Genus",
         low = "gainsboro", high = "dim gray", na.value = "white",
-        title = "Genus level heatmap (> 0.5 % abundance)") + 
+        title = "Genus level (> 0.5 %)") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
     theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
     theme(legend.position = "right") +
@@ -536,8 +501,8 @@ plot(Heatmap_Genus)
 dev.off()
 
 # saving plot as html widget
-#Genus_Heatmap<-ggplotly(Heatmap_Genus)
-#htmlwidgets::saveWidget(as_widget(Genus_Heatmap), "Genus_Heatmap.html")
+Genus_Heatmap<-ggplotly(Heatmap_Genus)
+htmlwidgets::saveWidget(as_widget(Genus_Heatmap), "Genus_Heatmap.html")
 
 ####################################################################################################
 
@@ -548,7 +513,7 @@ tax_table(ps)[, 7] <- apply(tax.tab, 1, ModifyTax, ind = 7)
 # prepare the Species level data file
 Species_level <- tax_glom(ps, taxrank = "Species", is.na("Species"))
 #print Species level data file info
-Species_level
+#Species_level
 #transform
 Species_level_transformed <- transform_sample_counts(Species_level, function(x) {x/sum(x)}*100)
 #melting the transforming Species data
@@ -558,15 +523,11 @@ Species_level_transformed_psmelt$Species <- as.character(Species_level_transform
 #merge the Species with abundance less than 1
 Species_level_transformed_psmelt$Species[Species_level_transformed_psmelt$Abundance < 0.5] <- "x-Minor Species(<0.5)"
 
-#count the number of phylum which will be in plot
-Total_Species_numbers_for_plot <- length(unique(Species_level_transformed_psmelt$Species))
-Total_Species_numbers_for_plot
-
-#Plot the bar-plot at Species level
+# Species level barplot
 Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt, 
         aes(x = Sample, y = Abundance, fill = Species)) + 
     geom_bar(aes(color = Species, fill = Species), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = distinctColorPalette(length(unique(Species_level_transformed_psmelt$Species)))) +
+    scale_fill_manual(values = my_colours)+
     theme(legend.position = "bottom") +
     guides(fill=guide_legend(title = "Species", title.position = "top", title.theme = element_text(face = "bold"))) +
     theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
@@ -579,18 +540,24 @@ Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt,
     theme(axis.line.y.left = element_line(colour = "black")) +
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")
+    ylab("Relative Abundance (%)")+
+    ggtitle("Species level (> 0.5%)")+
+    theme(plot.title = element_text(size = 10, face = "bold"))
 
-Species_level_barplot
-
-#saving plot in pdf
+    #saving plot in pdf
 pdf("Species_level_Barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Species_level_barplot)
 dev.off()
+ 
+# saving Species number in species level barplot
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste("=======================")
+paste("Species number in species level barplot(> 0.5%): ", length(unique(Species_level_transformed_psmelt$Species)))
+sink()                                                             
 
 # saving plot as html widget
-#barplot_Species<-ggplotly(Species_level_barplot)
-#htmlwidgets::saveWidget(as_widget(barplot_Species), "Barplot_Species.html")
+barplot_Species<-ggplotly(Species_level_barplot)
+htmlwidgets::saveWidget(as_widget(barplot_Species), "Barplot_Species.html")
 
 ########
 
@@ -602,7 +569,7 @@ Species_level_transformed_forheatmap_morethan0.5 <- filter_taxa(Species_level_tr
 Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan0.5, 
         taxa.label = "Species",
         low = "gainsboro", high = "dimgrey", na.value = "white",
-        title = "Species level heatmap (> 0.5 % abundance)") + 
+        title = "Species level (> 0.5 %)") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
     theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
     theme(legend.position = "right") +
@@ -616,15 +583,13 @@ Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan0.5,
     theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8)) +
     theme(axis.title.y = element_text(colour = "black", face = "bold", size = 12))
 
-Heatmap_Species
-
 # saving plot in pdf
 pdf("Heatmap_Species.pdf", width = 28, height = 18, paper = "a4r")
 plot(Heatmap_Species)
 dev.off()
 
 # saving plot as html widget
-#Species_Heatmap<-ggplotly(Heatmap_Species)
-#htmlwidgets::saveWidget(as_widget(Species_Heatmap), "Species_Heatmap.html")
+Species_Heatmap<-ggplotly(Heatmap_Species)
+htmlwidgets::saveWidget(as_widget(Species_Heatmap), "Species_Heatmap.html")
 ######################
 
