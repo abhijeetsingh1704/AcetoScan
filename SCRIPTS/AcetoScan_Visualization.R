@@ -1,8 +1,10 @@
 #!/usr/bin/env Rscript
 
 # File: AcetoScan_Visualization.R
-# Last modified: tis maj 07, 2019  10:40
+# modified: tis maj 07, 2019  10:40
 # Sign: JN
+# Last modified: son maj 26, 2019  12:44
+# Sign: AB
 
 otu_file <- "FTHFS_OTU_table_R.txt"
 tax_file <- "FTHFS_TAX_table_R.txt"
@@ -15,7 +17,6 @@ suppressPackageStartupMessages(library("phyloseq"))
 suppressPackageStartupMessages(library("ggplot2"))
 suppressPackageStartupMessages(library("plotly"))
 suppressPackageStartupMessages(library("RColorBrewer"))
-suppressPackageStartupMessages(library("randomcoloR"))
 suppressPackageStartupMessages(library("plyr"))
 suppressPackageStartupMessages(library("dplyr"))
 
@@ -70,14 +71,10 @@ ps_table
 prevalence_dataframe <- apply(X = otu_table(ps),
                               MARGIN = ifelse(taxa_are_rows(ps), yes = 1, no = 2),
                               FUN = function(x){sum(x > 0)})
-prevalence_dataframe
-
 # Add taxonomy and total read counts to this data.frame
 prevalence_dataframe <- data.frame(Prevalence = prevalence_dataframe,
                                    TotalAbundance = taxa_sums(ps),
                                    tax_table(ps))
-prevalence_dataframe
-
 # Compute the mean prevalences and total abundance of the features in each phylum
 prevalence_table <- plyr::ddply(prevalence_dataframe, "Phylum", function(df1) {
     data.frame(mean_prevalence = mean(df1$Prevalence),
@@ -85,35 +82,23 @@ prevalence_table <- plyr::ddply(prevalence_dataframe, "Phylum", function(df1) {
                stringsAsFactors = FALSE)
 })
 
-#visualize the total and average prevalance 
-prevalence_table
-
-#save the prevalance table as text file
+# save the prevalance table as text file
 write.table(prevalence_table, "prevalence_table_normalized.txt", sep = "\t", row.names = TRUE)
 
-#Count the number of sequence variants (SVs) which will be included in study
-# to mention in manuscript
-ntaxa(ps)
-
-#Get the number of phylum and genus would be present
-number_of_Phylum  <- length(get_taxa_unique(ps, taxonomic.rank = "Phylum"))
-number_of_Class   <- length(get_taxa_unique(ps, taxonomic.rank = "Class"))
-number_of_Order   <- length(get_taxa_unique(ps, taxonomic.rank = "Order"))
-number_of_Family  <- length(get_taxa_unique(ps, taxonomic.rank = "Family"))
-number_of_Genus   <- length(get_taxa_unique(ps, taxonomic.rank = "Genus"))
-number_of_Species <- length(get_taxa_unique(ps, taxonomic.rank = "Species"))
-#check the numbers
-number_of_Phylum
-number_of_Class
-number_of_Order
-number_of_Family
-number_of_Genus
-number_of_Species
+# Write the details of taxa to file
+sink("taxa_details.txt")
+paste("number_of_Phylum: - ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
+paste("number_of_Class: - ", length(get_taxa_unique(ps, taxonomic.rank = "Class")))
+paste("number_of_Order: - ", length(get_taxa_unique(ps, taxonomic.rank = "Order")))
+paste("number_of_Family: - ", length(get_taxa_unique(ps, taxonomic.rank = "Family")))
+paste("number_of_Genus: - ", length(get_taxa_unique(ps, taxonomic.rank = "Genus")))
+paste("number_of_Species: - ", length(get_taxa_unique(ps, taxonomic.rank = "Species")))
+sink()
 
 ##Calculate abundance of different ranks
 ##use filtered phylum file
 #   taxonomy table   
-tax.tab <- data.frame(tax_table(ps))
+tax.tab <- tibble(tax_table(ps))
 tax.tab
 
 #function for the modification of OTU table
