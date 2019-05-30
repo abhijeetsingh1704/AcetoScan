@@ -37,6 +37,11 @@ if ! command -v "blastx" > /dev/null ; then
         sudo apt install -y ncbi-blast+
 fi
 
+###     Checking if bioperl is installed
+
+        echo "Checking BioPerl"
+        sudo apt install -y -qq < /dev/null > /dev/null
+
 ###     Checking if R and Rscript are installed
 
 if ! command -v "R" > /dev/null ; then
