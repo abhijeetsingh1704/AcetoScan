@@ -1,67 +1,79 @@
+#!/bin/bash
+
 # INSTALL for AcetoScan
 
-- Last modified: tor maj 23, 2019  12:38
-- Sign: JN
+#- Last modified: tor maj 30, 2019  15:38
+#- Sign: Abhi
 
-## Installation
+# setting pipefail
 
-#### Dependencies
+set -euo pipefail
 
-Make sure the external dependencies are installed:
+##      Installation
 
-1. Cutadapt (v.X.X.X)
-2. Vsearch (v.2.13.0)
-3. NCBI BLAST+ (v.2.8.1+)
-4. R (v.3.5.2), with libraries:
-    - phyloseq
-    - ggplot2
-    - plotly
-    - RColorBrewer
-    - randomcoloR
-    - plyr
-    - dplyr
+##      Checking and installing Dependencies
 
-For example, on a Ubuntu-based Linux system, this could be done using:
+###     Checking if cutadapt is installed
 
-**Note tor 23 maj 2019:** The versions on Ubuntu's central repositories
-are not the latest (cutadapt, vsearch).
+echo "Checking and installing dependencies for debian/ubuntu based systems"
+if ! command -v "cutadapt" > /dev/null ; then
+        echo "Installing Cutadapt"    
+        sudo apt install -y cutadapt=1.18-1
+fi
 
-TODO: Need to test the pipeline with/without those versions.
+###     Checking if vsearch is installed
 
-    sudo apt install -y \
-        cutadapt \
-        ncbi-blast+ \
-        vsearch \
-        libv8-dev \
-        r-base \
-        r-base-dev \
-        r-bioc-phyloseq \
-        r-cran-dplyr \
-        r-cran-ggplot2 \
-        r-cran-plotly \
-        r-cran-plyr \
-        r-cran-rcolorbrewer
+if ! command -v "vsearch" > /dev/null ; then
+        echo "Installing Vsearch"
+        wget "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
+        tar xzf vsearch-2.13.1-linux-x86_64.tar.gz
+        sudo cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch
+fi
 
-    Rscript -e "install.packages('randomcoloR', dependencies=TRUE, repos='https://ftp.acc.umu.se/mirror/CRAN/')"
+###     Checking if Blast is installed
 
-If later version of Vsearch is needed, it can be installed from GitHub:
+if ! command -v "blastx" > /dev/null ; then
+        echo "Installing NCBI-blast+"
+        sudo apt install -y ncbi-blast+
+fi
 
-    wget "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
-    tar xzf vsearch-2.13.1-linux-x86_64.tar.gz
-    sudo cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch
+###     Checking if R and Rscript are installed
 
-#### Scripts
+if ! command -v "R" > /dev/null ; then
+        echo "Installing R"
+        sudo apt install -y -qq \
+                        libv8-dev \                                
+                        r-base \
+                        r-base-dev < /dev/null > /dev/null                               
+fi
 
-Add the path to folder `AcetoScan/SCRIPTS` to your PATH (or add the scripts in the folder `SCRIPTS` to
-your PATH). For example:
+###     Installing R packages 
 
-    export PATH="/path/to/AcetoScan/SCRIPTS:${PATH}"
+echo "Checking R dependencies"
+        sudo apt install -y -qq \
+                        r-bioc-phyloseq \
+                        r-cran-dplyr \
+                        r-cran-ggplot2 \
+                        r-cran-plotly \
+                        r-cran-plyr \
+                        r-cran-rcolorbrewer < /dev/null > /dev/null
 
-#### Blast data base
+###     Copying Acetoscan executable to /usr/local/bin
 
-Make sure you have access to the [AcetoBase]() data base. Can be retrieved by:
+sudo find / -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+sudo chmod +x /usr/local/bin/acetoscan
 
-        wget "https://www.someserver.se/path/to/ACETOBASE_DB_DIR.tgz"
-        tar xvzf ACETOBASE_DB_DIR.tgz
+###     fixing the directory for AcetoScan program
 
-TODO: add instructions on where to place this data base
+sudo mkdir -p /home/acetoscan/acetoscan_bin
+sudo mkdir -p /home/acetoscan/acetobase
+
+###     copying acetoscan dependencies to acetoscan_bin
+
+sudo cp ./acetoscan_bin/* /home/acetoscan/acetoscan_bin/
+
+###     Downloading AcetoBase
+
+echo "Downloading AcetoBase"
+#wget -P /home/acetoscan/acetobase/ "https://www.acetobase.molbio.slu.se/path/to/ACETOBASE_DB_DIR.tgz"
+#tar xvzf ACETOBASE_DB_DIR.tgz  
