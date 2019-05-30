@@ -80,5 +80,5 @@ sudo cp ./acetoscan_bin/* /home/acetoscan/acetoscan_bin/
 ###     Downloading AcetoBase
 
 echo "Downloading AcetoBase"
-#wget -P /home/acetoscan/acetobase/ "https://www.acetobase.molbio.slu.se/path/to/AcetoBase_V1.tgz"
-#tar xvzf /home/acetoscan/acetobase/AcetoBase_V1.tgz  
+wget -P /home/acetoscan/acetobase/ "https://www.acetobase.molbio.slu.se/path/to/AcetoBase_V1.tgz"
+tar xvzf /home/acetoscan/acetobase/AcetoBase_V1.tgz  
