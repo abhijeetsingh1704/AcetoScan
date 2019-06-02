@@ -42,9 +42,9 @@ For installation run the following command in terminal, this will `INSTALL` all 
 `acetoscan` will result in three directories
 
 ```
-1. `input_data`		- Directory will be created `in default/destination path` where input raw data will be softlinked
-2. `output_data`	- Directory will be created `in default/destination path` where process data will be generated and stored. In case of process failure, data can be accessed from here for further processing
-3. `acetoscan_result`	- Directory will be created `in default/destination path` containing all the final graphics, OTU table and TAX table. After successful execution of analysis, all the important data will be copies to this final directory.
+1. input_data 		- Directory will be created `in default/destination path` where input raw data will be softlinked
+2. output_data 		- Directory will be created `in default/destination path` where process data will be generated and stored. In case of process failure, data can be accessed from here for further processing
+3. acetoscan_result 	- Directory will be created `in default/destination path` containing all the final graphics, OTU table and TAX table. After successful execution of analysis, all the important data will be copies to this final directory.
 ```
 ## Using acetoscan program
 
