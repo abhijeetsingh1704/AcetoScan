@@ -244,7 +244,7 @@ echo -e "\n#Performing adapters trimming and quality filtering"
         echo "#This might take a while"
         
         #cutadapt external script        
-        cutadapt_illumina2.sh
+        cutadapt_acetoscan.sh
                 
         echo ""
         kill $!
