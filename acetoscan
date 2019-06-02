@@ -1,499 +1,488 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: tor maj 23, 2019  12:08
-# Sign: JN
+# Last modified: son Juni, 2019  18:59
+# Sign: Abhi
 
 set -euo pipefail
 
-clear
-echo " 
-   ██                   █            ▓███▒                     
-   ██                   █           █▓  ░█                     
-  ▒██▒   ▓██▒   ███   █████   ███   █       ▓██▒  ░███░  █▒██▒ 
-  ▓▒▒▓  ▓█  ▓  ▓▓ ▒█    █    █▓ ▓█  █▓░    ▓█  ▓  █▒ ▒█  █▓ ▒█ 
-  █░░█  █░     █   █    █    █   █   ▓██▓  █░         █  █   █ 
-  █  █  █      █████    █    █   █      ▓█ █      ▒████  █   █ 
- ▒████▒ █░     █        █    █   █       █ █░     █▒  █  █   █ 
- ▓▒  ▒▓ ▓█  ▓  ▓▓  █    █░   █▓ ▓█  █░  ▓█ ▓█  ▓  █░ ▓█  █   █ 
- █░  ░█  ▓██▒   ███▒    ▒██   ███   ▒████░  ▓██▒  ▒██▒█  █   █"
-
-echo "
-###    Dependencies
-###    ------------
-###    1. Cutadapt(1.18+)    2. Vsearch (v2.13.0)
-###    3. NCBI BLAST+ (2.8.1+)
-###    4. R (3.5.2) (libraries - phyloseq, ggplot2, plotly, 
-       RColorBrewer, plyr, dplyr)"
-
-
-###    Introduction
-echo ""
-echo "¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤"
-echo ""
-echo "> AcetoScan is written by Abhijeet Singh (abhijeetsingh.aau@gmail.com)"
-echo "> Version - AcetoScan_V1.0"
-echo "> Program for the analysis of FTHFS amplicon sequencing data from 
- Illumina MiSeq platform(2*300bp)
-> The Input data must be in fastq.gz format 
-> AcetoScan only processes the forward reads 
--.-.-.-.-.-.-.-.-.-.-.-.-.-.=========================
-Forward reads files must be *_R1_001.fastq.gz format
--.-.-.-.-.-.-.-.-.-.-.-.-.-.========================="
-echo "¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤"
-
-###    getting current working directory
-# TODO: Since the INPUT_DATA and OUTPUT_DATA folders are created by the script,
-# there is no reason for making sure the cwd is the "AcetoScan directory". The
-# only issue to solve is to make sure the helper scripts in "SCRIPTS" are found:
-# Find a good way to add them to the PATH!
-
-export CDIR=$(pwd)
-#set -e
-
-###    Checking dependencies
-echo "Performing dependencies check"
-echo ""
-
-Software_check.sh # <======== External script
-#bash "${CDIR}/SCRIPTS/Software_check.sh" # <======== external script
-
-###    User input to set the path
-echo ""
-echo "----->>>>> ${CDIR}"
-
-echo ""
-echo "Is \"AcetoScan\" your WORKING DIRECTORY in above path?"
-read -p "[y/n]: " REP_1
-echo ""
-
-###    getting absolute path in case working directory is different
-if [ "${REP_1}" == "y" ]; then
-    echo "yes" > /dev/null
-else
-    echo "Provide absolute path to directory named \"AcetoScan\"
-    "
-    read -e -p "Absolute path for the AcetoScan directory (use tab-autocompletion): " PIPELINE
-fi
-
-###    Checking if path is correct
-if [ "${REP_1}" == "n" ]; then
-    if [[ -d "${PIPELINE}/SCRIPTS" ]]; then
-        echo "" > /dev/null
-    else
-        echo "Incorrect path, Aborting !!!" ; exit 1
-    fi
-else
-    echo "" > /dev/null
-fi
-
-###    setting working directory according to user input
-if [ "${REP_1}" == "y" ]; then
-    echo "" > /dev/null
-else
-    export CDIR="${PIPELINE}"
-fi
-
-###    getting path for the raw illumina data
-echo "#Please provide the absolute path of the raw illumina reads"
-read -e -p "Path to Illumina directory (use tab-autocompletion): " READ_PATH
+echo \
+" ___________________________________________________________
+|     _    ____ _____ _____ ___  ____   ____    _    _   _  |
+|    / \  / ___| ____|_   _/ _ \/ ___| / ___|  / \  | \ | | |
+|   / _ \| |   |  _|   | || | | \___ \| |     / _ \ |  \| | |
+|  / ___ \ |___| |___  | || |_| |___) | |___ / ___ \| |\  | |
+| /_/   \_\____|_____| |_| \___/|____/ \____/_/   \_\_| \_| |
+|___________________________________________________________|
+"
 
 ###    Recording the time whent he script was started
+
 start=$(date +%s) #start time of script
 
-###    Checking if the entered path for pipeline is correct
-if [[ -d "${READ_PATH}" ]]; then
-    echo "" > /dev/null
-else
-    echo "Incorrect path, Aborting !!!"
-    exit 1
-fi
+###     Setting up variables
 
-###    Defining clustering threshold
-echo ""
-echo "#Please provide clustering threshold - (0.95)"
-read -e -p "Value - (0.0 to 1.0) : " CLUST_THRESHOLD
+input_dir=""            
+output_dir=""           
+read_type=""            
+cluster_threshold=""
 
-###    Checking threshold validity
-MAXTHRESHOLD=1.0
+###     Username
 
-if (( ${CLUST_THRESHOLD%%.*} < ${MAXTHRESHOLD%%.*} || ( ${CLUST_THRESHOLD%%.*} == ${MAXTHRESHOLD%%.*} \
-    && ${CLUST_THRESHOLD##*.} < ${MAXTHRESHOLD##*.} ) )) > /dev/null ; then    
-    echo "" > /dev/null
-else
-    echo "Invalid threshold: value must be between 0.0 and 1.0" && exit 1
-fi
+user=`echo ${SUDO_USER:-${USER}}`
+
+###     Defaults
+
+output_dir_def="/home/$user/acetoscan/output_data"
+read_type_def="1"
+cluster_threshold_def="0.95"
+version_def="0.1.0"
 
 ###    Getting processors information
+
 THREADS=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || getconf _NPROCESSORS_ONLN 2> /dev/null)
 
-###    Removing old directories
-# TODO: Check (and warn?) for presence before delete?
-rm -rf "${CDIR}/INPUT_DATA"
-rm -rf "${CDIR}/OUTPUT_DATA"
-rm -rf "${CDIR}/ACETOSCAN_RESULT"
+###     Defining flags
+
+#       function
+
+usage() {
+echo "Usage   : $0 [-i <input directory>] [-o <output directory>] [-r <reads type>] [-t <clustering threshold>]
+Example : acetoscan -i /<input path>/ -o /<output path>/ -r 1 -t 0.95" 1>&2; exit 1;
+}
+
+
+#       flags
+
+while getopts "i:o:r:t:hv" flags; 
+        do      
+                case "${flags}" in
+                        
+                        i)
+                                input_dir=${OPTARG}
+                                ;;
+
+                        o)
+                                output_dir=${OPTARG}
+                                ;;
+
+                        r)
+                                read_type=${OPTARG}
+                                ;;
+
+                        t)
+                                cluster_threshold=${OPTARG}
+                                ;;
+
+                        h)
+                                echo "
+Example : acetoscan -i /<input path>/ -o /<output path>/ -r 1 -t 0.95
+
+        -i      input directory containing raw illumina data
+        -o      output directory
+                default = /home/$user/acetoscan/output_data
+        -r      read type either forward or reverse reads 
+                default = 1        
+                1 = forward reads
+                2 = reverse reads
+        -t      clustering threshold
+                default = 0.95 (95% sequence similarity)      
+        -h      print Help
+        -v      print acetoscan version"
+                                exit                                
+                                ;;
+
+                        v)
+                                echo "AcetoScan version: $version_def"
+                                echo "Visit \"https://acetobase.molbio.slu.se/\" for more information."
+                                exit
+                                ;;
+
+                        *)
+                                usage
+                                ;;
+
+                esac
+        done
+
+shift $((OPTIND-1))
+
+###     Checking input_dir 
+
+if [ ! -d "$input_dir" ] && [ -x $input_dir]; then
+        echo -e "\n#Input directory not provided, Aborting!"
+        echo ""
+        usage
+        exit
+else
+        echo -e "\n#Content of input directory: $input_dir"        
+        forward_read_count=`find $input_dir -name "*_R1_001.fastq.gz" | wc -l`
+        reverse_read_count=`find $input_dir -name "*_R2_001.fastq.gz" | wc -l`
+        echo "-> Number of forward read files: $forward_read_count"
+        echo "-> Number of reverse read files: $reverse_read_count"
+        
+        
+fi
+
+###     Checking output_dir 
+
+
+if [ "$output_dir" == "" ]; then
+        output_dir="$output_dir_def"
+        echo -e "\n#Using default output directory: $output_dir_def"
+        if [ -d $output_dir_def ] ; then
+                echo -ne ""
+        else
+                mkdir -p $output_dir_def
+        fi
+else
+        if [  -d "$output_dir" ] && [ -x $output_dir ]; then
+                echo -e "\n#Output directory: $output_dir "
+        else
+                if [ ! -d "$output_dir" ]; then   
+                        mkdir -p $output_dir
+                        echo -e "\n#Output directory: $output_dir "
+                else
+                       echo -e "\n#Cannot access/create $output_dir " 
+                fi
+        fi
+fi
+
+###     setting up working directory
+
+export WKDIR="$output_dir"
+
+###     Checking read type
+
+if [ "$read_type" == "" ];then
+        read_type="$read_type_def"
+        echo -e "\n#Using default: Forward reads"
+else
+       echo -e "\n#Using R${read_type} reads"
+fi
+
+#       read variable
+
+export reads="R${read_type}"
+
+###     Checking read type
+
+if [ "$cluster_threshold" == "" ];then
+        cluster_threshold="$cluster_threshold_def"
+        echo -e "\n#Using default clustering threshold: 0.95"
+else
+        echo -e "\n#Clustering threshold: $cluster_threshold"
+fi
+
+###    Checking threshold validity
+
+MAXTHRESHOLD=1.0
+
+if (( ${cluster_threshold%%.*} < ${MAXTHRESHOLD%%.*} || ( ${cluster_threshold%%.*} == ${MAXTHRESHOLD%%.*} \
+    && ${cluster_threshold##*.} < ${MAXTHRESHOLD##*.} ) )) > /dev/null ; then    
+    echo "" > /dev/null
+else
+    echo -e "\n#Invalid threshold: value must be between 0.0 and 1.0" && exit 1
+fi
+
+###     Checking of output_data directory is has content
+
+###    Checking and cleaning the input_data and output_data directory
+
+if [ ! -z "$(ls -A $output_dir)" ]; then
+   echo -e "\n#WARNING: directory \"$output_dir\" is not empty, 
+          possibility of data loss!!!"
+
+        #       Cleaning
+        echo -e "\n#Removing previous data"
+        rm -f ${WKDIR}/input_data/*
+        rm -rf ${WKDIR}/output_data/*
+        rm -f ${WKDIR}/acetoscan_result/*
+else
+        #       creating new directories
+        echo -e "\n#Creating directories"
+        mkdir -v -p ${WKDIR}/input_data
+        mkdir -v -p ${WKDIR}/output_data
+        mkdir -v -p ${WKDIR}/acetoscan_result
+fi
+
+###    Checking dependencies
+
+echo -e "\n#Performing dependencies check"
+export PATH="/home/$user/acetoscan/acetoscan_bin/:${PATH}"
+Software_check.sh # <======== External script
 
 ###    find illumina raw reads and making soft links to the data
-mkdir -v -p "${CDIR}/INPUT_DATA"
-if ! cd "${CDIR}/INPUT_DATA/" ; then
-    echo "Error: could not cd to ${CDIR}/INPUT_DATA/"
+
+if ! cd "${WKDIR}/input_data/" ; then
+    echo "Error: could not cd to ${WKDIR}/input_data/"
     exit 1
 fi
 
-find "${READ_PATH}" -name '*_R1_001.fastq.gz' -exec ln -s {} "${CDIR}/INPUT_DATA/" \; 2> /dev/null
+#       softlinks
+
+find "${input_dir}" -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/input_data/" \; 2> /dev/null
 
 ###    Checking if link exist
-if [ ! -n "$(find "${CDIR}/INPUT_DATA/" -maxdepth 1 -type l -name '*_R1_001.fastq.gz' -print -quit)" ] ; then
-    echo "Input files \"*_R1_001.fastq.gz\" not found in ${CDIR}/INPUT_DATA/, Aborting !!!"
+
+if [ ! -n "$(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_"${reads}"_001.fastq.gz" -print -quit)" ] ; then
+    echo "Input files \"*_${reads}*.fastq.gz\" not found in ${WKDIR}/input_data/, Aborting !!!"
     exit 1
 fi
 
 ###    Adapter trimming and quality filtering of the raw reads
-# TODO: make sure the trimmed folder is created by mother script,
-# and found by worker script
-#mkdir -p "${CDIR}/OUTPUT_DATA"
-mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA"
-echo ""
-echo "Performing adapters trimming and quality filtering"
 
-cutadapt_illumina2.sh # <================= external script
-#cutadapt_illumina.sh # <================= external script
-#bash "${CDIR}/SCRIPTS/cutadapt_illumina.sh" # <================= external script
+mkdir -p "${WKDIR}/output_data/trimmed"
+echo -e "\n#Performing adapters trimming and quality filtering"
 
-if [ -e "${CDIR}/OUTPUT_DATA/cutadapt.out" ]; then
-    echo "Cutadapt report: -->> cutadapt.out in ${CDIR}/OUTPUT_DATA/"
-else
-    echo "Error! Cutadapt report cutadapt.out not found in ${CDIR}/OUTPUT_DATA/"
-    exit 1
-fi
+###     CUTADAPT <--- from external script
 
-###    Unzipping and preparing variables file
-if ! cd "${CDIR}/OUTPUT_DATA/trimmed" ; then
-    echo "Error: could not cd to ${CDIR}/OUTPUT_DATA/trimmed"
-    exit 1
-fi
+        #       making progress bar for cudadapt script
+        
+        while true; do echo -ne "#"; sleep 2; done &
+        trap 'kill $!' SIGTERM SIGKILL
+        echo "#This might take a while"
+        
+        #cutadapt external script        
+        cutadapt_illumina2.sh
+                
+        echo ""
+        kill $!
 
-# Begin fastq2fasta
-find "${CDIR}/OUTPUT_DATA/trimmed" -name '*_trimmed_R1.fastq.gz' \
-    -exec sh -c 'f="{}"; b=$(basename "${f}" .fastq.gz); cutadapt -o "${CDIR}/OUTPUT_DATA/trimmed/FASTA/${b}.fasta" "$f"' \;
+###     Begin Longest best frame analysis <--- from external script
 
-    ## force extracting 
-    ## TODO: Do we really need to uncompress? cutadapt can take compressed input
-    #gunzip -f ./*.fastq.gz
+echo -e "\n#Performing longest best frame analysis"
 
-    ## variable file
-    ## TODO: Use find instead of ls
-    #ls *trimmed_R1.fastq | while read FASTA_names
-    #do
-    #    echo "${FASTA_names%%.*}"
-    #done > FASTA_names.txt
+        #       making progress bar for best frame script
 
-    #### FastQ to FastA by EMBOSS
-    ## TODO: replace seqret with, e.g., cutadapt:
-    ##    cutadapt -o output.fasta input.fastq.gz
-    #echo ""
-    #echo "Converting FastQ to FastA"
-    #mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA"
-    #
-    #for FASTQ in $(cat FASTA_names.txt)
-    #do
-    #    seqret \
-    #        -sequence "${FASTQ}.fastq" \
-    #        -auto Y \
-    #        -warning N \
-    #        -outseq "${CDIR}/OUTPUT_DATA/trimmed/FASTA/${FASTQ}.fasta"
-    #done
-## End of fastq2fasta
+        while true; do echo -ne "#"; sleep 2; done &
+        trap 'kill $!' SIGTERM SIGKILL
+        echo "This might take a while"
 
+        #longorf-acetoscan external script
+        find "${WKDIR}/output_data/trimmed" -name "*_trimmed_${reads}.fasta" \
+        -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); longorf-acetoscan.pl --filter "$f" > "Best_${b}.fasta"' \; # <============= external script
+        
+        echo ""        
+        kill $!
 
-## Begin Longest best frame analysis
-### Mon 20 maj 2019 17:05:50: Try BioPerl script. 
-### TODO: If BioPerl is going to be used, make sure it is installed.
-find "${CDIR}/OUTPUT_DATA/trimmed/FASTA" -name '*_trimmed_R1.fasta' \
-    -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); longorf-acetoscan.pl --filter "$f" > "Best_${b}.fas"' \; # <============= external script
+###     Preprocessing for Clustering
 
-#    ###    Longest best frame analysis
-#    # preparing variable file
-#    if ! cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA" ; then
-#        echo "Error: could not cd to ${CDIR}/OUTPUT_DATA/trimmed/FASTA"
-#        exit 1
-#    fi
-#
-#    ls *trimmed_R1.fasta > FRAME_INPUTfile.txt
-#
-#    # analysis
-#    for FRAME_INPUT in $(cat FRAME_INPUTfile.txt)
-#    do
-#        #bash "${CDIR}/SCRIPTS/LongestBestFrame.sh" "${FRAME_INPUT}" # <============= external script
-#    done
-## End Longest best frame analysis
+cd ${WKDIR}/output_data/trimmed
+echo -e "\n#Performing preprocessing for clustering"
 
+for i in `find . -type f -iname "Best*.fasta" -printf "%f\n"`
+        do 
+             awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' "${i}"
+        done > All_best.fasta.tmp
 
-#########  Mon 20 maj 2019 17:03:43 ##################################
-## Begin Preprocessing for Clustering
-###    Preprocessing for Clustering
-    # preparing variable file
-    # TODO: use find or shell expansion instead of ls and cat
-    ls Best_*.fasta | while read bestname
-    do
-        echo "${bestname%%.*}"
-    done > file_bestname.txt
+###     Formating input for vsearch
 
-    # replace fasta header to file name
-    # TODO: use find or shell expansion instead of ls and cat
-    for i in $(cat file_bestname.txt)
-    do 
-        awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' "${i}.fasta"
-    done > pre_All_best.fasta.tmp
+perl -npe 'if(!/^>/){s/\S{60}/$&\n/g};{s/-/_/g}' All_best.fasta.tmp > All_best.fasta
 
-    # editing fasta headers
-    # TODO: this filtering are potentially done above by the BioPerl script (except the s/Best_//g).
-    #sed 's/-/_/g;s/ /_/g;s/:/_/g;s/Best_//g' pre_All_best.fasta.tmp > pre_All_best.fasta
-    sed -e 's/-/_/g' \
-        -e 's/ /_/g' \
-        -e 's/:/_/g' \
-        -e 's/Best_//g' pre_All_best.fasta.tmp > pre_All_best.fasta
+###     Begin clustering with VSEARCH (v2.13.0_linux_x86_64)
 
-    # formating input for vsearch
-    # TODO: check what this step is doing. Also: Need specific version of seqret!
-    # If wrapping fasta sequences is the aim, there is no need for seqret. One
-    # example (change '60' to whatever width you need):
-    # perl -npe 'if(!/^>/){s/\S{60}/$&\n/g}'  pre_All_best.fasta > All_best.fasta
-    seqret \
-        -sequence pre_All_best.fasta \
-        -auto Y \
-        -warning N \
-        -outseq All_best.fasta
-## End Preprocessing for Clustering
+mkdir -v -p "${WKDIR}/output_data/trimmed/VSEARCH"
+echo -e "\n#Begin clustering at $cluster_threshold%"
 
+    #   dereplication 
 
-## Begin clustering with VSEARCH
-    ###    Clustering with Vsearch (v2.13.0_linux_x86_64)
-    mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH"
+        echo -e "\n#Performing dereplication"
+        vsearch \
+                --derep_fulllength "${WKDIR}/output_data/trimmed/All_best.fasta" \
+                --output "${WKDIR}/output_data/trimmed/VSEARCH/best_derep.fasta" \
+                --minseqlength 150 \
+                --sizeout \
+                --minuniquesize 2 \
+                --relabel Unique \
+                --uc "${WKDIR}/output_data/trimmed/VSEARCH/derep.uc" \
+                --log="${WKDIR}/output_data/trimmed/VSEARCH/derep_log"
+    
+    #   removing chimeras
 
-    # dereplication 
-    echo "Performing dereplication on fasta sequences"
-    vsearch \
-        --derep_fulllength "${CDIR}/OUTPUT_DATA/trimmed/FASTA/All_best.fasta" \
-        --output "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/best_derep.fasta" \
-        --minseqlength 150 \
-        --sizeout \
-        --minuniquesize 2 \
-        --relabel Unique \
-        --uc "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/derep.uc" \
-        --log="${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/derep_log"
-    echo ""
-
-    # removing chimeras
-    echo "Removing chimeras from dereplicated fasta sequences"
-    vsearch \
-        --uchime_denovo "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/best_derep.fasta" \
-        --sizein \
-        --sizeout \
-        --chimeras "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/chimera.fasta" \
-        --nonchimeras "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/nonchimera.fasta" \
-        --log="${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/chimera_log.txt"
-    echo ""
-
+        echo -e "\n#Removing chimera"
+        vsearch \
+                --uchime_denovo "${WKDIR}/output_data/trimmed/VSEARCH/best_derep.fasta" \
+                --sizein \
+                --sizeout \
+                --chimeras "${WKDIR}/output_data/trimmed/VSEARCH/chimera.fasta" \
+                --nonchimeras "${WKDIR}/output_data/trimmed/VSEARCH/nonchimera.fasta" \
+                --log="${WKDIR}/output_data/trimmed/VSEARCH/chimera_log.txt"
+    
     # Clustering OTUs
-    echo "Removing chimeras from dereplicated fasta sequences"
-    vsearch \
-        --cluster_size "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/nonchimera.fasta" \
-        --id "${CLUST_THRESHOLD}" \
-        --centroid "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta" \
-        --otutabout "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/classic_pre_otu_table.txt" \
-        --uc "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/clustering_result" \
-        --sizein \
-        --sizeout \
-        --relabel 'OTU_' \
-        --biomout "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTUtable.biom.json"
-    echo ""
-## End clustering with VSEARCH
+
+        echo -e "\n#Clustering OTUs at ${cluster_threshold} % sequence similarity"
+        vsearch \
+                --cluster_size "${WKDIR}/output_data/trimmed/VSEARCH/nonchimera.fasta" \
+                --id "${cluster_threshold}" \
+                --centroid "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta" \
+                --otutabout "${WKDIR}/output_data/trimmed/VSEARCH/classic_pre_otu_table.txt" \
+                --uc "${WKDIR}/output_data/trimmed/VSEARCH/clustering_result" \
+                --sizein \
+                --sizeout \
+                --relabel 'OTU_' \
+                --biomout "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTUtable.biom.json"
+    
+###     End of clustering with VSEARCH
 
 
+###     Preparing input file for filtering of non target sequences
 
-# Preparing input file for filtering of non target sequences
 perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
-    sed '/^$/d' > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta.tmp"
+    sed '/^$/d' > "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp"
 
-###    Filtering non target sequences with BlastX
-echo "Filtering non target OTUs"
+###    Filtering non target sequences with BlastX from NCBI Blast+ (2.8.1)
 
-###    BlastX from NCBI Blast+ (2.8.1)
-# TODO: use diamond?
-#    diamond makedb --in db.fas -d db
-#    diamond blastx -d db -q query.fas -a diamond.hits -p 4
-#    diamond view -a diamond.hits.daa -o diamond.hits.m8
-blastx \
-    -query "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta.tmp" \
-    -db "${CDIR}/ACETOBASE_DB_DIR/AcetoBaseV1" \
-    -task blastx \
-    -max_target_seqs 1 \
-    -num_threads "${THREADS}" \
-    -evalue 1e-9 \
-    -out "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/blast_results_for_filtering" \
-    -outfmt "7 qseqid"
+        echo -e "\n#Filtering non target OTUs"
+        blastx \
+                -query "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" \
+                -db "/home/$user/acetoscan/acetobase/AcetoBaseV1" \
+                -task blastx \
+                -max_target_seqs 1 \
+                -num_threads "${THREADS}" \
+                -evalue 1e-9 \
+                -out "${WKDIR}/output_data/trimmed/VSEARCH/blast_results_for_filtering" \
+                -outfmt "7 qseqid"
 
-# processing blast result file
-sed '/^#/d' ./VSEARCH/blast_results_for_filtering > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU_list.txt"
+###     Processing blast result file, deleting commented lines
+sed '/^#/d' ./VSEARCH/blast_results_for_filtering > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt"
 
-# Extracting target sequences
-# TODO: iterator variable OTU unused. What is extracted?
-for OTU in $(cat ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU_list.txt)
-do
-    grep -A 1 "OTU" "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/pre_OTU.fasta.tmp" > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta.tmp"
-done 
+###     Extracting target sequences
+
+for OTU in $(cat ${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt)
+        do
+                grep -A 1 "OTU" "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp"
+        done 
 
 # processing filtered OTU multifasta file
-sed 's/-//g' "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta.tmp" | \
-    sed '/^#/d' > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta"
+
+sed -e 's/-/_/g;/^#/d' "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp" > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta"
 
 ###    Generating OTU table with filtered/target OTUs
-echo ""
-echo "Generating OTU table"
-vsearch \
-    --usearch_global "${CDIR}/OUTPUT_DATA/trimmed/FASTA/All_best.fasta" \
-    -db "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta" \
-    --id 0.95 \
-    --otutabout "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.tmp"
 
-sed -e 's/_trimmed_R1//g' "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.tmp" > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.pre"
-echo ""
+        echo -e "\n#Generating OTU table"
+        vsearch \
+                --usearch_global "${WKDIR}/output_data/trimmed/All_best.fasta" \
+                -db "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp" \
+                --id ${cluster_threshold} \
+                --otutabout "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.tmp"
+
+###     Processing Sample name
+
+sed -e "s/Best_//g;s/_trimmed_${reads}//g" "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.tmp" > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.pre"
 
 ###    Sorting OTUs in assending order
-# TODO: no need for cat
-#sed -e 's/#OTU ID/ID/' \
-#    -e 's/OTU_//' \
-#    -e 's/^/OTU_/' \
-#     "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.pre" | \
-#    sort -n > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt"
-cat "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.pre" | \
-    sed -e 's/#OTU ID/ID/' | \
-    sed -e 's/OTU_//' | \
-    sort -n | \
-        sed -e 's/^/OTU_/' > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt"
+
+sed -e 's/#OTU ID/ID/' "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.pre" \
+-e 's/OTU_//' | sort -n | sed -e 's/^/OTU_/' > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt"
+
+###     Preparing OTU table for R
+
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt" "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table_R.txt"
 
 ###    Assigning taxonomy 
-echo ""
-echo "Searching for taxonomy"
 
-cut -d ";" -f1 "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/filtered_OTU.fasta" > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta"
+echo -e "\n#Assigning taxonomy"
 
-blastx \
-    -query "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta" \
-    -db "${CDIR}/ACETOBASE_DB_DIR/AcetoBaseV1" \
-    -task blastx \
-    -max_target_seqs 1 \
-    -num_threads "${THREADS}" \
-    -evalue 1e-9 \
-    -out "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/OTUblast.txt.tmp" \
-    -outfmt "6 qseqid saccver pident"
+cut -d ";" -f1 "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta" > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU.fasta"
+
+        # assigning taxonomy by translated nucleotide query wait protein database
+        blastx \
+                -query "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU.fasta" \
+                -db "/home/$user/acetoscan/acetobase/AcetoBaseV1" \
+                -task blastx \
+                -max_target_seqs 1 \
+                -num_threads "${THREADS}" \
+                -evalue 1e-9 \
+                -out "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp" \
+                -outfmt "6 qseqid saccver pident"
 
 ###    Preparing OTU taxonomy table
-sed -e 's/;tax=/,/g' "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/OTUblast.txt.tmp" | \
-    sed '1s/^/#OTU,Subject_Accession,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity\n/' > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_pre"
+
+sed -e 's/;tax=/,/g' "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp" | \
+sed '1s/^/#OTU,Subject_Accession,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity\n/' > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_pre"
 
 #    making tab to comma
-sed -e 's/\t/,/g' "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_pre" > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_full.csv"
-
-###    Translating OTU nucleotide sequence to Amino acid based on best frame analysis
-rm -rf "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation"
-mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation"
-if ! cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation" ; then
-    echo "Error: could not cd to ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation"
-    exit 1
-fi
-cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta" .
-
-Translation_LBF.sh FTHFS_OTU.fasta  # <============== external script
-#bash "${CDIR}/SCRIPTS/Translation_LBF.sh" FTHFS_OTU.fasta  # <============== external script
+sed -e 's/\t/,/g' "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_pre" > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_full.csv"
 
 ###    fixing taxonomy to OTU fasta header 
-cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/" || echo "Error: could not cd to !$" && exit 1
-if ! cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/" ; then
-    echo "Error: could not cd to ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/"
+
+cd "${WKDIR}/output_data/trimmed/VSEARCH/" 
+if ! cd "${WKDIR}/output_data/trimmed/VSEARCH/" ; then
+    echo "Error: could not cd to ${WKDIR}/output_data/trimmed/VSEARCH/"
     exit 1
 fi
 
-# TODO: no need for cat
-#cat OTUblast.txt.tmp | sed 's/;tax=/\t/g' | \
-#    awk -F "\t" '{print $1,$3,$4}' | \
-#    sed  '1s/^/OTU_ID,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity \n/' | \
-#    sed 's/ /,/g' > FTHFS_TAX_table.txt
+###     Making Tax table
 sed 's/;tax=/\t/g' OTUblast.txt.tmp | \
     awk -F "\t" '{print $1,$3,$4}' | \
     sed -e '1s/^/OTU_ID,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity \n/' \
         -e 's/ /,/g' > FTHFS_TAX_table.txt
 
 ###    Preparing the input for R analysis
-sed 's/,/\t/g' "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table.txt" | \
+
+sed 's/,/\t/g' "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table.txt" | \
     awk 'NF{NF--};1' | \
-    sed 's/ /\t/g'> "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_R.txt"
+    sed 's/ /\t/g'> "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_R.txt"
 
-# TODO: cat? Use cp, mv, or ln -s instead?
-cat "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt" > "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table_R.txt"
+###    Preparing input for R analysis
 
-###    R analysis
-mkdir -p "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION"
-if ! cd "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION" ; then
-    echo "Error: could not cd to ${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION"
+mkdir -v -p "${WKDIR}/output_data/trimmed/VSEARCH/Visualization"
+if ! cd "${WKDIR}/output_data/trimmed/VSEARCH/Visualization" ; then
+    echo "Error: could not cd to ${WKDIR}/output_data/trimmed/VSEARCH/Visualization"
     exit 1
 fi
-cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table_R.txt" .
-cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_R.txt" .
 
-#cp $CDIR/SCRIPTS/AcetoScan_Visualization.R .
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table_R.txt" .
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_R.txt" .
+cp "/home/$user/acetoscan/acetoscan_bin/AcetoScan_Visualization.R" .
+
+###     Running R script
 
 RPATH=$(which R)
-echo -e "\n\n\n"
-echo "Preparing graphics"
-echo -e "\n\n\n"
+echo -e "\n#Preparing graphics"
 
-# TODO: use Rscript instead of R
+###     Rscript not working
+
 "${RPATH}" \
     --slave \
     --no-restore \
     --silent \
     --quiet \
-    --file="${CDIR}/SCRIPTS/AcetoScan_Visualization.R" > /dev/null
+    --file="AcetoScan_Visualization.R" > /dev/null
 
-###    Putting everything together in a Result DIRECTORY
-mkdir -p "${CDIR}/ACETOSCAN_RESULT"
-cd "${CDIR}/ACETOSCAN_RESULT" || echo "Error: could not cd to !$" && exit 1
-if ! cd "${CDIR}/ACETOSCAN_RESULT" ; then
-    echo "Error: could not cd to ${CDIR}/ACETOSCAN_RESULT"
-    exit 1
-fi
-cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU.fasta" .
-cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_OTU_table.txt" .
-cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table_full.csv" .
-cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/FTHFS_TAX_table.txt" .
-cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/Translation/Translation*.fasta" .
+###    Putting everything together in a Result DIRECTORY = acetoscan_result or Visualization
 
-if [ -f "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/Barplot_Phylum_Absolute_abundance.pdf" ]; then
-    cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*Barplot*.pdf" .
-    cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*Heatmap*.pdf" .
-    cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/Phyloseq_object_processing_info.txt" .
-    cp "${CDIR}/OUTPUT_DATA/trimmed/FASTA/VSEARCH/VISUALIZATION/*.html" .
+mkdir -v -p "${WKDIR}/acetoscan_result"
+cd "${WKDIR}/acetoscan_result" 
+
+        #       result files
+
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU.fasta" .
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt" .
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_full.csv" .
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table.txt" .
+
+        #       graphics
+
+if [ -f "${WKDIR}/output_data/trimmed/VSEARCH/Visualization/6_Species_barplot.html" ]; then
+        cp ${WKDIR}/output_data/trimmed/VSEARCH/Visualization/* .
+        rm AcetoScan_Visualization.R
+        echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
+        echo "#Final results are in directory \"acetoscan_result\" in path ${WKDIR}/acetoscan_result"
+        echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
 else
-    echo "" > /dev/null
+        rm AcetoScan_Visualization.R        
+        echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
+        echo "#Final results are in directory \"Visualization\" in path ${WKDIR}/output_data/trimmed/VSEARCH/Visualization/"
+        echo "#And OTU table and TAX table in \"acetoscan_result\" in path ${WKDIR}/acetoscan_result"
+        echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
 fi
 
 ###    Getting final information
+
 end=$(date +%s) # end time of script
 runtime=$(((end - start))) # calculate runtime
-
-DATASIZE=$(du "$READ_PATH/*" -ch | grep "total" | sed 's/total//')
-
-echo ""
-echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
-echo "Final results are in Directory \"ACETOSCAN_RESULT\" in path ${CDIR}/ACETOSCAN_RESULT"
-echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
-echo ""
-echo "${DATASIZE} of data processed in ${runtime} seconds"
-
-#     Print blank lines
-echo -e "\n\n\n"
+echo -e "\n#Acetoscan runtime: ${runtime} seconds"
 
 ###    End of script
-
