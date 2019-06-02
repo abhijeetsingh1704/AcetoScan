@@ -1,56 +1,68 @@
 # AcetoScan
 
-- Version: 0.1 (20190423)
-- Last modified: tor maj 23, 2019  12:37
+- Version: 0.1.0 (20190602)
+- Last modified: son Juni 02, 2019  19:40
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
 
-The pipeline directory AcetoScan contains scripts for the MiSeq illumina data
-analysis for the FTHFS amplicon sequencing.
+Acetoscan is a bash program for the analysis of Illumina MiSeq sequencing data for the FTHFS (Formyl--tetrahydrofolate synthetase) gene/amplicons
 
-The main script is `acetoscan`.
+
+## Dependencies
+
+`acetoscan` uses some software dependencies
+```
+	- Cutadapt 	(1.18-1)
+	- Vsearch 	(2.13.1)
+	- NCBI-blast+ 	(2.5.0+)
+	- Bioperl 	(1.7.2-3)
+	- R 		(3.5.2), with libraries:
+		- phyloseq 	(1.24.2)
+		- ggplot2 	(3.1.1)
+		- plotly 	(4.9.0)
+		- RColorBrewer 	(1.1.2)
+		- plyr 		(1.8.4)
+		- dplyr 	(0.8.0.1)
+```
+
 
 ## Installation
 
-Please see the file `INSTALL` for details. Briefly:
+For installation run the following command in terminal, this will `INSTALL` all dependencies (if unavailable) and download the reference database from acetobase website. 
 
-1. Make sure the external dependencies are installed:
+> $ sudo ./INSTALL
 
-    - Cutadapt (v.X.X)
-    - Vsearch (v.2.13.0)
-    - NCBI BLAST+ (v.2.8.1+)
-    - R (v.3.5.2), with libraries:
-        - phyloseq
-        - ggplot2
-        - plotly
-        - RColorBrewer
-        - randomcoloR
-        - plyr
-        - dplyr
+## acetoscan binary
 
-2. Add the path to folder `AcetoScan/SCRIPTS` to your PATH (or add the
-scripts in the folder `SCRIPTS` to your PATH).
+`INSTALL` will create main directory `acetoscan` in `/home/user/` and sub-directories `acetoscan_bin` containing dependendencies binaries & `acetobase` contains reference database
 
-3. Make sure you have access to the [AcetoBase]() data base. Can be retrieved by:
+## acetoscan output
 
-        wget "https://www.someserver.se/path/to/ACETOBASE_DB_DIR.gz"
+`acetoscan` will result in three directories
 
-## Contents of pipeline
+```
+1. `input_data`		- Directory will be created `in default/destination path` where input raw data will be softlinked
+2. `output_data`	- Directory will be created `in default/destination path` where process data will be generated and stored. In case of process failure, data can be accessed from here for further processing
+3. `acetoscan_result`	- Directory will be created `in default/destination path` containing all the final graphics, OTU table and TAX table. After successful execution of analysis, all the important data will be copies to this final directory.
+```
+## Using acetoscan program
 
-1. `SCRIPTS` - Directory contains scripts required for the analysis
-2. `INPUT_DATA` - Directory will be created where input raw data will be softlinked
-3. `OUTPUT_data` - Will be created. Directory where the output of analysis will be processed and kept.
-4. `ACETOSCAN_RESULT` - Directory will be created during analysis and will contain the final results:
-	a. OTU sequences
-	b. OTU table
-	c. TAX table
-	d. Translation of OTUs
+Use `acetoscan` as follows
 
+> $ acetoscan -i /input path/ -o /output path/ -r 1 -t 0.95
+	
+```
+	-i      input directory containing raw illumina data
+        -o      output directory
+                default = /home/abhi/acetoscan/output_data
+        -r      read type either forward or reverse reads 
+                default = 1        
+                1 = forward reads
+                2 = reverse reads
+        -t      clustering threshold
+                default = 0.95 (95% sequence similarity)      
+        -h      print Help
+        -v      print acetoscan version
 
-## Usage
-
-	$ ./acetoscan
-		
-The script is interactive and will ask for the absolute path to Illumina rawdata.
-
+```
