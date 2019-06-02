@@ -2,8 +2,8 @@
 
 # INSTALL for AcetoScan
 
-# Last modified: tor maj 30, 2019  15:38
-# Sign: Abhi
+#- Last modified: tor Juni 2, 2019  18:56
+#- Sign: Abhi
 
 # setting pipefail
 
@@ -13,18 +13,20 @@ set -euo pipefail
 
 ##      Checking and installing Dependencies
 
+echo -e "\n#Checking and installing dependencies for debian/ubuntu based systems"
+
 ###     Checking if cutadapt is installed
 
-echo "Checking and installing dependencies for debian/ubuntu based systems"
+
 if ! command -v "cutadapt" > /dev/null ; then
-        echo "Installing Cutadapt"    
+        echo -e "\n#Installing Cutadapt"    
         sudo apt install -y cutadapt=1.18-1
 fi
 
 ###     Checking if vsearch is installed
 
 if ! command -v "vsearch" > /dev/null ; then
-        echo "Installing Vsearch"
+        echo -e "\n#Installing Vsearch"
         wget "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
         tar xzf vsearch-2.13.1-linux-x86_64.tar.gz
         sudo cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch
@@ -33,35 +35,34 @@ fi
 ###     Checking if Blast is installed
 
 if ! command -v "blastx" > /dev/null ; then
-        echo "Installing NCBI-blast+"
+        echo -e "\n#Installing NCBI-blast+"
         sudo apt install -y ncbi-blast+
 fi
 
 ###     Checking if bioperl is installed
 
-        echo "Checking BioPerl"
-        sudo apt install -y -qq < /dev/null > /dev/null
+        echo -e "\n#Checking BioPerl"
+        sudo apt install -y -qq 
+
 
 ###     Checking if R and Rscript are installed
 
 if ! command -v "R" > /dev/null ; then
-        echo "Installing R"
-        sudo apt install -y -qq \
-                        libv8-dev \                                
-                        r-base \
-                        r-base-dev < /dev/null > /dev/null                               
+        echo -e "\n#Installing R"
+        sudo apt install -y libnode-dev
+        sudo apt install -y r-base
+        sudo apt install -y r-base-dev
 fi
 
 ###     Installing R packages 
 
-echo "Checking R dependencies"
-        sudo apt install -y -qq \
-                        r-bioc-phyloseq \
-                        r-cran-dplyr \
-                        r-cran-ggplot2 \
-                        r-cran-plotly \
-                        r-cran-plyr \
-                        r-cran-rcolorbrewer < /dev/null > /dev/null
+echo -e "\n#Checking/Fixing R dependencies"
+        sudo apt install -y -qq r-bioc-phyloseq 
+        sudo apt install -y -qq r-cran-dplyr 
+        sudo apt install -y -qq r-cran-ggplot2 
+        sudo apt install -y -qq r-cran-plotly 
+        sudo apt install -y -qq r-cran-plyr 
+        sudo apt install -y -qq r-cran-rcolorbrewer 
 
 ###     Copying Acetoscan executable to /usr/local/bin
 
@@ -70,15 +71,20 @@ sudo chmod +x /usr/local/bin/acetoscan
 
 ###     fixing the directory for AcetoScan program
 
-sudo mkdir -p /home/acetoscan/acetoscan_bin
-sudo mkdir -p /home/acetoscan/acetobase
+user=`echo ${SUDO_USER:-${USER}}`
+
+mkdir -m 777 -p /home/$user/acetoscan/acetoscan_bin
+mkdir -m 777 -p /home/$user/acetoscan/acetobase
+mkdir -m 777 -p /home/$user/acetoscan/output_data
 
 ###     copying acetoscan dependencies to acetoscan_bin
 
-sudo cp ./acetoscan_bin/* /home/acetoscan/acetoscan_bin/
+cp ./acetoscan_bin/* /home/$user/acetoscan/acetoscan_bin/
 
 ###     Downloading AcetoBase
 
-echo "Downloading AcetoBase"
-sudo wget -P /home/acetoscan/acetobase/ "https://www.acetobase.molbio.slu.se/path/to/AcetoBase_V1.tgz"
-sudo tar xvzf /home/acetoscan/acetobase/AcetoBase_V1.tgz  
+echo -e "\n#Downloading AcetoBase"
+#sudo wget -P /home/$user/acetoscan/acetobase/ "https://www.acetobase.molbio.slu.se/path/to/AcetoBase_V1.tgz"
+#sudo tar xf /home/$user/acetoscan/acetobase/AcetoBase_V1.tgz -C /home/$user/acetoscan/acetobase/ 
+
+###     End of script 
