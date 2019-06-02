@@ -80,6 +80,7 @@ mkdir -m 777 -p /home/$user/acetoscan/output_data
 ###     copying acetoscan dependencies to acetoscan_bin
 
 cp ./acetoscan_bin/* /home/$user/acetoscan/acetoscan_bin/
+sudo chmod +x /home/$user/acetoscan/acetoscan_bin/*
 
 ###     Downloading AcetoBase
 
