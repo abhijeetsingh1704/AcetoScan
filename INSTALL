@@ -42,7 +42,7 @@ fi
 ###     Checking if bioperl is installed
 
         echo -e "\n#Checking BioPerl"
-        sudo apt install -y -qq 
+        sudo apt install -y -qq bioperl
 
 
 ###     Checking if R and Rscript are installed
