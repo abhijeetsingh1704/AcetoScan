@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: son Juni, 2019  18:59
-# Sign: Abhi
+# Last modified: mån jun 03, 2019  03:00
+# Sign: JN 
 
 set -euo pipefail
 
@@ -29,7 +29,7 @@ cluster_threshold=""
 
 ###     Username
 
-user=`echo ${SUDO_USER:-${USER}}`
+user=$(echo ${SUDO_USER:-${USER}})
 
 ###     Defaults
 
@@ -109,15 +109,15 @@ shift $((OPTIND-1))
 
 ###     Checking input_dir 
 
-if [ ! -d "$input_dir" ] && [ -x $input_dir]; then
+if [ ! -d "$input_dir" ] && [ -x "$input_dir" ]; then
         echo -e "\n#Input directory not provided, Aborting!"
         echo ""
         usage
         exit
 else
         echo -e "\n#Content of input directory: $input_dir"        
-        forward_read_count=`find $input_dir -name "*_R1_001.fastq.gz" | wc -l`
-        reverse_read_count=`find $input_dir -name "*_R2_001.fastq.gz" | wc -l`
+        forward_read_count=$(find "$input_dir" -name '*_R1_001.fastq.gz' | wc -l)
+        reverse_read_count=$(find "$input_dir" -name '*_R2_001.fastq.gz' | wc -l)
         echo "-> Number of forward read files: $forward_read_count"
         echo "-> Number of reverse read files: $reverse_read_count"
         
@@ -130,17 +130,17 @@ fi
 if [ "$output_dir" == "" ]; then
         output_dir="$output_dir_def"
         echo -e "\n#Using default output directory: $output_dir_def"
-        if [ -d $output_dir_def ] ; then
+        if [ -d "$output_dir_def" ] ; then
                 echo -ne ""
         else
-                mkdir -p $output_dir_def
+                mkdir -p "$output_dir_def"
         fi
 else
-        if [  -d "$output_dir" ] && [ -x $output_dir ]; then
+        if [  -d "$output_dir" ] && [ -x "$output_dir" ]; then
                 echo -e "\n#Output directory: $output_dir "
         else
                 if [ ! -d "$output_dir" ]; then   
-                        mkdir -p $output_dir
+                        mkdir -p "$output_dir"
                         echo -e "\n#Output directory: $output_dir "
                 else
                        echo -e "\n#Cannot access/create $output_dir " 
@@ -189,11 +189,12 @@ fi
 
 ###    Checking and cleaning the input_data and output_data directory
 
-if [ ! -z "$(ls -A $output_dir)" ]; then
+if [ ! -z "$(ls -A "$output_dir")" ]; then
    echo -e "\n#WARNING: directory \"$output_dir\" is not empty, 
           possibility of data loss!!!"
 
         #       Cleaning
+        # NOTE JN: Use find and -exec rm {} ;\ instead of file expansion
         echo -e "\n#Removing previous data"
         rm -f ${WKDIR}/input_data/*
         rm -rf ${WKDIR}/output_data/*
@@ -201,9 +202,9 @@ if [ ! -z "$(ls -A $output_dir)" ]; then
 else
         #       creating new directories
         echo -e "\n#Creating directories"
-        mkdir -v -p ${WKDIR}/input_data
-        mkdir -v -p ${WKDIR}/output_data
-        mkdir -v -p ${WKDIR}/acetoscan_result
+        mkdir -v -p "${WKDIR}/input_data"
+        mkdir -v -p "${WKDIR}/output_data"
+        mkdir -v -p "${WKDIR}/acetoscan_result"
 fi
 
 ###    Checking dependencies
@@ -225,7 +226,7 @@ find "${input_dir}" -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/inp
 
 ###    Checking if link exist
 
-if [ ! -n "$(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_"${reads}"_001.fastq.gz" -print -quit)" ] ; then
+if [ ! -n "$(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.gz" -print -quit)" ] ; then
     echo "Input files \"*_${reads}*.fastq.gz\" not found in ${WKDIR}/input_data/, Aborting !!!"
     exit 1
 fi
@@ -238,6 +239,7 @@ echo -e "\n#Performing adapters trimming and quality filtering"
 ###     CUTADAPT <--- from external script
 
         #       making progress bar for cudadapt script
+        # NOTE JN: "SIGKILL/SIGSTOP can not be trapped"
         
         while true; do echo -ne "#"; sleep 2; done &
         trap 'kill $!' SIGTERM SIGKILL
@@ -260,6 +262,7 @@ echo -e "\n#Performing longest best frame analysis"
         echo "This might take a while"
 
         #longorf-acetoscan external script
+        # NOTE JN: Could use gnu parallel. And, "Injecting filenames is fragile and insecure. Use parameters."
         find "${WKDIR}/output_data/trimmed" -name "*_trimmed_${reads}.fasta" \
         -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); longorf-acetoscan.pl --filter "$f" > "Best_${b}.fasta"' \; # <============= external script
         
@@ -268,10 +271,11 @@ echo -e "\n#Performing longest best frame analysis"
 
 ###     Preprocessing for Clustering
 
-cd ${WKDIR}/output_data/trimmed
+cd "${WKDIR}/output_data/trimmed"
 echo -e "\n#Performing preprocessing for clustering"
 
-for i in `find . -type f -iname "Best*.fasta" -printf "%f\n"`
+# NOTE JN: "For loops over find output are fragile. Use find -exec or a while read loop."
+for i in $(find . -type f -iname "Best*.fasta" -printf "%f\n")
         do 
              awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' "${i}"
         done > All_best.fasta.tmp
@@ -348,8 +352,8 @@ perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
 sed '/^#/d' ./VSEARCH/blast_results_for_filtering > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt"
 
 ###     Extracting target sequences
-
-for OTU in $(cat ${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt)
+# NOTE JN: variable OTU not used
+for OTU in $(cat "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt")
         do
                 grep -A 1 "OTU" "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp"
         done 
