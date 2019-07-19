@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# File: cutadapt_acetoscan.sh
-# Last modified: son Juni 2, 2019  19:21
+# File: AcetoScan_cutadapt.sh
+# Last modified: fre jul 19, 2019 20:56
 # Sign: Abhi
 
 # Cutadapt script for cleaning ILLUMINA read data, 
@@ -29,11 +29,11 @@ for FwdIn in *"${reads}"*.fastq.gz; do
             -b "ATNTTNGCNAANGGNCCNNCNTG" \
             -b "TANAANCGNTTNCCNGGNNGNAC" \
             --max-n 0 \
-            --maximum-length 277 \
-            --minimum-length 150 \
+            --maximum-length $MaxL \
+            --minimum-length $MinL \
             --discard-untrimmed \
             -j 0 \
-            -q 20 \
+            -q $QT \
             --length-tag "size=" \
             -o "${cutadapt_dir}/${FwdOut}" \
             "${FwdIn}" >> "${cutadapt_out}"
