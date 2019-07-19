@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: mån jun 03, 2019  03:00
-# Sign: JN 
+# Last modified: fre jul 19, 2019 20:44
+# Sign: Abhi
 
 set -euo pipefail
 
@@ -24,17 +24,23 @@ start=$(date +%s) #start time of script
 
 input_dir=""            
 output_dir=""           
-read_type=""            
+read_type=""
+max_len=""
+min_len=""
+qual=""            
 cluster_threshold=""
 
 ###     Username
 
-user=$(echo ${SUDO_USER:-${USER}})
+user=`echo ${SUDO_USER:-${USER}}`
 
 ###     Defaults
 
 output_dir_def="/home/$user/acetoscan/output_data"
 read_type_def="1"
+max_len_def="277"
+min_len_def="150"
+qual_def="20" 
 cluster_threshold_def="0.95"
 version_def="0.1.0"
 
@@ -47,14 +53,14 @@ THREADS=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || getconf _NPROC
 #       function
 
 usage() {
-echo "Usage   : $0 [-i <input directory>] [-o <output directory>] [-r <reads type>] [-t <clustering threshold>]
-Example : acetoscan -i /<input path>/ -o /<output path>/ -r 1 -t 0.95" 1>&2; exit 1;
+echo "Usage   : $0 [-i <input directory>] [-o <output directory>] [-m <max_length>] [-n <min_length>] [-q <quality threshold>] [-r <reads type>] [-t <clustering threshold>]
+Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95" 1>&2; exit 1;
 }
 
 
 #       flags
 
-while getopts "i:o:r:t:hv" flags; 
+while getopts "i:o:m:n:q:r:t:hv" flags; 
         do      
                 case "${flags}" in
                         
@@ -66,6 +72,18 @@ while getopts "i:o:r:t:hv" flags;
                                 output_dir=${OPTARG}
                                 ;;
 
+                        m)
+                                max_len=${OPTARG}
+                                ;;
+
+                        n)
+                                min_len=${OPTARG}
+                                ;;
+
+                        q)
+                                qual=${OPTARG}
+                                ;;
+                        
                         r)
                                 read_type=${OPTARG}
                                 ;;
@@ -76,13 +94,19 @@ while getopts "i:o:r:t:hv" flags;
 
                         h)
                                 echo "
-Example : acetoscan -i /<input path>/ -o /<output path>/ -r 1 -t 0.95
+Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95
 
         -i      input directory containing raw illumina data
         -o      output directory
-                default = /home/$user/acetoscan/output_data
+                default = /home/${user}/acetoscan/output_data
+        -m      maximum length of sequence after quality filtering
+                defalut max_length = 277
+        -n      minimum length of sequence after quality filtering
+                defalut min_length = 150
+        -q      Quality threshold for the sequences 
+                default quality threshold = 20
         -r      read type either forward or reverse reads 
-                default = 1        
+                default read = 1        
                 1 = forward reads
                 2 = reverse reads
         -t      clustering threshold
@@ -93,19 +117,40 @@ Example : acetoscan -i /<input path>/ -o /<output path>/ -r 1 -t 0.95
                                 ;;
 
                         v)
-                                echo "AcetoScan version: $version_def"
+                                echo "AcetoScan version: ${version_def}"
                                 echo "Visit \"https://acetobase.molbio.slu.se/\" for more information."
                                 exit
                                 ;;
 
                         *)
                                 usage
+                                exit
+                                ;;
+
+                        :)      
+                                usage
+                                exit
+                                ;;
+                        
+                        \?)
+                                usage
+                                exit
                                 ;;
 
                 esac
         done
 
 shift $((OPTIND-1))
+
+###     check
+
+if ((OPTIND == 1));then
+echo -e "\n#Input directory not provided, Aborting!"
+        echo ""
+        usage
+        exit
+fi
+
 
 ###     Checking input_dir 
 
@@ -152,6 +197,33 @@ fi
 
 export WKDIR="$output_dir"
 
+###     Checking maximum length threshold
+
+if [ "$max_len" == "" ];then
+        max_len="$max_len_def"
+        echo -e "\n#Using default max_length: 277"
+else
+       echo -e "\n#Using max_length: ${max_len}"
+fi
+
+###     Checking minimum length threshold
+
+if [ "$min_len" == "" ];then
+        min_len="$min_len_def"
+        echo -e "\n#Using default min_length: 150"
+else
+       echo -e "\n#Using min_length: ${min_len}"
+fi
+
+###     Checking quality threshold
+
+if [ "$qual" == "" ];then
+        qual="$qual_def"
+        echo -e "\n#Using default quality threshold: 20"
+else
+       echo -e "\n#Using quality threshold: ${qual}"
+fi
+
 ###     Checking read type
 
 if [ "$read_type" == "" ];then
@@ -164,6 +236,9 @@ fi
 #       read variable
 
 export reads="R${read_type}"
+export MaxL="$max_len"
+export MinL="$min_len"
+export QT="$qual"
 
 ###     Checking read type
 
@@ -194,7 +269,6 @@ if [ ! -z "$(ls -A "$output_dir")" ]; then
           possibility of data loss!!!"
 
         #       Cleaning
-        # NOTE JN: Use find and -exec rm {} ;\ instead of file expansion
         echo -e "\n#Removing previous data"
         rm -f ${WKDIR}/input_data/*
         rm -rf ${WKDIR}/output_data/*
@@ -211,7 +285,7 @@ fi
 
 echo -e "\n#Performing dependencies check"
 export PATH="/home/$user/acetoscan/acetoscan_bin/:${PATH}"
-Software_check.sh # <======== External script
+AcetoScan_software_check.sh # <======== External script
 
 ###    find illumina raw reads and making soft links to the data
 
@@ -239,14 +313,13 @@ echo -e "\n#Performing adapters trimming and quality filtering"
 ###     CUTADAPT <--- from external script
 
         #       making progress bar for cudadapt script
-        # NOTE JN: "SIGKILL/SIGSTOP can not be trapped"
-        
+                
         while true; do echo -ne "#"; sleep 2; done &
         trap 'kill $!' SIGTERM SIGKILL
         echo "#This might take a while"
         
         #cutadapt external script        
-        cutadapt_acetoscan.sh
+        AcetoScan_cutadapt.sh   # <============= external script
                 
         echo ""
         kill $!
@@ -262,9 +335,9 @@ echo -e "\n#Performing longest best frame analysis"
         echo "This might take a while"
 
         #longorf-acetoscan external script
-        # NOTE JN: Could use gnu parallel. And, "Injecting filenames is fragile and insecure. Use parameters."
-        find "${WKDIR}/output_data/trimmed" -name "*_trimmed_${reads}.fasta" \
-        -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); longorf-acetoscan.pl --filter "$f" > "Best_${b}.fasta"' \; # <============= external script
+        
+        find ${WKDIR}/output_data/trimmed/ -name "*_trimmed_${reads}.fasta" \
+        -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); AcetoScan_longorf.pl --filter "$f" > "Best_${b}.fasta"' \; # <============= external script
         
         echo ""        
         kill $!
@@ -274,10 +347,11 @@ echo -e "\n#Performing longest best frame analysis"
 cd "${WKDIR}/output_data/trimmed"
 echo -e "\n#Performing preprocessing for clustering"
 
-# NOTE JN: "For loops over find output are fragile. Use find -exec or a while read loop."
-for i in $(find . -type f -iname "Best*.fasta" -printf "%f\n")
+#       Finding and replacing the fasta header with file name
+
+find ${WKDIR}/output_data/ -type f -iname "Best*.fasta" -printf "%f\n" | while read x;
         do 
-             awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' "${i}"
+             awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' "${x}"
         done > All_best.fasta.tmp
 
 ###     Formating input for vsearch
@@ -295,7 +369,6 @@ echo -e "\n#Begin clustering at $cluster_threshold%"
         vsearch \
                 --derep_fulllength "${WKDIR}/output_data/trimmed/All_best.fasta" \
                 --output "${WKDIR}/output_data/trimmed/VSEARCH/best_derep.fasta" \
-                --minseqlength 150 \
                 --sizeout \
                 --minuniquesize 2 \
                 --relabel Unique \
@@ -352,7 +425,7 @@ perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
 sed '/^#/d' ./VSEARCH/blast_results_for_filtering > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt"
 
 ###     Extracting target sequences
-# NOTE JN: variable OTU not used
+
 for OTU in $(cat "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt")
         do
                 grep -A 1 "OTU" "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp"
