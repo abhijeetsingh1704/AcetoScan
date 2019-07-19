@@ -32,6 +32,7 @@ Acetoscan is a bash program for the analysis of Illumina MiSeq sequencing data f
 For installation run the following command in terminal, this will `INSTALL` all dependencies (if unavailable) and download the reference database from acetobase website. 
 
 > sudo chmod +x INSTALL
+
 > $ sudo ./INSTALL
 
 ## acetoscan binary
