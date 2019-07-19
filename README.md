@@ -31,6 +31,7 @@ Acetoscan is a bash program for the analysis of Illumina MiSeq sequencing data f
 
 For installation run the following command in terminal, this will `INSTALL` all dependencies (if unavailable) and download the reference database from acetobase website. 
 
+> sudo chmod +x INSTALL
 > $ sudo ./INSTALL
 
 ## acetoscan binary
@@ -52,14 +53,20 @@ For installation run the following command in terminal, this will `INSTALL` all 
 
 Use `acetoscan` as follows
 
-> $ acetoscan -i /input path/ -o /output path/ -r 1 -t 0.95
+> $ acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95
 	
 ```
 	-i      input directory containing raw illumina data
         -o      output directory
-                default = /home/abhi/acetoscan/output_data
+                default = /home/${user}/acetoscan/output_data
+        -m      maximum length of sequence after quality filtering
+                defalut max_length = 277
+        -n      minimum length of sequence after quality filtering
+                defalut min_length = 150
+        -q      Quality threshold for the sequences 
+                default quality threshold = 20
         -r      read type either forward or reverse reads 
-                default = 1        
+                default read = 1        
                 1 = forward reads
                 2 = reverse reads
         -t      clustering threshold
