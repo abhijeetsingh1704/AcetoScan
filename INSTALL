@@ -2,7 +2,7 @@
 
 # INSTALL for AcetoScan
 
-#- Last modified: tor Juni 2, 2019  18:56
+#- Last modified: fre jul 19, 2019 20:51
 #- Sign: Abhi
 
 # setting pipefail
@@ -20,7 +20,7 @@ echo -e "\n#Checking and installing dependencies for debian/ubuntu based systems
 
 if ! command -v "cutadapt" > /dev/null ; then
         echo -e "\n#Installing Cutadapt"    
-        sudo apt install -y cutadapt=1.18-1
+        sudo apt install -y -qq cutadapt=1.18-1 < /dev/null > /dev/null
 fi
 
 ###     Checking if vsearch is installed
@@ -36,33 +36,33 @@ fi
 
 if ! command -v "blastx" > /dev/null ; then
         echo -e "\n#Installing NCBI-blast+"
-        sudo apt install -y ncbi-blast+
+        sudo apt install -y -qq ncbi-blast+ < /dev/null > /dev/null
 fi
 
 ###     Checking if bioperl is installed
 
         echo -e "\n#Checking BioPerl"
-        sudo apt install -y -qq bioperl
+        sudo apt install -y -qq bioperl < /dev/null > /dev/null
 
 
 ###     Checking if R and Rscript are installed
 
 if ! command -v "R" > /dev/null ; then
         echo -e "\n#Installing R"
-        sudo apt install -y libnode-dev
-        sudo apt install -y r-base
-        sudo apt install -y r-base-dev
+        sudo apt install -y -qq libnode-dev < /dev/null > /dev/null
+        sudo apt install -y -qq r-base < /dev/null > /dev/null
+        sudo apt install -y -qq r-base-dev < /dev/null > /dev/null
 fi
 
 ###     Installing R packages 
 
 echo -e "\n#Checking/Fixing R dependencies"
-        sudo apt install -y -qq r-bioc-phyloseq 
-        sudo apt install -y -qq r-cran-dplyr 
-        sudo apt install -y -qq r-cran-ggplot2 
-        sudo apt install -y -qq r-cran-plotly 
-        sudo apt install -y -qq r-cran-plyr 
-        sudo apt install -y -qq r-cran-rcolorbrewer 
+        sudo apt install -y -qq r-bioc-phyloseq < /dev/null > /dev/null
+        sudo apt install -y -qq r-cran-dplyr < /dev/null > /dev/null
+        sudo apt install -y -qq r-cran-ggplot2 < /dev/null > /dev/null
+        sudo apt install -y -qq r-cran-plotly < /dev/null > /dev/null
+        sudo apt install -y -qq r-cran-plyr < /dev/null > /dev/null
+        sudo apt install -y -qq r-cran-rcolorbrewer < /dev/null > /dev/null
 
 ###     Copying Acetoscan executable to /usr/local/bin
 
@@ -87,5 +87,8 @@ sudo chmod +x /home/$user/acetoscan/acetoscan_bin/*
 echo -e "\n#Downloading AcetoBase"
 #sudo wget -O /home/$user/acetoscan/acetobase/AcetoBase_V1.tgz https://acetobase.molbio.slu.se/download/acetobase_ref_protein
 #sudo tar xf /home/$user/acetoscan/acetobase/AcetoBase_V1.tgz -C /home/$user/acetoscan/acetobase/ 
+#sudo find /home/$user/acetoscan/acetobase/ -type f -iname "AcetobaseV1.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBaseV1.fasta
+#sudo cd /home/$user/acetoscan/acetobase/
+#makeblastdb -in AcetoBaseV1.fasta -dbtype prot -title AcetoBaseV1 -out AcetoBaseV1
 
 ###     End of script 
