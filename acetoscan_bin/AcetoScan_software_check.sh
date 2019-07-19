@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# File: Software_check.sh
-# Last modified: mån maj 20, 2019  01:13
+# File: AcetoScan_software_check.sh
+# Last modified: fre jul 19, 2019 20:49
 # Sign: Abhi
 
 ###     User
@@ -49,8 +49,11 @@ fi
 if [ ! -f /home/$user/acetoscan/acetobase/*.phr ];then
         echo -e "\n#Cannot access acetobase"
         echo -e "\n#Trying to Download AcetoBase"
-        sudo wget -P /home/$user/acetoscan/acetobase/ "https://www.acetobase.molbio.slu.se/path/to/AcetoBase_V1.tgz"
-        sudo tar xf /home/$user/acetoscan/acetobase/AcetoBase_V1.tgz -C /home/$user/acetoscan/acetobase/
+        sudo wget -O /home/$user/acetoscan/acetobase/AcetoBase_V1.tgz https://acetobase.molbio.slu.se/download/acetobase_ref_protein
+        sudo tar xf /home/$user/acetoscan/acetobase/AcetoBase_V1.tgz -C /home/$user/acetoscan/acetobase/ 
+        sudo find /home/$user/acetoscan/acetobase/ -type f -iname "AcetobaseV1.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBaseV1.fasta
+        sudo cd /home/$user/acetoscan/acetobase/
+        makeblastdb -in AcetoBaseV1.fasta -dbtype prot -title AcetoBaseV1 -out AcetoBaseV1
 fi
 
 ###     End of script
