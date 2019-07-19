@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# longorf-acetoscan.pl
+# AcetoScan_longorf.pl
 # Based on longorf.pl v0208020920 (c) Dan Kortschak 2002
 # Modifications by JN tor 25 apr 2019 14:41:40
 
