@@ -1,7 +1,7 @@
 # AcetoScan
 
-- Version: 0.1.0 (20190602)
-- Last modified: son Juni 02, 2019  19:40
+- Version: 0.1.0 (20190719)
+- Last modified: fre jul 19, 2019 20:59
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
