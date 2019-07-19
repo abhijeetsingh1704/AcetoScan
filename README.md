@@ -54,7 +54,7 @@ For installation run the following command in terminal, this will `INSTALL` all 
 
 Use `acetoscan` as follows
 
-> $ acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95
+> $ acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.95
 	
 ```
 	-i      input directory containing raw illumina data
