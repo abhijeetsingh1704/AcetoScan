@@ -73,7 +73,7 @@ $ acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.95
                 defalut max_length = 277
         -n      minimum length of sequence after quality filtering
                 defalut min_length = 150
-        -q      Quality threshold for the sequences 
+        -q      quality threshold for the sequences 
                 default quality threshold = 20
         -r      read type either forward or reverse reads 
                 default read = 1        
