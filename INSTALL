@@ -20,7 +20,7 @@ echo -e "\n#Checking and installing dependencies for debian/ubuntu based systems
 
 if ! command -v "cutadapt" > /dev/null ; then
         echo -e "\n#Installing Cutadapt"    
-        sudo apt install -y -qq cutadapt=1.18-1 < /dev/null > /dev/null
+        sudo apt install -y -qq cutadapt=1.18-1 
 fi
 
 ###     Checking if vsearch is installed
@@ -36,33 +36,33 @@ fi
 
 if ! command -v "blastx" > /dev/null ; then
         echo -e "\n#Installing NCBI-blast+"
-        sudo apt install -y -qq ncbi-blast+ < /dev/null > /dev/null
+        sudo apt install -y -qq ncbi-blast+ 
 fi
 
 ###     Checking if bioperl is installed
 
         echo -e "\n#Checking BioPerl"
-        sudo apt install -y -qq bioperl < /dev/null > /dev/null
+        sudo apt install -y -qq bioperl 
 
 
 ###     Checking if R and Rscript are installed
 
 if ! command -v "R" > /dev/null ; then
         echo -e "\n#Installing R"
-        sudo apt install -y -qq libnode-dev < /dev/null > /dev/null
-        sudo apt install -y -qq r-base < /dev/null > /dev/null
-        sudo apt install -y -qq r-base-dev < /dev/null > /dev/null
+        sudo apt install -y -qq libnode-dev 
+        sudo apt install -y -qq r-base 
+        sudo apt install -y -qq r-base-dev 
 fi
 
 ###     Installing R packages 
 
 echo -e "\n#Checking/Fixing R dependencies"
-        sudo apt install -y -qq r-bioc-phyloseq < /dev/null > /dev/null
-        sudo apt install -y -qq r-cran-dplyr < /dev/null > /dev/null
-        sudo apt install -y -qq r-cran-ggplot2 < /dev/null > /dev/null
-        sudo apt install -y -qq r-cran-plotly < /dev/null > /dev/null
-        sudo apt install -y -qq r-cran-plyr < /dev/null > /dev/null
-        sudo apt install -y -qq r-cran-rcolorbrewer < /dev/null > /dev/null
+        sudo apt install -y -qq r-bioc-phyloseq 
+        sudo apt install -y -qq r-cran-dplyr 
+        sudo apt install -y -qq r-cran-ggplot2 
+        sudo apt install -y -qq r-cran-plotly 
+        sudo apt install -y -qq r-cran-plyr 
+        sudo apt install -y -qq r-cran-rcolorbrewer 
 
 ###     Copying Acetoscan executable to /usr/local/bin
 
