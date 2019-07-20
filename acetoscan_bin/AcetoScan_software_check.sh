@@ -49,11 +49,10 @@ fi
 if [ ! -f /home/$user/acetoscan/acetobase/*.phr ];then
         echo -e "\n#Cannot access acetobase"
         echo -e "\n#Trying to Download AcetoBase"
-        sudo wget -O /home/$user/acetoscan/acetobase/AcetoBase_V1.tgz https://acetobase.molbio.slu.se/download/acetobase_ref_protein
-        sudo tar xf /home/$user/acetoscan/acetobase/AcetoBase_V1.tgz -C /home/$user/acetoscan/acetobase/ 
-        sudo find /home/$user/acetoscan/acetobase/ -type f -iname "AcetobaseV1.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBaseV1.fasta
-        sudo cd /home/$user/acetoscan/acetobase/
-        makeblastdb -in AcetoBaseV1.fasta -dbtype prot -title AcetoBaseV1 -out AcetoBaseV1
+        wget -O /home/$user/acetoscan/acetobase/AcetoBase_V1.tar.gz https://acetobase.molbio.slu.se/download/acetobase_ref_protein
+        tar xf /home/$user/acetoscan/acetobase/AcetoBase_V1.tar.gz -C /home/$user/acetoscan/acetobase/ 
+        find /home/$user/ -type f -iname "AcetoBaseV1.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBaseV1.fasta
+        cd /home/$user/acetoscan/acetobase/ && makeblastdb -in AcetoBaseV1.fasta -dbtype prot -title AcetoBaseV1 -out AcetoBaseV1
 fi
 
 ###     End of script
