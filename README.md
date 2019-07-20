@@ -31,7 +31,7 @@ Acetoscan is a bash program for the analysis of Illumina MiSeq sequencing data f
 
 For installation run the following command in terminal, this will `INSTALL` all dependencies (if unavailable) and download the reference database from acetobase website. 
 ```
-$ sudo chmod +x INSTALL
+$ chmod +x INSTALL
 
 $ sudo ./INSTALL
 ```
@@ -49,7 +49,7 @@ $ sudo ./INSTALL
 ```
 1. input_data 		- containing softlinked input raw data
 ```
-## Raw data must in format "Samplename_XYZ_L001_R1_001.fastq.gz" 
+######			Raw data must in format "Samplename_XYZ_L001_R1_001.fastq.gz" 
 https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/miseqreporter/miseq-reporter-generate-fastq-workflow-guide-15042322-01.pdf, page 9, FASTQ File Names
 
 ```				
