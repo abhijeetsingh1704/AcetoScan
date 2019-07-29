@@ -65,8 +65,13 @@ fi
 
 ###     Copying Acetoscan executable to /usr/local/bin
 
-find / -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
 chmod +x /usr/local/bin/acetoscan
+
+###     Copying Acetoscan executable to /home/$user/acetoscan/ for non-super user
+
+find . -type f -name "acetoscan" -exec cp {} /home/$user/acetoscan/ \; 2>/dev/null
+chmod +x /home/$user/acetoscan/
 
 ###     fixing the directory for AcetoScan program
 
@@ -89,4 +94,5 @@ chmod +x /home/$user/acetoscan/acetoscan_bin/*
 #find /home/$user/ -type f -iname "AcetoBaseV1.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBaseV1.fasta
 #cd /home/$user/acetoscan/acetobase/ && makeblastdb -in AcetoBaseV1.fasta -dbtype prot -title AcetoBaseV1 -out AcetoBaseV1
 
+echo -e "\n#Installation DONE for $user"
 ###     End of script 
