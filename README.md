@@ -36,6 +36,17 @@ $ chmod +x INSTALL
 $ sudo ./INSTALL
 ```
 
+## Installation without sudo/ROOT
+
+For installation as local user make user the Dependencies Software are installed and modules are loaded
+```
+chmod +x INSTALL
+
+./INSTALL
+```
+
+
+
 ## acetoscan binary
 
 `INSTALL` will create main directory `acetoscan` in `/home/user/` and sub-directories `acetoscan_bin` containing dependendencies binaries & `acetobase` contains reference database
