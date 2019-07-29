@@ -41,8 +41,10 @@ fi
 
 ###     Checking if bioperl is installed
 
+if ! command -v perl -MBio::SeqIO -e 'printf "%vd\n", $Bio::SeqIO::VERSION, "\n"' > /dev/null ; then
         echo -e "\n#Checking BioPerl"
         sudo apt install -y -qq bioperl 
+fi
 
 
 ###     Checking if R and Rscript are installed
@@ -52,19 +54,14 @@ if ! command -v "R" > /dev/null ; then
         sudo apt install -y -qq libnode-dev 
         sudo apt install -y -qq r-base 
         sudo apt install -y -qq r-base-dev 
-fi
-
-###     Installing R packages 
-
-
-echo -e "\n#Checking/Fixing R dependencies"
+        echo -e "\n#Checking/Fixing R dependencies"
         sudo apt install -y -qq r-bioc-phyloseq 
         sudo apt install -y -qq r-cran-dplyr 
         sudo apt install -y -qq r-cran-ggplot2 
         sudo apt install -y -qq r-cran-plotly 
         sudo apt install -y -qq r-cran-plyr 
         sudo apt install -y -qq r-cran-rcolorbrewer 
-
+fi
 
 ###     Copying Acetoscan executable to /usr/local/bin
 
