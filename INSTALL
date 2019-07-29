@@ -56,7 +56,7 @@ fi
 
 ###     Installing R packages 
 
-if ! command -v "R" > /dev/null ; then
+
 echo -e "\n#Checking/Fixing R dependencies"
         sudo apt install -y -qq r-bioc-phyloseq 
         sudo apt install -y -qq r-cran-dplyr 
@@ -64,7 +64,7 @@ echo -e "\n#Checking/Fixing R dependencies"
         sudo apt install -y -qq r-cran-plotly 
         sudo apt install -y -qq r-cran-plyr 
         sudo apt install -y -qq r-cran-rcolorbrewer 
-fi
+
 
 ###     Copying Acetoscan executable to /usr/local/bin
 
