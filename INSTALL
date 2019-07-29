@@ -65,13 +65,18 @@ fi
 
 ###     Copying Acetoscan executable to /usr/local/bin
 
-find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-chmod +x /usr/local/bin/acetoscan
+if [ `whoami` = 'root' ]; then
 
-###     Copying Acetoscan executable to /home/$user/acetoscan/ for non-super user
+        find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+        chmod +x /usr/local/bin/acetoscan
+else
 
-find . -type f -name "acetoscan" -exec cp {} /home/$user/acetoscan/ \; 2>/dev/null
-chmod +x /home/$user/acetoscan/
+        ###     Copying Acetoscan executable to /home/$user/acetoscan/ for non-super user
+
+        find . -type f -name "acetoscan" -exec cp {} /home/$user/acetoscan/ \; 2>/dev/null
+        chmod +x /home/$user/acetoscan/
+
+fi
 
 ###     fixing the directory for AcetoScan program
 
