@@ -20,14 +20,14 @@ echo -e "\n#Checking and installing dependencies for debian/ubuntu based systems
 
 if ! command -v "cutadapt" > /dev/null ; then
         echo -e "\n#Installing Cutadapt"    
-        sudo apt install -y -qq cutadapt=1.18-1 
+        sudo apt install -y -qq cutadapt
 fi
 
 ###     Checking if vsearch is installed
 
 if ! command -v "vsearch" > /dev/null ; then
         echo -e "\n#Installing Vsearch"
-        wget "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
+        wget -c --no-check-certificate "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
         tar xzf vsearch-2.13.1-linux-x86_64.tar.gz
         sudo cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch
 fi
