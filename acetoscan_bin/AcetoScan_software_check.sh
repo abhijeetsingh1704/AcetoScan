@@ -28,7 +28,7 @@ fi
 
 ###     Checking if Bioperl is installed
 
-if ! perl -MBio::Root::Version -e 'print $Bio::Root::Version::VERSION,"\n"' > /dev/null ; then
+if ! command -v perl -MBio::SeqIO -e 'printf "%vd\n", $Bio::SeqIO::VERSION, "\n"' > /dev/null ; then
 echo -e "\n#Error: Bioperl not found, Aborting !!!"
     exit 1
 fi
