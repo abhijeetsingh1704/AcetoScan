@@ -11,6 +11,10 @@ set -euo pipefail
 
 ##      Installation
 
+###     Username
+
+user=`echo ${SUDO_USER:-${USER}}`
+
 ##      Checking and installing Dependencies
 
 echo -e "\n#Checking and installing dependencies for debian/ubuntu based systems"
