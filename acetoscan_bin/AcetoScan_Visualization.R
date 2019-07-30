@@ -230,7 +230,7 @@ class_level_transformed <- transform_sample_counts(class_level, function(x) {x/s
 class_level_transformed_psmelt <- psmelt(class_level_transformed)
 # converting the class information as character
 class_level_transformed_psmelt$Class <- as.character(class_level_transformed_psmelt$Class)
-# merge the class with abundance less than 1
+# merge the class with abundance less than 0.25
 class_level_transformed_psmelt$Class[class_level_transformed_psmelt$Abundance < 0.25] <- "x-Minor class (<0.25)"
 
 # Class level barplot
@@ -252,7 +252,7 @@ Class_level_barplot <- ggplot(data = class_level_transformed_psmelt,
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
     ylab("Relative Abundance (%)")+
-    ggtitle("Class level (> 0.25%)")+
+    ggtitle("Class level (> 0.25 %)")+
     theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
@@ -263,7 +263,7 @@ dev.off()
 # saving Class numbers in Class level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
 paste("=======================")
-paste("Class number in Class level barplot (> 0.25%): ", length(unique(class_level_transformed_psmelt$Class)))
+paste("Class number in Class level barplot (> 0.25 %): ", length(unique(class_level_transformed_psmelt$Class)))
 sink()
 
 # saving plot as html widget
@@ -285,7 +285,7 @@ order_level_transformed <- transform_sample_counts(order_level, function(x) {x/s
 order_level_transformed_psmelt <- psmelt(order_level_transformed)
 # converting the order information as character
 order_level_transformed_psmelt$Order <- as.character(order_level_transformed_psmelt$Order)
-# merge the order with abundance less than 1
+# merge the order with abundance less than 0.25
 order_level_transformed_psmelt$Order[order_level_transformed_psmelt$Abundance < 0.25] <- "x-Minor order(<0.25)"
 
 # Order level barplot
@@ -307,7 +307,7 @@ Order_level_barplot <- ggplot(data = order_level_transformed_psmelt,
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
     ylab("Relative Abundance (%)")+
-    ggtitle("Order level (> 0.25%)")+
+    ggtitle("Order level (> 0.25 %)")+
     theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
@@ -318,7 +318,7 @@ dev.off()
 # saving Order number in order level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
 paste("=======================")
-paste("Order number in order level barplot (> 0.25%): ", length(unique(order_level_transformed_psmelt$Order)))
+paste("Order number in order level barplot (> 0.25 %): ", length(unique(order_level_transformed_psmelt$Order)))
 sink()
 
 #saving plot as html widget
@@ -342,7 +342,7 @@ family_level_transformed_psmelt <- psmelt(family_level_transformed)
 # converting the family information as character
 family_level_transformed_psmelt$Family <- as.character(family_level_transformed_psmelt$Family)
 # merge the family with abundance less than 1
-family_level_transformed_psmelt$Family[family_level_transformed_psmelt$Abundance < 0.5] <- "x-Minor family(<0.5)"
+family_level_transformed_psmelt$Family[family_level_transformed_psmelt$Abundance < 1] <- "x-Minor family(<1)"
 
 # Family level barplot
 Family_level_barplot <- ggplot(data = family_level_transformed_psmelt,
@@ -362,7 +362,7 @@ Family_level_barplot <- ggplot(data = family_level_transformed_psmelt,
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
     ylab("Relative Abundance (%)")+
-    ggtitle("Family level (> 0.5%)")+
+    ggtitle("Family level (> 1 %)")+
     theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
@@ -373,7 +373,7 @@ dev.off()
 # saving Family number in family level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
 paste("=======================")
-paste("Family number in family level barplot(> 0.5%): ", length(unique(family_level_transformed_psmelt$Family)))
+paste("Family number in family level barplot(> 1 %): ", length(unique(family_level_transformed_psmelt$Family)))
 sink()
 
 #saving plot as html widget
@@ -383,13 +383,13 @@ htmlwidgets::saveWidget(as_widget(barplot_family), "4_Family_barplot.html")
 
 ############################################################################################################
 
-#heatmapping for abundance more than 0.5%
+#heatmapping for abundance more than 1%
 family_level_transformed_forheatmap <- transform_sample_counts(family_level, function(x) x / sum(x)*100 )
 
-family_level_transformed_forheatmap_morethan0.5 <- filter_taxa(family_level_transformed_forheatmap, function(x) sum(x) > 0.5, TRUE)
+family_level_transformed_forheatmap_morethan1 <- filter_taxa(family_level_transformed_forheatmap, function(x) sum(x) > 1, TRUE)
 
-Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan0.5, 
-    taxa.label = "Family", title = "Family level (> 0.5 %)",
+Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan1, 
+    taxa.label = "Family", title = "Family level (> 1 %)",
         low = "#FEFE62", high = "#D35FB7", na.value = "white") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
     theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
@@ -429,7 +429,7 @@ genus_level_transformed_psmelt <- psmelt(genus_level_transformed)
 # converting the genus information as character
 genus_level_transformed_psmelt$Genus <- as.character(genus_level_transformed_psmelt$Genus)
 # merge the genus with abundance less than 1
-genus_level_transformed_psmelt$Genus[genus_level_transformed_psmelt$Abundance < 0.5] <- "x-Minor genus(<0.5)"
+genus_level_transformed_psmelt$Genus[genus_level_transformed_psmelt$Abundance < 1] <- "x-Minor genus(<1)"
 
 # Genus level barplot
 Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt, 
@@ -449,7 +449,7 @@ Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt,
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
     ylab("Relative Abundance (%)")+
-    ggtitle("Genus level (> 0.5%)")+
+    ggtitle("Genus level (> 1 %)")+
     theme(plot.title = element_text(size = 10, face = "bold"))                                                     
 
 #saving plot in pdf
@@ -460,7 +460,7 @@ dev.off()
 # saving Genus number in genus level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
 paste("=======================")
-paste("Genus number in genus level barplot(> 0.5%): ", length(unique(genus_level_transformed_psmelt$Genus)))
+paste("Genus number in genus level barplot(> 1 %): ", length(unique(genus_level_transformed_psmelt$Genus)))
 sink()                                                               
 
 #saving plot as html widget
@@ -469,15 +469,15 @@ htmlwidgets::saveWidget(as_widget(barplot_genus), "5_Genus_barplot.html")
   
 ###########
 
-# heatmapping for abundance more than 0.5%
+# heatmapping for abundance more than 1%
 genus_level_transformed_forheatmap <- transform_sample_counts(genus_level, function(x) x / sum(x)*100 )
 
-genus_level_transformed_forheatmap_morethan0.5 <- filter_taxa(genus_level_transformed_forheatmap, function(x) sum(x) > 0.5, TRUE)
+genus_level_transformed_forheatmap_morethan1 <- filter_taxa(genus_level_transformed_forheatmap, function(x) sum(x) > 1, TRUE)
 
-Heatmap_Genus <- plot_heatmap(genus_level_transformed_forheatmap_morethan0.5, 
+Heatmap_Genus <- plot_heatmap(genus_level_transformed_forheatmap_morethan1, 
         taxa.label = "Genus",
         low = "#FEFE62", high = "#D35FB7", na.value = "white",
-        title = "Genus level (> 0.5 %)") + 
+        title = "Genus level (> 1 %)") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
     theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
     theme(legend.position = "right") +
@@ -516,8 +516,8 @@ Species_level_transformed <- transform_sample_counts(Species_level, function(x) 
 Species_level_transformed_psmelt <- psmelt(Species_level_transformed)
 #converting the Species information as character
 Species_level_transformed_psmelt$Species <- as.character(Species_level_transformed_psmelt$Species)
-#merge the Species with abundance less than 1
-Species_level_transformed_psmelt$Species[Species_level_transformed_psmelt$Abundance < 0.5] <- "x-Minor Species(<0.5)"
+#merge the Species with abundance less than 5
+Species_level_transformed_psmelt$Species[Species_level_transformed_psmelt$Abundance < 5] <- "x-Minor Species(<5)"
 
 # Species level barplot
 Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt, 
@@ -537,7 +537,7 @@ Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt,
     theme(axis.line.x.bottom = element_line(colour = "black")) +
     theme(axis.line.x.top = element_line(colour = "black")) +
     ylab("Relative Abundance (%)")+
-    ggtitle("Species level (> 0.5%)")+
+    ggtitle("Species level (> 5 %)")+
     theme(plot.title = element_text(size = 10, face = "bold"))
 
     #saving plot in pdf
@@ -548,7 +548,7 @@ dev.off()
 # saving Species number in species level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
 paste("=======================")
-paste("Species number in species level barplot(> 0.5%): ", length(unique(Species_level_transformed_psmelt$Species)))
+paste("Species number in species level barplot(> 5%): ", length(unique(Species_level_transformed_psmelt$Species)))
 sink()                                                             
 
 # saving plot as html widget
@@ -557,15 +557,15 @@ htmlwidgets::saveWidget(as_widget(barplot_Species), "6_Species_barplot.html")
 
 ########
 
-# heatmapping for abundance more than 0.5%
+# heatmapping for abundance more than 5%
 Species_level_transformed_forheatmap <- transform_sample_counts(Species_level, function(x) x / sum(x)*100 )
 
-Species_level_transformed_forheatmap_morethan0.5 <- filter_taxa(Species_level_transformed_forheatmap, function(x) sum(x) > 0.5, TRUE)
+Species_level_transformed_forheatmap_morethan5 <- filter_taxa(Species_level_transformed_forheatmap, function(x) sum(x) > 5, TRUE)
 
-Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan0.5, 
+Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan5, 
         taxa.label = "Species",
         low = "#FEFE62", high = "#D35FB7", na.value = "white",
-        title = "Species level (> 0.5 %)") + 
+        title = "Species level (> 5 %)") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
     theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
     theme(legend.position = "right") +
