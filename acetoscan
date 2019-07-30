@@ -440,7 +440,7 @@ sed -e 's/-/_/g;/^#/d' "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.
         echo -e "\n#Generating OTU table"
         vsearch \
                 --usearch_global "${WKDIR}/output_data/trimmed/All_best.fasta" \
-                -db "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp" \
+                --db "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp" \
                 --id ${cluster_threshold} \
                 --otutabout "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.tmp"
 
