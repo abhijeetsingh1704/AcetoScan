@@ -426,10 +426,10 @@ sed '/^#/d' ./VSEARCH/blast_results_for_filtering > "${WKDIR}/output_data/trimme
 
 ###     Extracting target sequences
 
-for OTU in $(cat "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt")
+while read line;
         do
-                grep -A 1 "OTU" "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp"
-        done 
+                grep -w -A 1 "$line" "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" >> "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp"
+        done < ${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt
 
 # processing filtered OTU multifasta file
 
