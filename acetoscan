@@ -315,14 +315,14 @@ echo -e "\n#Performing adapters trimming and quality filtering"
         #       making progress bar for cudadapt script
                 
         while true; do echo -ne "#"; sleep 2; done &
-        trap 'kill $!' EXIT
+        trap 'kill $!' SIGTERM
         echo "#This might take a while"
         
         #cutadapt external script        
         AcetoScan_cutadapt.sh   # <============= external script
                 
         echo ""
-        kill $! && trap " " EXIT
+        kill $! 
 
 ###     Begin Longest best frame analysis <--- from external script
 
@@ -331,7 +331,7 @@ echo -e "\n#Performing longest best frame analysis"
         #       making progress bar for best frame script
 
         while true; do echo -ne "#"; sleep 2; done &
-        trap 'kill $!' EXIT
+        trap 'kill $!' SIGTERM
         echo "This might take a while"
 
         #longorf-acetoscan external script
@@ -340,7 +340,7 @@ echo -e "\n#Performing longest best frame analysis"
         -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); AcetoScan_longorf.pl --filter "$f" > "Best_${b}.fasta"' \; # <============= external script
         
         echo ""        
-        kill $! trap " " && EXIT
+        kill $! 
 
 ###     Preprocessing for Clustering
 
