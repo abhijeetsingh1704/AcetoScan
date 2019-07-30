@@ -76,15 +76,13 @@ if [ `whoami` = 'root' ]; then
 else
 
         ###     Copying Acetoscan executable to /home/$user/acetoscan/ for non-super user
-
+        mkdir -m 777 -p /home/$user/acetoscan
         find . -type f -name "acetoscan" -exec cp {} /home/$user/acetoscan/ \; 2>/dev/null
         chmod +x /home/$user/acetoscan/acetoscan
 
 fi
 
 ###     fixing the directory for AcetoScan program
-
-user=`echo ${SUDO_USER:-${USER}}`
 
 mkdir -m 777 -p /home/$user/acetoscan/acetoscan_bin
 mkdir -m 777 -p /home/$user/acetoscan/acetobase
