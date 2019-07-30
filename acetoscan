@@ -521,7 +521,7 @@ cp "/home/$user/acetoscan/acetoscan_bin/AcetoScan_Visualization.R" .
 RPATH=$(which R)
 echo -e "\n#Preparing graphics"
 
-echo -ne "\n#In case of execution halt, access data in path ${WKDIR}/output_data/trimmed/VSEARCH/"
+echo -ne "\n#In case of execution halt, access data in path ${WKDIR}/output_data/trimmed/VSEARCH/\n"
 
 ###     Rscript not working
 
