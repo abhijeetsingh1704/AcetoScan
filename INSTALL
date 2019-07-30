@@ -17,20 +17,20 @@ user=`echo ${SUDO_USER:-${USER}}`
 
 ##      Checking and installing Dependencies
 
-echo -e "\n#Checking and installing dependencies for debian/ubuntu based systems"
+echo -ne "\n#Checking and installing dependencies for debian/ubuntu based systems"
 
 ###     Checking if cutadapt is installed
 
 
 if ! command -v "cutadapt" > /dev/null ; then
-        echo -e "\n#Installing Cutadapt"    
+        echo -ne "\n#Installing Cutadapt"    
         sudo apt install -y -qq cutadapt
 fi
 
 ###     Checking if vsearch is installed
 
 if ! command -v "vsearch" > /dev/null ; then
-        echo -e "\n#Installing Vsearch"
+        echo -ne "\n#Installing Vsearch"
         wget -c --no-check-certificate "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
         tar xzf vsearch-2.13.1-linux-x86_64.tar.gz
         cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch
@@ -39,14 +39,14 @@ fi
 ###     Checking if Blast is installed
 
 if ! command -v "blastx" > /dev/null ; then
-        echo -e "\n#Installing NCBI-blast+"
+        echo -ne "\n#Installing NCBI-blast+"
         sudo apt install -y -qq ncbi-blast+ 
 fi
 
 ###     Checking if bioperl is installed
 
 if ! command -v perl -MBio::SeqIO -e 'printf "%vd\n", $Bio::SeqIO::VERSION, "\n"' > /dev/null ; then
-        echo -e "\n#Checking BioPerl"
+        echo -ne "\n#Checking BioPerl"
         sudo apt install -y -qq bioperl 
 fi
 
@@ -54,7 +54,7 @@ fi
 ###     Checking if R and Rscript are installed
 
 if ! command -v "R" > /dev/null ; then
-        echo -e "\n#Installing R"
+        echo -ne "\n#Installing R"
         sudo apt install -y -qq libnode-dev 
         sudo apt install -y -qq r-base 
         sudo apt install -y -qq r-base-dev 
@@ -70,12 +70,13 @@ fi
 ###     Copying Acetoscan executable to /usr/local/bin
 
 if [ `whoami` = 'root' ]; then
-
+        echo -ne "\n#Installing acetoscan for root"
         find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
         chmod +x /usr/local/bin/acetoscan
 else
 
         ###     Copying Acetoscan executable to /home/$user/acetoscan/ for non-super user
+        echo -ne "\n#Installing acetoscan for $user"
         mkdir -m 777 -p /home/$user/acetoscan
         find . -type f -name "acetoscan" -exec cp {} /home/$user/acetoscan/ \; 2>/dev/null
         chmod +x /home/$user/acetoscan/acetoscan
@@ -101,5 +102,5 @@ chmod +x /home/$user/acetoscan/acetoscan_bin/*
 #find /home/$user/ -type f -iname "AcetoBaseV1.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBaseV1.fasta
 #cd /home/$user/acetoscan/acetobase/ && makeblastdb -in AcetoBaseV1.fasta -dbtype prot -title AcetoBaseV1 -out AcetoBaseV1
 
-echo -e "\n#Installation DONE for $user"
+echo -ne "\n#Installation DONE for $user"
 ###     End of script 
