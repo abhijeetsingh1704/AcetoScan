@@ -308,15 +308,16 @@ fi
 ###    Adapter trimming and quality filtering of the raw reads
 
 mkdir -p "${WKDIR}/output_data/trimmed"
-echo -e "\n#Performing adapters trimming and quality filtering"
+echo -ne "\n#Performing adapters trimming and quality filtering"
 
 ###     CUTADAPT <--- from external script
 
         #       making progress bar for cudadapt script
                 
-        while true; do echo -ne "#"; sleep 2; done &
+        while true; do echo -ne "#"; sleep 1; done &
         trap 'kill $!' SIGTERM
-        echo "#This might take a while"
+        echo -ne "\n\n#This might take a while"
+        echo -ne "\n[Processing:]"
         
         #cutadapt external script        
         AcetoScan_cutadapt.sh   # <============= external script
@@ -326,13 +327,14 @@ echo -e "\n#Performing adapters trimming and quality filtering"
 
 ###     Begin Longest best frame analysis <--- from external script
 
-echo -e "\n#Performing longest best frame analysis"
+echo -ne "\n#Performing longest best frame analysis"
 
         #       making progress bar for best frame script
 
-        while true; do echo -ne "#"; sleep 2; done &
+        while true; do echo -ne "#"; sleep 1; done &
         trap 'kill $!' SIGTERM
-        echo "This might take a while"
+        echo -ne "\n\n#This might take a while"
+        echo -ne "\n[Processing:]"
 
         #longorf-acetoscan external script
         
@@ -361,7 +363,7 @@ perl -npe 'if(!/^>/){s/\S{60}/$&\n/g};{s/-/_/g}' All_best.fasta.tmp > All_best.f
 ###     Begin clustering with VSEARCH (v2.13.0_linux_x86_64)
 
 mkdir -v -p "${WKDIR}/output_data/trimmed/VSEARCH"
-echo -e "\n#Begin clustering at $cluster_threshold%"
+echo -e "\n#Begin clustering at $cluster_threshold %"
 
     #   dereplication 
 
@@ -370,7 +372,7 @@ echo -e "\n#Begin clustering at $cluster_threshold%"
                 --derep_fulllength "${WKDIR}/output_data/trimmed/All_best.fasta" \
                 --output "${WKDIR}/output_data/trimmed/VSEARCH/best_derep.fasta" \
                 --sizeout \
-                --minuniquesize 2 \
+                --minuniquesize 5 \
                 --relabel Unique \
                 --uc "${WKDIR}/output_data/trimmed/VSEARCH/derep.uc" \
                 --log="${WKDIR}/output_data/trimmed/VSEARCH/derep_log"
@@ -417,7 +419,7 @@ perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
                 -task blastx \
                 -max_target_seqs 1 \
                 -num_threads "${THREADS}" \
-                -evalue 1e-9 \
+                -evalue 10e-5 \
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/blast_results_for_filtering" \
                 -outfmt "7 qseqid"
 
@@ -518,6 +520,8 @@ cp "/home/$user/acetoscan/acetoscan_bin/AcetoScan_Visualization.R" .
 
 RPATH=$(which R)
 echo -e "\n#Preparing graphics"
+
+echo -ne "\n#In case of execution halt, access data in path ${WKDIR}/output_data/trimmed/VSEARCH/"
 
 ###     Rscript not working
 
