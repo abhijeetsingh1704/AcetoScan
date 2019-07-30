@@ -145,7 +145,7 @@ shift $((OPTIND-1))
 ###     check
 
 if ((OPTIND == 1));then
-echo -e "\n#Input directory not provided, Aborting!"
+echo -ne "\n#Input directory not provided, Aborting!"
         echo ""
         usage
         exit
@@ -155,12 +155,12 @@ fi
 ###     Checking input_dir 
 
 if [ ! -d "$input_dir" ] && [ -x "$input_dir" ]; then
-        echo -e "\n#Input directory not provided, Aborting!"
+        echo -ne "\n#Input directory not provided, Aborting!"
         echo ""
         usage
         exit
 else
-        echo -e "\n#Content of input directory: $input_dir"        
+        echo -ne "\n#Content of input directory: $input_dir"        
         forward_read_count=$(find "$input_dir" -name '*_R1_001.fastq.gz' | wc -l)
         reverse_read_count=$(find "$input_dir" -name '*_R2_001.fastq.gz' | wc -l)
         echo "-> Number of forward read files: $forward_read_count"
@@ -174,7 +174,7 @@ fi
 
 if [ "$output_dir" == "" ]; then
         output_dir="$output_dir_def"
-        echo -e "\n#Using default output directory: $output_dir_def"
+        echo -ne "\n#Using default output directory: $output_dir_def"
         if [ -d "$output_dir_def" ] ; then
                 echo -ne ""
         else
@@ -182,13 +182,13 @@ if [ "$output_dir" == "" ]; then
         fi
 else
         if [  -d "$output_dir" ] && [ -x "$output_dir" ]; then
-                echo -e "\n#Output directory: $output_dir "
+                echo -ne "\n#Output directory: $output_dir "
         else
                 if [ ! -d "$output_dir" ]; then   
                         mkdir -p "$output_dir"
-                        echo -e "\n#Output directory: $output_dir "
+                        echo -ne "\n#Output directory: $output_dir "
                 else
-                       echo -e "\n#Cannot access/create $output_dir " 
+                       echo -ne "\n#Cannot access/create $output_dir " 
                 fi
         fi
 fi
@@ -201,36 +201,36 @@ export WKDIR="$output_dir"
 
 if [ "$max_len" == "" ];then
         max_len="$max_len_def"
-        echo -e "\n#Using default max_length: 277"
+        echo -ne "\n#Using default max_length: 277"
 else
-       echo -e "\n#Using max_length: ${max_len}"
+       echo -ne "\n#Using max_length: ${max_len}"
 fi
 
 ###     Checking minimum length threshold
 
 if [ "$min_len" == "" ];then
         min_len="$min_len_def"
-        echo -e "\n#Using default min_length: 150"
+        echo -ne "\n#Using default min_length: 150"
 else
-       echo -e "\n#Using min_length: ${min_len}"
+       echo -ne "\n#Using min_length: ${min_len}"
 fi
 
 ###     Checking quality threshold
 
 if [ "$qual" == "" ];then
         qual="$qual_def"
-        echo -e "\n#Using default quality threshold: 20"
+        echo -ne "\n#Using default quality threshold: 20"
 else
-       echo -e "\n#Using quality threshold: ${qual}"
+       echo -ne "\n#Using quality threshold: ${qual}"
 fi
 
 ###     Checking read type
 
 if [ "$read_type" == "" ];then
         read_type="$read_type_def"
-        echo -e "\n#Using default: Forward reads"
+        echo -ne "\n#Using default: Forward reads"
 else
-       echo -e "\n#Using R${read_type} reads"
+       echo -ne "\n#Using R${read_type} reads"
 fi
 
 #       read variable
@@ -244,9 +244,9 @@ export QT="$qual"
 
 if [ "$cluster_threshold" == "" ];then
         cluster_threshold="$cluster_threshold_def"
-        echo -e "\n#Using default clustering threshold: 0.95"
+        echo -ne "\n#Using default clustering threshold: 0.95"
 else
-        echo -e "\n#Clustering threshold: $cluster_threshold"
+        echo -ne "\n#Clustering threshold: $cluster_threshold"
 fi
 
 ###    Checking threshold validity
@@ -257,7 +257,7 @@ if (( ${cluster_threshold%%.*} < ${MAXTHRESHOLD%%.*} || ( ${cluster_threshold%%.
     && ${cluster_threshold##*.} < ${MAXTHRESHOLD##*.} ) )) > /dev/null ; then    
     echo "" > /dev/null
 else
-    echo -e "\n#Invalid threshold: value must be between 0.0 and 1.0" && exit 1
+    echo -ne "\n#Invalid threshold: value must be between 0.0 and 1.0" && exit 1
 fi
 
 ###     Checking of output_data directory is has content
@@ -265,17 +265,17 @@ fi
 ###    Checking and cleaning the input_data and output_data directory
 
 if [ ! -z "$(ls -A "$output_dir")" ]; then
-   echo -e "\n#WARNING: directory \"$output_dir\" is not empty, 
+   echo -ne "\n#WARNING: directory \"$output_dir\" is not empty, 
           possibility of data loss!!!"
 
         #       Cleaning
-        echo -e "\n#Removing previous data"
+        echo -ne "\n#Removing previous data"
         rm -f ${WKDIR}/input_data/*
         rm -rf ${WKDIR}/output_data/*
         rm -f ${WKDIR}/acetoscan_result/*
 else
         #       creating new directories
-        echo -e "\n#Creating directories"
+        echo -ne "\n#Creating directories"
         mkdir -v -p "${WKDIR}/input_data"
         mkdir -v -p "${WKDIR}/output_data"
         mkdir -v -p "${WKDIR}/acetoscan_result"
@@ -283,14 +283,14 @@ fi
 
 ###    Checking dependencies
 
-echo -e "\n#Performing dependencies check"
+echo -ne "\n#Performing dependencies check"
 export PATH="/home/$user/acetoscan/acetoscan_bin/:${PATH}"
 AcetoScan_software_check.sh # <======== External script
 
 ###    find illumina raw reads and making soft links to the data
 
 if ! cd "${WKDIR}/input_data/" ; then
-    echo "Error: could not cd to ${WKDIR}/input_data/"
+    echo -ne "\n#Error: could not cd to ${WKDIR}/input_data/"
     exit 1
 fi
 
@@ -301,7 +301,7 @@ find "${input_dir}" -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/inp
 ###    Checking if link exist
 
 if [ ! -n "$(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.gz" -print -quit)" ] ; then
-    echo "Input files \"*_${reads}*.fastq.gz\" not found in ${WKDIR}/input_data/, Aborting !!!"
+    echo -ne "\n#Input files \"*_${reads}*.fastq.gz\" not found in ${WKDIR}/input_data/, Aborting !!!"
     exit 1
 fi
 
@@ -347,7 +347,7 @@ echo -ne "\n#Performing longest best frame analysis"
 ###     Preprocessing for Clustering
 
 cd "${WKDIR}/output_data/trimmed"
-echo -e "\n#Performing preprocessing for clustering"
+echo -ne "\n#Performing preprocessing for clustering"
 
 #       Finding and replacing the fasta header with file name
 
@@ -363,11 +363,11 @@ perl -npe 'if(!/^>/){s/\S{60}/$&\n/g};{s/-/_/g}' All_best.fasta.tmp > All_best.f
 ###     Begin clustering with VSEARCH (v2.13.0_linux_x86_64)
 
 mkdir -v -p "${WKDIR}/output_data/trimmed/VSEARCH"
-echo -e "\n#Begin clustering at $cluster_threshold %"
+echo -ne "\n#Begin clustering at $cluster_threshold %"
 
     #   dereplication 
 
-        echo -e "\n#Performing dereplication"
+        echo -ne "\n#Performing dereplication"
         vsearch \
                 --derep_fulllength "${WKDIR}/output_data/trimmed/All_best.fasta" \
                 --output "${WKDIR}/output_data/trimmed/VSEARCH/best_derep.fasta" \
@@ -379,7 +379,7 @@ echo -e "\n#Begin clustering at $cluster_threshold %"
     
     #   removing chimeras
 
-        echo -e "\n#Removing chimera"
+        echo -ne "\n#Removing chimera"
         vsearch \
                 --uchime_denovo "${WKDIR}/output_data/trimmed/VSEARCH/best_derep.fasta" \
                 --sizein \
@@ -390,7 +390,7 @@ echo -e "\n#Begin clustering at $cluster_threshold %"
     
     # Clustering OTUs
 
-        echo -e "\n#Clustering OTUs at ${cluster_threshold} % sequence similarity"
+        echo -ne "\n#Clustering OTUs at ${cluster_threshold} % sequence similarity"
         vsearch \
                 --cluster_size "${WKDIR}/output_data/trimmed/VSEARCH/nonchimera.fasta" \
                 --id "${cluster_threshold}" \
@@ -412,7 +412,7 @@ perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
 
 ###    Filtering non target sequences with BlastX from NCBI Blast+ (2.8.1)
 
-        echo -e "\n#Filtering non target OTUs"
+        echo -ne "\n#Filtering non target OTUs"
         blastx \
                 -query "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" \
                 -db "/home/$user/acetoscan/acetobase/AcetoBaseV1" \
@@ -439,7 +439,7 @@ sed -e 's/-/_/g;/^#/d' "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.
 
 ###    Generating OTU table with filtered/target OTUs
 
-        echo -e "\n#Generating OTU table"
+        echo -ne "\n#Generating OTU table"
         vsearch \
                 --usearch_global "${WKDIR}/output_data/trimmed/All_best.fasta" \
                 --db "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp" \
@@ -461,7 +461,7 @@ cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt" "${WKDIR}/output_d
 
 ###    Assigning taxonomy 
 
-echo -e "\n#Assigning taxonomy"
+echo -ne "\n#Assigning taxonomy"
 
 cut -d ";" -f1 "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta" > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU.fasta"
 
@@ -488,7 +488,7 @@ sed -e 's/\t/,/g' "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_pre" > "
 
 cd "${WKDIR}/output_data/trimmed/VSEARCH/" 
 if ! cd "${WKDIR}/output_data/trimmed/VSEARCH/" ; then
-    echo "Error: could not cd to ${WKDIR}/output_data/trimmed/VSEARCH/"
+    echo -ne "\n#Error: could not access ${WKDIR}/output_data/trimmed/VSEARCH/"
     exit 1
 fi
 
@@ -508,7 +508,7 @@ sed 's/,/\t/g' "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table.txt" | \
 
 mkdir -v -p "${WKDIR}/output_data/trimmed/VSEARCH/Visualization"
 if ! cd "${WKDIR}/output_data/trimmed/VSEARCH/Visualization" ; then
-    echo "Error: could not cd to ${WKDIR}/output_data/trimmed/VSEARCH/Visualization"
+    echo -ne "\n#Error: could not access ${WKDIR}/output_data/trimmed/VSEARCH/Visualization"
     exit 1
 fi
 
@@ -519,7 +519,7 @@ cp "/home/$user/acetoscan/acetoscan_bin/AcetoScan_Visualization.R" .
 ###     Running R script
 
 RPATH=$(which R)
-echo -e "\n#Preparing graphics"
+echo -ne "\n#Preparing graphics"
 
 echo -ne "\n#In case of execution halt, access data in path ${WKDIR}/output_data/trimmed/VSEARCH/\n"
 
@@ -564,6 +564,6 @@ fi
 
 end=$(date +%s) # end time of script
 runtime=$(((end - start))) # calculate runtime
-echo -e "\n#Acetoscan runtime: ${runtime} seconds"
+echo -ne "\n#Acetoscan runtime: ${runtime} seconds"
 
 ###    End of script
