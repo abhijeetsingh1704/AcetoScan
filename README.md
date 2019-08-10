@@ -1,7 +1,7 @@
 # AcetoScan
 
 - Version: 0.1.0 (20190719)
-- Last modified: fre jul 19, 2019 20:59
+- Last modified: SAT aug 10, 2019 17:41
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -82,22 +82,23 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -
 ```
 	
 ```
-	-i      input directory containing raw illumina data
-        -o      output directory
-                default = /home/${user}/acetoscan/output_data
-        -m      maximum length of sequence after quality filtering
-                defalut max_length = 277
-        -n      minimum length of sequence after quality filtering
-                defalut min_length = 150
-        -q      quality threshold for the sequences 
-                default quality threshold = 20
-        -r      read type either forward or reverse reads 
-                default read = 1        
-                1 = forward reads
-                2 = reverse reads
-        -t      clustering threshold
-                default = 0.95 (95% sequence similarity)      
+	-i      Input directory containing raw illumina data
+        -o      Output directory
+                        :default = /home/${user}/acetoscan/output_data
+        -m      Maximum length of sequence after quality filtering
+                        :defalut max_length = 277
+        -n      Minimum length of sequence after quality filtering
+                        :defalut min_length = 150
+        -q      Quality threshold for the sequences 
+                        :default quality threshold = 20
+        -r      Read type either forward or reverse reads 
+                        1 = forward reads (default)
+                        2 = reverse reads
+        -t      Clustering threshold
+                        :default cluster threshold = 0.95 (95 %)
+        -c      Minimum cluster size
+                        :default minimum cluster size = 5      
         -h      print Help
-        -v      print acetoscan version
+        -v      print acetoscan version"
 
 ```
