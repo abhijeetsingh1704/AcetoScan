@@ -100,7 +100,7 @@ while getopts "i:o:m:n:q:r:t:c:hv" flags;
 
                         h)
                                 echo "
-Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95
+Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
 
         -i      Input directory containing raw illumina data
         -o      Output directory
