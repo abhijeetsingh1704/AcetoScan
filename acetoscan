@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Tis jul 30, 2019 19:51
+# Last modified: SAT aug 10, 2019 17:30
 # Sign: Abhi
 
 set -euo pipefail
@@ -29,6 +29,7 @@ max_len=""
 min_len=""
 qual=""            
 cluster_threshold=""
+cluster_size=""
 
 ###     Username
 
@@ -42,6 +43,7 @@ max_len_def="277"
 min_len_def="150"
 qual_def="20" 
 cluster_threshold_def="0.95"
+cluster_size_def="5"
 version_def="0.1.0"
 
 ###    Getting processors information
@@ -53,14 +55,14 @@ THREADS=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || getconf _NPROC
 #       function
 
 usage() {
-echo "Usage   : $0 [-i <input directory>] [-o <output directory>] [-m <max_length>] [-n <min_length>] [-q <quality threshold>] [-r <reads type>] [-t <clustering threshold>]
-Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95" 1>&2; exit 1;
+echo "Usage   : $0 [-i <input directory>] [-o <output directory>] [-m <max_length>] [-n <min_length>] [-q <quality threshold>] [-r <reads type>] [-t <clustering threshold>] [-c <min_cluster size>]
+Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5" 1>&2; exit 1;
 }
 
 
 #       flags
 
-while getopts "i:o:m:n:q:r:t:hv" flags; 
+while getopts "i:o:m:n:q:r:t:c:hv" flags; 
         do      
                 case "${flags}" in
                         
@@ -90,6 +92,10 @@ while getopts "i:o:m:n:q:r:t:hv" flags;
 
                         t)
                                 cluster_threshold=${OPTARG}
+                                ;;
+                                
+                        c)
+                                cluster_size=${OPTARG}
                                 ;;
 
                         h)
@@ -240,13 +246,22 @@ export MaxL="$max_len"
 export MinL="$min_len"
 export QT="$qual"
 
-###     Checking read type
+###     Checking clustering threshold
 
 if [ "$cluster_threshold" == "" ];then
         cluster_threshold="$cluster_threshold_def"
         echo -e "\n#Using default clustering threshold: 0.95"
 else
         echo -e "\n#Clustering threshold: $cluster_threshold"
+fi
+
+###     Checking minimum clustering size
+
+if [ "$cluster_size" == "" ];then
+        cluster_size="$cluster_size_def"
+        echo -e "\n#Using default minimum cluster size : 5"
+else
+        echo -e "\n#Minimum cluster size: $cluster_size"
 fi
 
 ###    Checking threshold validity
@@ -265,9 +280,12 @@ fi
 ###    Checking and cleaning the input_data and output_data directory
 
 if [ ! -z "$(ls -A "$output_dir")" ]; then
-   echo -e "\n#WARNING: directory \"$output_dir\" is not empty, 
-          possibility of data loss!!!"
-        
+   echo -e "\n#WARNING: directory \"$output_dir\" is not empty, possibility of data loss!!!"
+   
+        #       Compressing previous data
+        echo -e "\n#Compressing previous data to /home/$user/${user}_${start}_backup.tar.gz"
+        tar -zcf /home/$user/acetoscan_backup_${start}.tar.gz ${WKDIR}
+       
         #       Cleaning
         echo -e "\n#Removing previous data"
         rm -f ${WKDIR}/input_data/*
@@ -310,11 +328,16 @@ fi
 ###     function for the processing bar
 
 
-processing (){
-                while true
+spin=( '/' '-' '\' '|' )
+
+processing() {
+              while [ 1 ]
                 do
-                        echo -ne ">"
-                        sleep 0.25
+                   for s in "${spin[@]}"
+                        do
+                                echo -ne "\r[Processing:]$s"
+                                sleep 0.25
+                        done
                 done &
 }
 
@@ -322,6 +345,7 @@ processing (){
 
 mkdir -p "${WKDIR}/output_data/trimmed"
 echo -e "\n#Performing adapters trimming and quality filtering"
+echo -e "\n#OBS: This might take a while!"
 
 ###     CUTADAPT <--- from external script
 
@@ -329,8 +353,6 @@ echo -e "\n#Performing adapters trimming and quality filtering"
                 
         processing
         pid=$!
-        
-        echo -ne "\b[Processing:]"
         
         #cutadapt external script        
         AcetoScan_cutadapt.sh   # <============= external script
@@ -341,14 +363,13 @@ echo -e "\n#Performing adapters trimming and quality filtering"
 ###     Begin Longest best frame analysis <--- from external script
 
 echo -e "\n#Performing longest best frame analysis"
+echo -e "\n#OBS: This might take a while!"
 
         #       making progress bar for best frame script
 
         processing
         pid=$!
         
-        echo -ne "\b[Processing:]"
-
         #longorf-acetoscan external script
         
         find ${WKDIR}/output_data/trimmed/ -name "*_trimmed_${reads}.fasta" \
@@ -360,8 +381,11 @@ echo -e "\n#Performing longest best frame analysis"
 ###     Preprocessing for Clustering
 
 cd "${WKDIR}/output_data/trimmed"
-echo -e "\n#Performing preprocessing for clustering"
+echo -e "\n#Preprocessing for clustering"
 echo ""
+
+processing
+pid=$!
 
 #       Finding and replacing the fasta header with file name
 
@@ -373,6 +397,10 @@ find ${WKDIR}/output_data/ -type f -iname "Best*.fasta" -printf "%f\n" | while r
 ###     Formating input for vsearch
 
 perl -npe 'if(!/^>/){s/\S{60}/$&\n/g};{s/-/_/g}' All_best.fasta.tmp > All_best.fasta
+
+echo -ne "Done\n"        
+kill $pid
+echo ""
 
 ###     Begin clustering with VSEARCH (v2.13.0_linux_x86_64)
 
@@ -386,7 +414,7 @@ echo -e "\n#Begin clustering at $cluster_threshold %"
                 --derep_fulllength "${WKDIR}/output_data/trimmed/All_best.fasta" \
                 --output "${WKDIR}/output_data/trimmed/VSEARCH/best_derep.fasta" \
                 --sizeout \
-                --minuniquesize 5 \
+                --minuniquesize "${cluster_size}" \
                 --relabel Unique \
                 --uc "${WKDIR}/output_data/trimmed/VSEARCH/derep.uc" \
                 --log="${WKDIR}/output_data/trimmed/VSEARCH/derep_log"
@@ -427,7 +455,7 @@ perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
 ###    Filtering non target sequences with BlastX from NCBI Blast+ (2.8.1)
 
 echo -e "\n#Filtering non target OTUs"
-echo -ne "[Processing:]"
+echo -e "\n#OBS: This might take a while!"
 
 processing
 pid=$!
@@ -484,7 +512,7 @@ cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt" "${WKDIR}/output_d
 ###    Assigning taxonomy 
 
 echo -e "\n#Assigning taxonomy"
-echo -ne "[Processing:]"
+echo -e "\n#OBS: This might take a while!"
 
 processing
 pid=$!
@@ -579,11 +607,13 @@ cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table.txt" .
 if [ -f "${WKDIR}/output_data/trimmed/VSEARCH/Visualization/6_Species_barplot.html" ]; then
         cp ${WKDIR}/output_data/trimmed/VSEARCH/Visualization/* .
         rm AcetoScan_Visualization.R
+        rm FTHFS_*table_R.txt
         echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
         echo "#Final results are in directory \"acetoscan_result\" in path ${WKDIR}/acetoscan_result"
         echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
 else
-        rm AcetoScan_Visualization.R        
+        rm AcetoScan_Visualization.R
+        rm FTHFS_*table_R.txt
         echo "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.=================================================="
         echo "#Final results are in directory \"Visualization\" in path ${WKDIR}/output_data/trimmed/VSEARCH/Visualization/"
         echo "#And OTU table and TAX table in \"acetoscan_result\" in path ${WKDIR}/acetoscan_result"
