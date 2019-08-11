@@ -288,7 +288,7 @@ if [ ! -z "$(ls -A "$output_dir")" ]; then
         tar -zcf /home/$user/acetoscan_backup_${start}.tar.gz ${WKDIR}
        
         #       Cleaning
-        echo -e "\n#Removing previous data"
+        echo -e "\n#Removing previous data from ${WKDIR}"
         rm -f ${WKDIR}/input_data/*
         rm -rf ${WKDIR}/output_data/*
         rm -f ${WKDIR}/acetoscan_result/*
