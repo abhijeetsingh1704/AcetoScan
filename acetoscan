@@ -596,12 +596,18 @@ echo -e "\n#In case of execution halt, access data in path ${WKDIR}/output_data/
 mkdir -v -p "${WKDIR}/acetoscan_result"
 cd "${WKDIR}/acetoscan_result" 
 
+
         #       result files
 
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU.fasta" .
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt" .
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_full.csv" .
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table.txt" .
+
+###     Phylogenetic inference
+
+mafft --reorder --thread "${THREADS}" FTHFS_OTU.fasta > FTHFS_OTU_alignment.fasta
+fasttree -nt -gtr FTHFS_OTU_alignment.fasta > FTHFS_OTU.tree
 
         #       graphics
 
