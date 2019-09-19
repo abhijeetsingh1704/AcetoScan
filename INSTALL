@@ -2,7 +2,7 @@
 
 # INSTALL for AcetoScan
 
-#- Last modified: fre jul 19, 2019 20:51
+#- Last modified: fre sep 19, 2019 18:39
 #- Sign: Abhi
 
 # setting pipefail
@@ -64,7 +64,10 @@ if ! command -v "R" > /dev/null ; then
         sudo apt install -y -qq r-cran-ggplot2 
         sudo apt install -y -qq r-cran-plotly 
         sudo apt install -y -qq r-cran-plyr 
-        sudo apt install -y -qq r-cran-rcolorbrewer 
+        sudo apt install -y -qq r-cran-rcolorbrewer
+        sudo apt install -y -qq r-cran-ape
+        sudo apt install -y -qq r-cran-phangorn
+        sudo apt install -y -qq r-cran-seqinr
 fi
 
 ###     Copying Acetoscan executable to /usr/local/bin
