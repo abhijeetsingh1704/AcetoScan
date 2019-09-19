@@ -611,7 +611,7 @@ fasttree -nt -gtr FTHFS_OTU_alignment.fasta > FTHFS_OTU.tree
 
         #       graphics
 
-if [ -f "${WKDIR}/output_data/trimmed/VSEARCH/Visualization/6_Species_barplot.html" ]; then
+if [ -f "${WKDIR}/output_data/trimmed/VSEARCH/Visualization/Alpha_diversity.html" ]; then
         cp ${WKDIR}/output_data/trimmed/VSEARCH/Visualization/* .
         rm AcetoScan_Visualization.R
         rm FTHFS_*table_R.txt
