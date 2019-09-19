@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: SAT aug 10, 2019 17:30
+# Last modified: Tor Sep 19, 2019 19:50
 # Sign: Abhi
 
 set -euo pipefail
