@@ -599,6 +599,80 @@ dev.off()
 Species_Heatmap<-ggplotly(Heatmap_Species)
 htmlwidgets::saveWidget(as_widget(Species_Heatmap), "6_Species_heatmap.html")
 ######################
+                                                              
+                                                              
+########
 
+# Ordination
+                                                              
+set.seed(10)
+ps.ord <- ordinate(ps, "NMDS", "bray" )
+ps.ord
+                                                              
+# Plotting ordination
+                                                              
+ NMDS_Phylum <- plot_ordination(ps, ps.ord,
+                              type="taxa",
+                              color = "Phylum")+
+  geom_point(size=2, stroke=1)+
+  theme(legend.title = element_text(face = "bold", size = 10))+
+  facet_wrap(~Phylum)+
+  theme(axis.text.x = element_text(colour = "black", angle = 0, hjust = 1, vjust = 1, face = "bold", size = 8))+
+  theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 8, face = "bold"))+
+  theme(axis.line.y.left = element_line(colour = "black"))+
+  theme(axis.line.x.bottom = element_line(colour = "black"))+
+  theme(axis.line.x.top = element_line(colour = "black"))+
+  theme(legend.position = "bottom")+
+  theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
+  theme(strip.text.x = element_text(margin = margin(0.025,0,0.025,0, "cm")))+
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8))+
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 8))
 
+# saving plot in pdf
+pdf("NMDS_Phylum.pdf", width = 28, height = 18, paper = "a4r")
+plot(NMDS_Phylum)
+dev.off()
+
+# saving plot as html widget
+NMDS_Phylum_ <-ggplotly(NMDS_Phylum)
+htmlwidgets::saveWidget(as_widget(NMDS_Phylum_), "NMDS_Phylum.html")
+######################
+                                                              
+
+########                                                              
+                                                              
+# Alpha diversity analysis
+                                                              
+Alpha_diversity <-   plot_richness(ps, 
+              measures = c("Observed", "Shannon", "Simpson"), 
+              nrow=3)+
+  theme(panel.background = element_rect(fill = NA),
+        panel.grid.major = element_line(colour = "grey90", linetype = "dashed"),
+        panel.ontop = F)+
+  labs(x="Sample", y="Alpha diversity measure")+
+  theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
+  theme(axis.title.x = element_text(face="bold", size=10))+
+  theme(axis.title.y = element_text(face="bold", size=10))+ 
+  theme(axis.text.x  = element_text(face="bold",size=8,angle=60,hjust=1,vjust=1,colour = "black"))+
+  theme(axis.text.y  = element_text(face="bold",size=8, colour = "black"))+ 
+  theme(legend.text=element_text(size=7))+
+  theme(legend.title=element_text(size=10, face = "bold", colour = "black"))+
+  theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
+  theme(strip.text.x = element_text(margin = margin(0.025,0,0.025,0, "cm")))+
+  theme(strip.background = element_rect(colour = "black", fill = "white"),
+        strip.background.x = element_rect(colour = NA, fill = "grey90"))+
+  theme(axis.line.y.left = element_line(colour = "black"))+
+  theme(axis.line.x.bottom = element_line(colour = "black"))                                                                                                                           
+                                                              
+# saving plot in pdf
+pdf("Alpha_diversity.pdf", width = 28, height = 18, paper = "a4r")
+plot(Alpha_diversity)
+dev.off()
+
+# saving plot as html widget
+Alpha_diversity_ <-ggplotly(Alpha_diversity)
+htmlwidgets::saveWidget(as_widget(Alpha_diversity_), "Alpha_diversity.html")
+######################                                                             
+                                                              
+                                       
 ### End of script
