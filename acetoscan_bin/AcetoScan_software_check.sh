@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan_software_check.sh
-# Last modified: fre jul 19, 2019 20:49
+# Last modified: fre sep 19, 2019 20:49
 # Sign: Abhi
 
 ###     User
@@ -23,6 +23,18 @@ fi
 ###     Checking if Blast is installed
 if ! command -v "blastx" > /dev/null ; then
     echo -ne "\n#Error: NCBI Blast+ (blastx) not found, Aborting !!!"
+    exit 1
+fi
+
+###     Checking if Mafft is installed
+if ! command -v "mafft" > /dev/null ; then
+    echo -ne "\n#Error: Mafft not found, Aborting !!!"
+    exit 1
+fi
+
+###     Checking if FastTree is installed
+if ! command -v "fasttree" > /dev/null ; then
+    echo -ne "\n#Error: FastTree not found, Aborting !!!"
     exit 1
 fi
 
