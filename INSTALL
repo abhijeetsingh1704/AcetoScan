@@ -43,6 +43,20 @@ if ! command -v "blastx" > /dev/null ; then
         sudo apt install -y -qq ncbi-blast+ 
 fi
 
+###     Checking if MAFFT is installed
+
+if ! command -v "mafft" > /dev/null ; then
+        echo -ne "\n#Installing Mafft"
+        sudo apt install -y -qq mafft 
+fi
+
+###     Checking if FastTree is installed
+
+if ! command -v "fasttree" > /dev/null ; then
+        echo -ne "\n#Installing FastTree"
+        sudo apt install -y -qq fasttree 
+fi
+
 ###     Checking if bioperl is installed
 
 if ! command -v perl -MBio::SeqIO -e 'printf "%vd\n", $Bio::SeqIO::VERSION, "\n"' > /dev/null ; then
@@ -65,9 +79,7 @@ if ! command -v "R" > /dev/null ; then
         sudo apt install -y -qq r-cran-plotly 
         sudo apt install -y -qq r-cran-plyr 
         sudo apt install -y -qq r-cran-rcolorbrewer
-        sudo apt install -y -qq r-cran-ape
-        sudo apt install -y -qq r-cran-phangorn
-        sudo apt install -y -qq r-cran-seqinr
+        
 fi
 
 ###     Copying Acetoscan executable to /usr/local/bin
