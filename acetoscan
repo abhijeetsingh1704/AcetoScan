@@ -606,7 +606,15 @@ cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table.txt" .
 
 ###     Phylogenetic inference
 
+echo -e "\n#Preparing for Phylogenetic inference"
+
+#       Multiple sequence alignment by mafft
+
+echo -e "\n#Performing Multiple Sequence Alignment"
 mafft --reorder --thread "${THREADS}" FTHFS_OTU.fasta > FTHFS_OTU_alignment.fasta
+
+#       Phylogenetic tree construction by FastTree
+echo -e "\n#Preparing phylogenetic tree"
 fasttree -nt -gtr FTHFS_OTU_alignment.fasta > FTHFS_OTU.tree
 
         #       graphics
