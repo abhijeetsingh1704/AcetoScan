@@ -479,7 +479,7 @@ pid=$!
                 -num_threads "${THREADS}" \
                 -evalue 10e-5 \
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/blast_results_for_filtering" \
-                -outfmt "7 qseqid"
+                -outfmt "7 qseqid" 2> /dev/null
 
         ###     Processing blast result file, deleting commented lines
         sed '/^#/d' ./VSEARCH/blast_results_for_filtering > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt"
@@ -539,7 +539,7 @@ pid=$!
                 -num_threads "${THREADS}" \
                 -evalue 1e-9 \
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp" \
-                -outfmt "6 qseqid saccver pident"
+                -outfmt "6 qseqid saccver pident" 2> /dev/null
 
 echo -ne "Done\n"
 kill $pid
