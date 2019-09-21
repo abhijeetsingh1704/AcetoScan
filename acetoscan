@@ -620,7 +620,15 @@ mkdir -v -p "${WKDIR}/acetoscan_result"
         #       result files
 
 cd "${WKDIR}/output_data/trimmed/VSEARCH/" 
-cp FTHFS_OTU.fasta FTHFS_OTU.tree FTHFS_OTU_alignment.fasta FTHFS_OTU_table.txt FTHFS_TAX_table.txt FTHFS_TAX_table_full.csv "${WKDIR}/acetoscan_result"
+
+cp 	FTHFS_OTU.fasta \
+	FTHFS_OTU.tree \
+	FTHFS_OTU_alignment.fasta \
+	FTHFS_OTU_table.txt \
+	FTHFS_TAX_table.txt \
+	FTHFS_TAX_table_full.csv \
+	"${WKDIR}/acetoscan_result"
+
 cd "${WKDIR}/acetoscan_result" 
 
         #       graphics
