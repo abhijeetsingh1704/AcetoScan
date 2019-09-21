@@ -67,5 +67,6 @@ if [ ! -f /home/$user/acetoscan/acetobase/*.phr ];then
         cd /home/$user/acetoscan/acetobase/ && makeblastdb -in AcetoBaseV1.fasta -dbtype prot -title AcetoBaseV1 -out AcetoBaseV1
 fi
 
-echo -ne "\n#Everything looks good\n"
+echo -e "\n#Everything looks good"
+echo -e "\n#====================="
 ###     End of script
