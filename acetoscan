@@ -293,7 +293,7 @@ if [ ! -z "$(ls -A "$output_dir")" ]; then
    echo -e "\n#WARNING: directory \"$output_dir\" is not empty, possibility of data loss!!!"
    
         #       Compressing previous data
-        echo -e "\n#Compressing previous data to /home/$user/${user}_${start}_backup.tar.gz"
+        echo -e "\n#Compressing previous data to /home/$user/ as acetoscan_backup_${start}.tar.gz"
         tar -zcf /home/$user/acetoscan_backup_${start}.tar.gz ${WKDIR}
        
         #       Cleaning
