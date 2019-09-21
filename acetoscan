@@ -323,8 +323,8 @@ if ! cd "${WKDIR}/input_data/" ; then
 fi
 
 #       softlinks
-
-find "${input_dir}" -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/input_data/" \; 
+cd "${input_dir}"
+find . -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/input_data/" \; 
 
 ###    Checking if link exist
 
