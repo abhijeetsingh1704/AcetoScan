@@ -176,9 +176,9 @@ else
         reverse_read_size=$(find "$input_dir" -name '*_R2_001.fastq.gz' -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
         #
         echo "-> Number of forward read files: $forward_read_count"
-        echo -e "-> Size of forward read files: $forward_read_size\n"
+        echo -e "-> Size of forward read files: $forward_read_size"
         echo "-> Number of reverse read files: $reverse_read_count"
-        echo -e "-> Size of reverse read files: $reverse_read_size\n"
+        echo -e "-> Size of reverse read files: $reverse_read_size"
         echo -e "\n#============================================================"
         
         
