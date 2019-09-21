@@ -168,10 +168,19 @@ if [ ! -d "$input_dir" ] && [ -x "$input_dir" ]; then
         exit
 else
         echo -e "\n#Content of input directory: $input_dir"        
+        echo -e "\n#============================================================"
         forward_read_count=$(find "$input_dir" -name '*_R1_001.fastq.gz' | wc -l)
         reverse_read_count=$(find "$input_dir" -name '*_R2_001.fastq.gz' | wc -l)
+        #
+        forward_read_size=$(find "$input_dir" -name '*_R1_001.fastq.gz' -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
+        reverse_read_size=$(find "$input_dir" -name '*_R2_001.fastq.gz' -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
+        #
         echo "-> Number of forward read files: $forward_read_count"
+        echo -e "-> Size of forward read files: $forward_read_size\n"
         echo "-> Number of reverse read files: $reverse_read_count"
+        echo -e "-> Size of reverse read files: $reverse_read_size\n"
+        echo -e "\n#============================================================"
+        
         
         
 fi
@@ -315,7 +324,7 @@ fi
 
 #       softlinks
 
-find "${input_dir}" -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/input_data/" \; 2> /dev/null
+find "${input_dir}" -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/input_data/" \; 
 
 ###    Checking if link exist
 
@@ -341,6 +350,12 @@ processing() {
                         done
                 done &
 }
+
+###     Start processing data and finding the size
+
+processing_data_size=$(find "$input_dir" -name "*_${reads}_001.fastq.gz" -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
+echo -e "\n#Processing: \"${processing_data_size}\""
+
 
 ###    Adapter trimming and quality filtering of the raw reads
 
@@ -639,6 +654,6 @@ fi
 
 end=$(date +%s) # end time of script
 runtime=$(((end - start))) # calculate runtime
-echo -e "\n#Acetoscan runtime: ${runtime} seconds"
+echo -e "\n#Acetoscan Processed: $processing_data_size in ${runtime} seconds"
 
 ###    End of script
