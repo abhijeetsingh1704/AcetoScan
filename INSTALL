@@ -53,10 +53,8 @@ fi
 ###     Checking if FastTree is installed
 
 if ! command -v "fasttree" > /dev/null ; then
-        if ! command -v "FastTree" > /dev/null; then
-                echo -e "\n#Installing FastTree"
-                sudo apt install -y -qq fasttree 
-        fi
+        echo -e "\n#Installing Fasttree"
+        sudo apt install -y -qq fasttree 
 fi
 
 ###     Checking if bioperl is installed
