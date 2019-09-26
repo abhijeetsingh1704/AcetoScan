@@ -34,10 +34,8 @@ fi
 
 ###     Checking if FastTree is installed
 if ! command -v "fasttree" > /dev/null ; then
-    if ! command -v "FastTree" > /dev/null; then
-        echo -ne "\n#\tError: FastTree not found, Aborting !!!"
+    echo -ne "\n#\tError: Fasttree (2.1.9+) not found, Aborting !!!"
     exit 1
-    fi
 fi
 
 ###     Checking if Bioperl is installed
