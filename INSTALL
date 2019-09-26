@@ -2,7 +2,7 @@
 
 # INSTALL for AcetoScan
 
-#- Last modified: fre sep 19, 2019 18:39
+#- Last modified: fre sep 26, 2019 14:00
 #- Sign: Abhi
 
 # setting pipefail
@@ -23,9 +23,11 @@ echo -e "\n#Checking and installing dependencies for debian/ubuntu based systems
 
 
 if ! command -v "cutadapt" > /dev/null ; then
-        echo -e "\n#Installing Cutadapt"    
-        sudo apt install -y -qq cutadapt
-fi
+         if ! command -v "FastTree" > /dev/null; then
+                echo -e "\n#Installing Cutadapt"    
+                sudo apt install -y -qq cutadapt
+        fi
+fi     
 
 ###     Checking if vsearch is installed
 
