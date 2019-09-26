@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan_software_check.sh
-# Last modified: fre sep 21, 2019 19:34
+# Last modified: fre sep 26, 2019 14:00
 # Sign: Abhi
 
 ###     User
@@ -34,8 +34,10 @@ fi
 
 ###     Checking if FastTree is installed
 if ! command -v "fasttree" > /dev/null ; then
-    echo -ne "\n#\tError: FastTree not found, Aborting !!!"
+    if ! command -v "FastTree" > /dev/null; then
+        echo -ne "\n#\tError: FastTree not found, Aborting !!!"
     exit 1
+    fi
 fi
 
 ###     Checking if Bioperl is installed
