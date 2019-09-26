@@ -2,7 +2,7 @@
 
 # INSTALL for AcetoScan
 
-#- Last modified: fre sep 19, 2019 18:39
+#- Last modified: fre sep 26, 2019 14:00
 #- Sign: Abhi
 
 # setting pipefail
@@ -53,8 +53,10 @@ fi
 ###     Checking if FastTree is installed
 
 if ! command -v "fasttree" > /dev/null ; then
-        echo -e "\n#Installing FastTree"
-        sudo apt install -y -qq fasttree 
+        if ! command -v "FastTree" > /dev/null; then
+                echo -e "\n#Installing FastTree"
+                sudo apt install -y -qq fasttree 
+        fi
 fi
 
 ###     Checking if bioperl is installed
