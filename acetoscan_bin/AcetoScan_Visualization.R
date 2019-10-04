@@ -58,7 +58,7 @@ DIV5x <- paste(DIV,DIV,DIV,DIV,DIV)
 # Making phyloseq object from the tax table and OTU table
 ps <- phyloseq(OTU_data_subset_mat_table, TAX_data_mat_table)
 # Save infor of phyloseq object
-sink("Phyloseq_object_processing_info.txt")
+sink("Visualization_processing_info.txt")
 paste("phyloseq_object: ")
 print(ps)
 sink()
@@ -71,7 +71,7 @@ sink()
 # phylum detail
 ps_table <- table(tax_table(ps)[, "Phylum"], exclude = NULL)
 # save phylum detail
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("phyloseq_phylum_table: ")
 print(ps_table)
@@ -93,14 +93,14 @@ prevalence_table <- plyr::ddply(prevalence_dataframe, "Phylum", function(df1) {
 })
 
 # #save the prevalance table as text file
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Phylum_prevalence_table: ")
 print(prevalence_table)
 sink()
 
 # Write the details of taxa to file
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("number_of_Phylum: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
 get_taxa_unique(ps, taxonomic.rank = "Phylum")
@@ -172,7 +172,7 @@ plot(Phylum_Absolute_abundance)
 dev.off()
 
 # saving Total_Phylum_numbers_in_absolute abundance_barplot
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Total Phylum numbers in absolute abundance_barplot: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
 sink()
@@ -231,7 +231,7 @@ plot(Phylum_level_barplot)
 dev.off()
 
 # saving Phylum number in phylum level barplot
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Phylum number in phylum level barplot: ", length(unique(phylum_level_transformed_psmelt$Phylum)))
 sink()
@@ -291,7 +291,7 @@ plot(Class_level_barplot)
 dev.off()
 
 # saving Class numbers in Class level barplot
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Class number in Class level barplot (> 0.25 %): ", length(unique(class_level_transformed_psmelt$Class)))
 sink()
@@ -351,7 +351,7 @@ plot(Order_level_barplot)
 dev.off()
 
 # saving Order number in order level barplot
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Order number in order level barplot (> 0.25 %): ", length(unique(order_level_transformed_psmelt$Order)))
 sink()
@@ -411,7 +411,7 @@ plot(Family_level_barplot)
 dev.off()
 
 # saving Family number in family level barplot
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Family number in family level barplot(> 1 %): ", length(unique(family_level_transformed_psmelt$Family)))
 sink()
@@ -508,7 +508,7 @@ plot(Genus_level_barplot)
 dev.off()                                           
                                                                
 # saving Genus number in genus level barplot
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Genus number in genus level barplot(> 1 %): ", length(unique(genus_level_transformed_psmelt$Genus)))
 sink()                                                               
@@ -606,7 +606,7 @@ plot(Species_level_barplot)
 dev.off()                                                            
  
 # saving Species number in species level barplot
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Species number in species level barplot(> 5%): ", length(unique(Species_level_transformed_psmelt$Species)))
 sink()                                                             
@@ -664,7 +664,7 @@ ps.ord <- ordinate(ps, "NMDS", "bray" )
 #ps.ord
                                                               
 # saving ordination detail
-sink("Phyloseq_object_processing_info.txt", append = T)
+sink("Visualization_processing_info.txt", append = T)
 paste(DIV5x)
 paste("Ordination details: ")
 ps.ord
