@@ -661,7 +661,7 @@ htmlwidgets::saveWidget(as_widget(Species_Heatmap), "6_Species_heatmap.html")
                                                               
 set.seed(10)
 ps.ord <- ordinate(ps, "NMDS", "bray" )
-ps.ord
+#ps.ord
                                                               
 # saving ordination detail
 sink("Phyloseq_object_processing_info.txt", append = T)
