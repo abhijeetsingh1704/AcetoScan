@@ -1,13 +1,13 @@
 #!/usr/bin/env Rscript
 
 # File: AcetoScan_Visualization.R
-# Last modified: son Juni 2, 2019  19:19
+# Last modified: Fri, oct10 2019  14:12
 # Sign: Abhi
 
 otu_file <- "FTHFS_OTU_table_R.txt"
 tax_file <- "FTHFS_TAX_table_R.txt"
 
-getwd()
+#getwd()
 
 # Load required packages
 suppressPackageStartupMessages(library("phyloseq"))
@@ -19,37 +19,41 @@ suppressPackageStartupMessages(library("dplyr"))
 
 ######
 OTU_data <- read.delim(otu_file, sep = "\t", header = TRUE)
-head(OTU_data)
-class(OTU_data) 
+#head(OTU_data)
+#class(OTU_data) 
 
 # 
 OTU_data_subset <- OTU_data[, -1]
-OTU_data_subset
+#OTU_data_subset
 OTU_data_subset_mat <- as.matrix(OTU_data_subset, sep = "\t", header = TRUE)
-OTU_data_subset_mat
+#OTU_data_subset_mat
 
 row.names(OTU_data_subset_mat) <- paste0("OTU_", 1:nrow(OTU_data_subset_mat))
-OTU_data_subset_mat
+#OTU_data_subset_mat
 
 OTU_data_subset_mat_table <- otu_table(OTU_data_subset_mat, taxa_are_rows = TRUE)
-OTU_data_subset_mat_table
+#OTU_data_subset_mat_table
 
 ######
 TAX_data <- read.table(tax_file, sep = "\t", header = TRUE)
-head(TAX_data)
-class(TAX_data)
+#head(TAX_data)
+#class(TAX_data)
 
 #
 TAX_data_subset <- TAX_data[, -1]
-TAX_data_subset
+#TAX_data_subset
 TAX_data_subset_mat <- as.matrix(TAX_data_subset)
-TAX_data_subset_mat
+#TAX_data_subset_mat
 
 row.names(TAX_data_subset_mat) <- paste0("OTU_", 1:nrow(TAX_data_subset_mat))
-TAX_data_subset_mat
+#TAX_data_subset_mat
 
 TAX_data_mat_table <- tax_table(TAX_data_subset_mat)
-TAX_data_mat_table
+#TAX_data_mat_table
+
+# Devining separator variable
+DIV <- "===================="
+DIV5x <- paste(DIV,DIV,DIV,DIV,DIV)
 
 # Making phyloseq object from the tax table and OTU table
 ps <- phyloseq(OTU_data_subset_mat_table, TAX_data_mat_table)
@@ -68,7 +72,7 @@ sink()
 ps_table <- table(tax_table(ps)[, "Phylum"], exclude = NULL)
 # save phylum detail
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("phyloseq_phylum_table: ")
 print(ps_table)
 sink()
@@ -90,29 +94,29 @@ prevalence_table <- plyr::ddply(prevalence_dataframe, "Phylum", function(df1) {
 
 # #save the prevalance table as text file
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("Phylum_prevalence_table: ")
 print(prevalence_table)
 sink()
 
 # Write the details of taxa to file
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("number_of_Phylum: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
 get_taxa_unique(ps, taxonomic.rank = "Phylum")
-paste("=======================")
+paste(DIV5x)
 paste("number_of_Class: ", length(get_taxa_unique(ps, taxonomic.rank = "Class")))
 get_taxa_unique(ps, taxonomic.rank = "Class")
-paste("=======================")
+paste(DIV5x)
 paste("number_of_Order: ", length(get_taxa_unique(ps, taxonomic.rank = "Order")))
 get_taxa_unique(ps, taxonomic.rank = "Order")
-paste("=======================")
+paste(DIV5x)
 paste("number_of_Family: ", length(get_taxa_unique(ps, taxonomic.rank = "Family")))
 get_taxa_unique(ps, taxonomic.rank = "Family")
-paste("=======================")
+paste(DIV5x)
 paste("number_of_Genus: ", length(get_taxa_unique(ps, taxonomic.rank = "Genus")))
 get_taxa_unique(ps, taxonomic.rank = "Genus")
-paste("=======================")
+paste(DIV5x)
 paste("number_of_Species: ", length(get_taxa_unique(ps, taxonomic.rank = "Species")))
 get_taxa_unique(ps, taxonomic.rank = "Species")
 sink()
@@ -162,9 +166,14 @@ pdf("Barplot_Phylum_Absolute_abundance.pdf", width = 28, height = 18, paper = "a
 plot(Phylum_Absolute_abundance)
 dev.off()
 
+# save plot as image
+tiff("Barplot_Phylum_Absolute_abundance.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Phylum_Absolute_abundance)
+dev.off()
+
 # saving Total_Phylum_numbers_in_absolute abundance_barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("Total Phylum numbers in absolute abundance_barplot: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
 sink()
 
@@ -216,9 +225,14 @@ pdf("1_Phylum_barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Phylum_level_barplot)
 dev.off()
 
+# save plot as image
+tiff("1_Phylum_barplot.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Phylum_level_barplot)
+dev.off()
+
 # saving Phylum number in phylum level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("Phylum number in phylum level barplot: ", length(unique(phylum_level_transformed_psmelt$Phylum)))
 sink()
 
@@ -271,9 +285,14 @@ pdf("2_Class_barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Class_level_barplot)
 dev.off()
 
+# save plot as image
+tiff("2_Class_barplot.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Class_level_barplot)
+dev.off()
+
 # saving Class numbers in Class level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("Class number in Class level barplot (> 0.25 %): ", length(unique(class_level_transformed_psmelt$Class)))
 sink()
 
@@ -326,9 +345,14 @@ pdf("3_Order_barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Order_level_barplot)
 dev.off()
 
+# save plot as image
+tiff("3_Order_barplot.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Order_level_barplot)
+dev.off()
+
 # saving Order number in order level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("Order number in order level barplot (> 0.25 %): ", length(unique(order_level_transformed_psmelt$Order)))
 sink()
 
@@ -381,9 +405,14 @@ pdf("4_Family_barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Family_level_barplot)
 dev.off()
 
+# save plot as image
+tiff("4_Family_barplot.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Family_level_barplot)
+dev.off()
+
 # saving Family number in family level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("Family number in family level barplot(> 1 %): ", length(unique(family_level_transformed_psmelt$Family)))
 sink()
 
@@ -419,6 +448,11 @@ Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan1,
 pdf("4_Family_heatmap.pdf", width = 28, height = 18, paper = "a4r")
 plot(Heatmap_family)
 dev.off()
+                                                             
+# save plot as image
+tiff("4_Family_heatmap.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Heatmap_family)
+dev.off()                                                             
 
 # saving plot as html widget
 family_heatmap<-ggplotly(Heatmap_family)
@@ -467,10 +501,15 @@ Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt,
 pdf("5_Genus_barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Genus_level_barplot)
 dev.off()
+                                                             
+# save plot as image
+tiff("5_Genus_barplot.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Genus_level_barplot)
+dev.off()                                           
                                                                
 # saving Genus number in genus level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("Genus number in genus level barplot(> 1 %): ", length(unique(genus_level_transformed_psmelt$Genus)))
 sink()                                                               
 
@@ -507,6 +546,11 @@ pdf("5_Genus_heatmap.pdf", width = 28, height = 18, paper = "a4r")
 plot(Heatmap_Genus)
 dev.off()
 
+# save plot as image
+tiff("5_Genus_heatmap.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Heatmap_Genus)
+dev.off()
+                                                            
 # saving plot as html widget
 Genus_Heatmap<-ggplotly(Heatmap_Genus)
 htmlwidgets::saveWidget(as_widget(Genus_Heatmap), "5_Genus_heatmap.html")
@@ -555,10 +599,15 @@ Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt,
 pdf("6_Species_barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Species_level_barplot)
 dev.off()
+                                                            
+# save plot as image
+tiff("6_Species_barplot.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Species_level_barplot)
+dev.off()                                                            
  
 # saving Species number in species level barplot
 sink("Phyloseq_object_processing_info.txt", append = T)
-paste("=======================")
+paste(DIV5x)
 paste("Species number in species level barplot(> 5%): ", length(unique(Species_level_transformed_psmelt$Species)))
 sink()                                                             
 
@@ -594,6 +643,11 @@ Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan5,
 pdf("6_Species_heatmap.pdf", width = 28, height = 18, paper = "a4r")
 plot(Heatmap_Species)
 dev.off()
+                                                              
+# save plot as image
+tiff("6_Species_heatmap.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Heatmap_Species)
+dev.off()                                                              
 
 # saving plot as html widget
 Species_Heatmap<-ggplotly(Heatmap_Species)
@@ -609,9 +663,16 @@ set.seed(10)
 ps.ord <- ordinate(ps, "NMDS", "bray" )
 ps.ord
                                                               
+# saving ordination detail
+sink("Phyloseq_object_processing_info.txt", append = T)
+paste(DIV5x)
+paste("Ordination details: ")
+ps.ord
+sink()                                                              
+                                                              
 # Plotting ordination
                                                               
- NMDS_Phylum <- plot_ordination(ps, ps.ord,
+ NMDS_Phylum_1 <- plot_ordination(ps, ps.ord,
                               type="taxa",
                               color = "Phylum")+
   geom_point(size=2, stroke=1)+
@@ -629,14 +690,52 @@ ps.ord
   theme(axis.title.y = element_text(colour = "black", face = "bold", size = 8))
 
 # saving plot in pdf
-pdf("NMDS_Phylum.pdf", width = 28, height = 18, paper = "a4r")
-plot(NMDS_Phylum)
+pdf("NMDS_Phylum_1.pdf", width = 28, height = 18, paper = "a4r")
+plot(NMDS_Phylum_1)
 dev.off()
+                                                              
+ # save plot as image
+tiff("NMDS_Phylum_1.tif", width = 12, height = 6, units = "in", res = 250)
+plot(NMDS_Phylum_1)
+dev.off()                                                             
 
 # saving plot as html widget
-NMDS_Phylum_ <-ggplotly(NMDS_Phylum)
-htmlwidgets::saveWidget(as_widget(NMDS_Phylum_), "NMDS_Phylum.html")
+NMDS_Phylum_1_ <-ggplotly(NMDS_Phylum_1)
+htmlwidgets::saveWidget(as_widget(NMDS_Phylum_1_), "NMDS_Phylum_1.html")
 ######################
+                                                              
+ # Plotting ordination 2
+                                                              
+ NMDS_Phylum_2 <- plot_ordination(ps, ps.ord,
+                              type="taxa",
+                              color = "Phylum")+
+  geom_point(size=2, stroke=1)+
+  theme(legend.title = element_text(face = "bold", size = 10))+
+  theme(axis.text.x = element_text(colour = "black", angle = 0, hjust = 1, vjust = 1, face = "bold", size = 8))+
+  theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 8, face = "bold"))+
+  theme(axis.line.y.left = element_line(colour = "black"))+
+  theme(axis.line.x.bottom = element_line(colour = "black"))+
+  theme(axis.line.x.top = element_line(colour = "black"))+
+  theme(legend.position = "bottom")+
+  theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
+  theme(strip.text.x = element_text(margin = margin(0.025,0,0.025,0, "cm")))+
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8))+
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 8))
+
+# saving plot in pdf
+pdf("NMDS_Phylum_2.pdf", width = 28, height = 18, paper = "a4r")
+plot(NMDS_Phylum_2)
+dev.off()
+                                                              
+ # save plot as image
+tiff("NMDS_Phylum_2.tif", width = 12, height = 6, units = "in", res = 250)
+plot(NMDS_Phylum_2)
+dev.off()                                                             
+
+# saving plot as html widget
+NMDS_Phylum_2_ <-ggplotly(NMDS_Phylum_2)
+htmlwidgets::saveWidget(as_widget(NMDS_Phylum_2_), "NMDS_Phylum_2.html")
+######################                                                             
                                                               
 
 ########                                                              
@@ -668,6 +767,11 @@ Alpha_diversity <-   plot_richness(ps,
 pdf("Alpha_diversity.pdf", width = 28, height = 18, paper = "a4r")
 plot(Alpha_diversity)
 dev.off()
+                                                              
+# save plot as image
+tiff("Alpha_diversity.tif", width = 12, height = 6, units = "in", res = 250)
+plot(Alpha_diversity)
+dev.off()                                                              
 
 # saving plot as html widget
 Alpha_diversity_ <-ggplotly(Alpha_diversity)
