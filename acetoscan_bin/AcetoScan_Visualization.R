@@ -51,7 +51,7 @@ row.names(TAX_data_subset_mat) <- paste0("OTU_", 1:nrow(TAX_data_subset_mat))
 TAX_data_mat_table <- tax_table(TAX_data_subset_mat)
 #TAX_data_mat_table
 
-# Devining separator variable
+# Dividing separator variable
 DIV <- "===================="
 DIV5x <- paste(DIV,DIV,DIV,DIV,DIV)
 
