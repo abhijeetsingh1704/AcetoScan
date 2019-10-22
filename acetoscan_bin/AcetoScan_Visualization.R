@@ -6,6 +6,7 @@
 
 otu_file <- "FTHFS_OTU_table_R.txt"
 tax_file <- "FTHFS_TAX_table_R.txt"
+sam_file <- "FTHFS_SAMPLE_table_R.txt"
 
 #getwd()
 
@@ -51,12 +52,20 @@ row.names(TAX_data_subset_mat) <- paste0("OTU_", 1:nrow(TAX_data_subset_mat))
 TAX_data_mat_table <- tax_table(TAX_data_subset_mat)
 #TAX_data_mat_table
 
+# reading and preparing sample data
+sam_data <- read.table(sam_file, header = T, sep = "\t")
+sam_data <- sample_data(sam_data)
+
 # Dividing separator variable
 DIV <- "===================="
 DIV5x <- paste(DIV,DIV,DIV,DIV,DIV)
 
 # Making phyloseq object from the tax table and OTU table
-ps <- phyloseq(OTU_data_subset_mat_table, TAX_data_mat_table)
+ps0 <- phyloseq(OTU_data_subset_mat_table, TAX_data_mat_table)
+
+# Adding sample data to phyloseq object
+ps <- merge_phyloseq(ps0, sam_data)
+
 # Save infor of phyloseq object
 sink("Visualization_processing_info.txt")
 paste("phyloseq_object: ")
@@ -429,7 +438,9 @@ family_level_transformed_forheatmap <- transform_sample_counts(family_level, fun
 family_level_transformed_forheatmap_morethan1 <- filter_taxa(family_level_transformed_forheatmap, function(x) sum(x) > 1, TRUE)
 
 Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan1, 
-    taxa.label = "Family", title = "Family level (> 1 %)",
+        taxa.label = "Family", 
+        title = "Family level (> 1 %)",
+        sample.order = "UNIQUENAMES",                       
         low = "#FEFE62", high = "#D35FB7", na.value = "white") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
     theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
@@ -526,6 +537,7 @@ genus_level_transformed_forheatmap_morethan1 <- filter_taxa(genus_level_transfor
 
 Heatmap_Genus <- plot_heatmap(genus_level_transformed_forheatmap_morethan1, 
         taxa.label = "Genus",
+        sample.order = "UNIQUENAMES",
         low = "#FEFE62", high = "#D35FB7", na.value = "white",
         title = "Genus level (> 1 %)") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
@@ -624,6 +636,7 @@ Species_level_transformed_forheatmap_morethan5 <- filter_taxa(Species_level_tran
 
 Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan5, 
         taxa.label = "Species",
+        sample.order = "UNIQUENAMES",
         low = "#FEFE62", high = "#D35FB7", na.value = "white",
         title = "Species level (> 5 %)") + 
     theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
