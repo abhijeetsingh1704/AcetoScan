@@ -583,6 +583,14 @@ fasttree -nt -gtr FTHFS_OTU_alignment.fasta > FTHFS_OTU.tree
 sed 's/,/\t/g' "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table.txt" | \
     awk 'NF{NF--};1' | \
     sed 's/ /\t/g'> "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_R.txt"
+    
+ ###	Preparing metadata file, input for R analysis
+ 
+ head -1 "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt" | \
+ 	sed 's/\t/\n/g' | \
+	sed '/OTU_ID/d' | \
+	sort | awk '{print $0 "\t" FNR}' | \
+	sed $'1i\tUNIQUENAME' > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_SAMPLE_table_R.txt"
 
 ###    Preparing input for R analysis
 
@@ -595,6 +603,7 @@ fi
 
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table_R.txt" .
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_R.txt" .
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_SAMPLE_table_R.txt" .
 cp "/home/$user/acetoscan/acetoscan_bin/AcetoScan_Visualization.R" .
 
 ###     Running R script
@@ -626,6 +635,7 @@ cp 	FTHFS_OTU.fasta \
 	FTHFS_OTU_alignment.fasta \
 	FTHFS_OTU_table.txt \
 	FTHFS_TAX_table.txt \
+	FTHFS_SAMPLE_table_R.txt \
 	FTHFS_TAX_table_full.csv \
 	"${WKDIR}/acetoscan_result"
 
