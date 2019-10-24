@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Tor Oct 24, 2019 19:45
+# Last modified: Tor Oct 24, 2019 21:45
 # Sign: Abhi
 
 set -euo pipefail
@@ -42,8 +42,8 @@ read_type_def="1"
 max_len_def="277"
 min_len_def="150"
 qual_def="20" 
-cluster_threshold_def="0.95"
-cluster_size_def="5"
+cluster_threshold_def="0.80"
+cluster_size_def="2"
 version_def="0.1.0"
 
 ###    Getting processors information
@@ -56,7 +56,7 @@ THREADS=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || getconf _NPROC
 
 usage() {
 echo "Usage   : $0 [-i <input directory>] [-o <output directory>] [-m <max_length>] [-n <min_length>] [-q <quality threshold>] [-r <reads type>] [-t <clustering threshold>] [-c <min_cluster size>]
-Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5" 1>&2; exit 1;
+Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.80 -c 2" 1>&2; exit 1;
 }
 
 
@@ -100,7 +100,7 @@ while getopts "i:o:m:n:q:r:t:c:hv" flags;
 
                         h)
                                 echo "
-Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
+Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.80 -c 2
 
         -i      Input directory containing raw illumina data
         -o      Output directory
@@ -115,9 +115,9 @@ Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 
                         1 = forward reads (default)
                         2 = reverse reads
         -t      Clustering threshold
-                        :default cluster threshold = 0.95 (95 %)
+                        :default cluster threshold = 0.80 (80 %)
         -c      Minimum cluster size
-                        :default minimum cluster size = 5
+                        :default minimum cluster size = 2
         -h      print Help
         -v      print acetoscan version"
                                 exit                                
