@@ -58,7 +58,7 @@ DIV <- "===================="
 DIV5x <- paste(DIV,DIV,DIV,DIV,DIV)
 
 # Making phyloseq object from the tax table and OTU table
-ps0 <- phyloseq(OTU_data_subset_mat_table, TAX_data_mat_table)
+ps0 <- phyloseq(OTU_data_mat_table, TAX_data_subset_mat_table)
 
 # Adding sample data to phyloseq object
 ps <- merge_phyloseq(ps0, sam_data)
