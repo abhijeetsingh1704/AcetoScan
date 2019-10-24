@@ -13,13 +13,13 @@ Acetoscan is a bash program for the analysis of Illumina MiSeq sequencing data f
 
 `acetoscan` uses some software dependencies
 ```
-	- Cutadapt 	(1.18-1)
-	- Vsearch 	(2.13.1)
-	- NCBI-blast+ 	(2.5.0+)
-	- Bioperl 	(1.7.2-3)
-	- Mafft		(7.307)
-	- Fasttree	(2.1.9)
-	- R 		(3.5.2), with libraries:
+	- Cutadapt 	(>1.18-1)
+	- Vsearch 	(>2.13.1)
+	- NCBI-blast+ 	(>2.5.0+)
+	- Bioperl 	(>1.7.2-3)
+	- Mafft		(>7.307)
+	- Fasttree	(>2.1.9)
+	- R 		(>3.5.2), with libraries:
 		¤ phyloseq 	(1.24.2)
 		¤ ggplot2 	(3.1.1)
 		¤ plotly 	(4.9.0)
