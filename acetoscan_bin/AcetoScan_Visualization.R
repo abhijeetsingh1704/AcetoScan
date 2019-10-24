@@ -18,42 +18,39 @@ suppressPackageStartupMessages(library("RColorBrewer"))
 suppressPackageStartupMessages(library("plyr"))
 suppressPackageStartupMessages(library("dplyr"))
 
-######
-OTU_data <- read.delim(otu_file, sep = "\t", header = TRUE)
+######  Reading OTU file
+
+OTU_data <- read.table(otu_file, sep = "\t", header = TRUE, row.names = 1)
 #head(OTU_data)
 #class(OTU_data) 
 
-# 
-OTU_data_subset <- OTU_data[, -1]
-#OTU_data_subset
-OTU_data_subset_mat <- as.matrix(OTU_data_subset, sep = "\t", header = TRUE)
-#OTU_data_subset_mat
+# Making matrix
+OTU_data_mat <- as.matrix(as.data.frame(OTU_data))
 
-row.names(OTU_data_subset_mat) <- paste0("OTU_", 1:nrow(OTU_data_subset_mat))
-#OTU_data_subset_mat
+# Making phyloseq otu table
+OTU_data_mat_table <- otu_table(OTU_data_mat, taxa_are_rows = TRUE)
 
-OTU_data_subset_mat_table <- otu_table(OTU_data_subset_mat, taxa_are_rows = TRUE)
-#OTU_data_subset_mat_table
+###### Reading TAX table
 
-######
-TAX_data <- read.table(tax_file, sep = "\t", header = TRUE)
+TAX_data <- read.table(tax_file, sep = "\t", header = TRUE, stringsAsFactors = F)
 #head(TAX_data)
-#class(TAX_data)
+#class(TAX_data) 
 
-#
+# subsetting the data
 TAX_data_subset <- TAX_data[, -1]
 #TAX_data_subset
-TAX_data_subset_mat <- as.matrix(TAX_data_subset)
-#TAX_data_subset_mat
 
-row.names(TAX_data_subset_mat) <- paste0("OTU_", 1:nrow(TAX_data_subset_mat))
-#TAX_data_subset_mat
+# getting OTU names from otu table "OTU_data"
+rownames(TAX_data_subset) <- rownames(OTU_data_mat_table)
 
-TAX_data_mat_table <- tax_table(TAX_data_subset_mat)
-#TAX_data_mat_table
+# making matrix of subset tax_data
+TAX_data_subset_mat <- as.matrix((TAX_data_subset))
 
-# reading and preparing sample data
-sam_data <- read.table(sam_file, header = T, sep = "\t")
+# making phyloseq tax table
+TAX_data_subset_mat_table <- tax_table(TAX_data_subset_mat)
+
+###### Reading sample data
+sam_data <- read.table(sam_file, header = T)
 sam_data <- sample_data(sam_data)
 
 # Dividing separator variable
