@@ -261,7 +261,7 @@ export QT="$qual"
 
 if [ "$cluster_threshold" == "" ];then
         cluster_threshold="$cluster_threshold_def"
-        echo -e "\n#\tUsing default clustering threshold: 0.95"
+        echo -e "\n#\tUsing default clustering threshold: 0.80 (80%)"
 else
         echo -e "\n#\tClustering threshold: $cluster_threshold"
 fi
@@ -270,7 +270,7 @@ fi
 
 if [ "$cluster_size" == "" ];then
         cluster_size="$cluster_size_def"
-        echo -e "\n#\tUsing default minimum cluster size : 5"
+        echo -e "\n#\tUsing default minimum cluster size : 2"
 else
         echo -e "\n#\tMinimum cluster size: $cluster_size"
 fi
