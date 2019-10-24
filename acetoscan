@@ -533,7 +533,7 @@ pid=$!
         # assigning taxonomy by translated nucleotide query wait protein database
         blastx \
                 -query "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU.fasta" \
-                -db "/home/$user/acetoscan/acetobase/AcetoBaseV1" \
+                -db "/home/$user/acetoscan/acetobase/AcetoBase" \
                 -task blastx \
                 -max_target_seqs 1 \
                 -num_threads "${THREADS}" \
