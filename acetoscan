@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: TUE Oct 22, 2019 21:45
+# Last modified: Tor Oct 24, 2019 19:45
 # Sign: Abhi
 
 set -euo pipefail
@@ -590,7 +590,9 @@ sed 's/,/\t/g' "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table.txt" | \
  	sed 's/\t/\n/g' | \
 	sed '/OTU_ID/d' | \
 	sort | awk '{print $0 "\t" FNR}' | \
-	sed $'1i\tUNIQUENAMES' > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_SAMPLE_table_R.txt"
+	awk '{$2=sprintf("U%05.0f", $2)}1' | \
+	sed '1i\UNIQUENAMES' | \
+	sed 's/UNIQUENAMES/\tUNIQUENAMES/' > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_SAMPLE_table_R.txt"
 
 ###    Preparing input for R analysis
 
