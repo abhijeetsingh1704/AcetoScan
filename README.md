@@ -1,7 +1,7 @@
 # AcetoScan
 
-- Version: 0.1.0 (20190719)
-- Last modified: SAT aug 10, 2019 17:41
+- Version: 0.1.0 (20191024)
+- Last modified: Tor Oct 24, 2019 21:47
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -40,7 +40,7 @@ $ sudo ./INSTALL
 
 ## Installation without sudo/ROOT
 
-For installation as local user make user the Dependencies Software are installed and modules are loaded
+For installation as local user make user the Dependencies Software are installed and modules are loaded (on server environment)
 ```
 chmod +x INSTALL
 
@@ -75,12 +75,12 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 Use `acetoscan` as follows
 
 ```
-$ acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
+$ acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.80 -c 2
 ```
 #### If installation is not as sudo/root
 
 ```
-$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
+$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.80 -c 2
 ```
 	
 ```
@@ -97,9 +97,9 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -
                         1 = forward reads (default)
                         2 = reverse reads
         -t      Clustering threshold
-                        :default cluster threshold = 0.95 (95 %)
+                        :default cluster threshold = 0.80 (80 %)
         -c      Minimum cluster size
-                        :default minimum cluster size = 5      
+                        :default minimum cluster size = 2      
         -h      print Help
         -v      print acetoscan version"
 
