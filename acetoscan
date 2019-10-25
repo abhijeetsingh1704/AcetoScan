@@ -537,7 +537,7 @@ pid=$!
                 -task blastx \
                 -max_target_seqs 1 \
                 -num_threads "${THREADS}" \
-                -evalue 1e-9 \
+                -evalue 10e-5 \
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp" \
                 -outfmt "6 qseqid saccver pident" 2> /dev/null
 
