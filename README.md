@@ -1,7 +1,7 @@
 # AcetoScan
 
 - Version: 0.1.0 (20191024)
-- Last modified: Tor Oct 24, 2019 21:47
+- Last modified: Tor Oct 25, 2019 12:27
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -75,12 +75,12 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 Use `acetoscan` as follows
 
 ```
-$ acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.80 -c 2
+$ acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
 ```
 #### If installation is not as sudo/root
 
 ```
-$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.80 -c 2
+$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
 ```
 	
 ```
@@ -97,9 +97,9 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -
                         1 = forward reads (default)
                         2 = reverse reads
         -t      Clustering threshold
-                        :default cluster threshold = 0.80 (80 %)
+                        :default cluster threshold = 0.95 (95 %)
         -c      Minimum cluster size
-                        :default minimum cluster size = 2      
+                        :default minimum cluster size = 5      
         -h      print Help
         -v      print acetoscan version"
 
