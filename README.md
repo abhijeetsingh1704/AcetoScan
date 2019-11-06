@@ -101,6 +101,6 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -
         -c      Minimum cluster size
                         :default minimum cluster size = 5      
         -h      print Help
-        -v      print acetoscan version"
+        -v      print acetoscan version
 
 ```
