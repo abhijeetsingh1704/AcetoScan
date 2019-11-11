@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Fre Oct 25, 2019 12:28
+# Last modified: Mon Nov 11, 2019 14:28
 # Sign: Abhi
 
 set -euo pipefail
@@ -570,11 +570,11 @@ sed 's/;tax=/\t/g' OTUblast.txt.tmp | \
 #       Multiple sequence alignment by mafft
 
 echo -e "\n#\tPerforming Multiple Sequence Alignment\n"
-mafft --reorder --thread "${THREADS}" FTHFS_OTU.fasta > FTHFS_OTU_alignment.fasta
+mafft --reorder --thread "${THREADS}" FTHFS_OTU.fasta > FTHFS_OTU.aln
 
 #       Phylogenetic tree construction by FastTree
 echo -e "\n#\tPreparing phylogenetic tree\n"
-fasttree -nt -gtr FTHFS_OTU_alignment.fasta > FTHFS_OTU.tree
+fasttree -nt -gtr FTHFS_OTU.aln > FTHFS_OTU.tree
 
 #########################################################################
 
@@ -634,7 +634,7 @@ cd "${WKDIR}/output_data/trimmed/VSEARCH/"
 
 cp 	FTHFS_OTU.fasta \
 	FTHFS_OTU.tree \
-	FTHFS_OTU_alignment.fasta \
+	FTHFS_OTU.aln \
 	FTHFS_OTU_table.txt \
 	FTHFS_TAX_table.txt \
 	FTHFS_SAMPLE_table_R.txt \
