@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # File: AcetoScan_Visualization.R
-# Last modified: Fri, oct 22, 2019  21:55
+# Last modified: Mon, Nov 11, 2019 15:04
 # Sign: Abhi
 
 otu_file <- "FTHFS_OTU_table_R.txt"
@@ -10,13 +10,27 @@ sam_file <- "FTHFS_SAMPLE_table_R.txt"
 
 #getwd()
 
-# Load required packages
-suppressPackageStartupMessages(library("phyloseq"))
-suppressPackageStartupMessages(library("ggplot2"))
-suppressPackageStartupMessages(library("plotly"))
-suppressPackageStartupMessages(library("RColorBrewer"))
-suppressPackageStartupMessages(library("plyr"))
-suppressPackageStartupMessages(library("dplyr"))
+# Function for loading OR installing if missing R packages
+Rpackage <- function(pkg){
+  pkgR <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(pkgR))
+    install.packages(pkgR)
+  sapply(pkg, require, character.only = TRUE)
+}
+
+# Defining required package list
+Libraries <- c("ggplot2", 
+              "phyloseq",
+              "plotly",
+              "RColorBrewer",
+              "plyr",
+              "dplyr")
+
+# Turn the warnings off 
+options(warn=-1)
+
+# Load required packages with suppressed start-up messages
+suppressPackageStartupMessages(Rpackage(Libraries))
 
 ######  Reading OTU file
 
