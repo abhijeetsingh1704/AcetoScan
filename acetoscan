@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Mon Nov 11, 2019 14:28
+# Last modified: Tis Nov 12, 2019 18:23
 # Sign: Abhi
 
 set -euo pipefail
@@ -477,7 +477,7 @@ pid=$!
                 -task blastx \
                 -max_target_seqs 1 \
                 -num_threads "${THREADS}" \
-                -evalue 10e-5 \
+                -evalue 1e-9 \
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/blast_results_for_filtering" \
                 -outfmt "7 qseqid" 2> /dev/null
 
@@ -537,7 +537,7 @@ pid=$!
                 -task blastx \
                 -max_target_seqs 1 \
                 -num_threads "${THREADS}" \
-                -evalue 10e-5 \
+                -evalue 1e-9 \
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp" \
                 -outfmt "6 qseqid saccver pident" 2> /dev/null
 
