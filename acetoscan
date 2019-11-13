@@ -4,7 +4,15 @@
 # Last modified: Ons Nov 13, 2019 15:45
 # Sign: Abhi
 
+###	set pipefail
+
 set -euo pipefail
+
+###	getting currect working directory to variable
+
+CDIR=$(pwd)
+
+###	acetoscan script
 
 echo \
 " ___________________________________________________________
@@ -162,6 +170,10 @@ echo -e "\n#\tInput directory not provided, Aborting!"
         exit
 fi
 
+###	Generating logfile
+
+exec > >(tee -a acetoscan_log )
+exec 2> >(tee -a acetoscan_log >&2)
 
 ###     Checking input_dir 
 
@@ -670,7 +682,13 @@ fi
 end=$(date +%s) # end time of script
 runtime=$(((end - start))) # calculate runtime
 processing_data_size=$(find "$input_dir" -iname "*_${reads}_001.fastq.gz" -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
-echo -e "\n#\tAcetoscan processed: $processing_data_size in ${runtime} seconds"
+echo -e "\n#\tAcetoscan processed: $processing_data_size in ${runtime} seconds\n"
+
+###	Moving logfile from previous initial working directory to acetoscan_result directory
+###	And removing logfile from previous initial working directory
+
+find ${CDIR} -name "acetoscan_log" -exec sed '/Processing:/d' {} > ${WKDIR}/acetoscan_result/acetoscan_${DATE}.log \;
+find ${CDIR} -name "acetoscan_log" -exec rm {} \;
 
 ###    End of script
 
