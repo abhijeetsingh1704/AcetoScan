@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Tis Nov 12, 2019 18:23
+# Last modified: Ons Nov 13, 2019 15:45
 # Sign: Abhi
 
 set -euo pipefail
@@ -19,6 +19,10 @@ echo \
 ###    Recording the time whent he script was started
 
 start=$(date +%s) #start time of script
+
+###	Variable for the backup
+
+DATE=$(date | sed 's/ /-/g' | cut -d- -f1,2,3)
 
 ###     Setting up variables
 
@@ -294,8 +298,8 @@ if [ ! -z "$(ls -A "$output_dir")" ]; then
    echo -e "\n#\tWARNING: directory \"$output_dir\" is not empty, possibility of data loss!!!"
    
         #       Compressing previous data
-        echo -e "\n#\tCompressing previous data to /home/$user/acetoscan_backup_${start}.tar.gz"
-        tar -zcf /home/$user/acetoscan_backup_${start}.tar.gz ${WKDIR}
+        echo -e "\n#\tCompressing previous data to /home/$user/acetoscan_backup_${DATE}.tar.gz"
+        tar -zcf /home/$user/acetoscan_backup_${DATE}.tar.gz ${WKDIR}
        
         #       Cleaning
         echo -e "\n#\tRemoving previous data from ${WKDIR}"
