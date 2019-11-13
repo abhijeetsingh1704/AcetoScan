@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Ons Nov 13, 2019 15:45
+# Last modified: Ons Nov 13, 2019 17:06
 # Sign: Abhi
 
 ###	set pipefail
@@ -184,7 +184,7 @@ if [ ! -d "$input_dir" ] && [ -x "$input_dir" ]; then
         exit
 else
         echo -e "\n#\tContent of input directory: $input_dir"        
-        echo -e "\n#============================================================"
+        echo -e "\n#============================================================\n"
         forward_read_count=$(find "$input_dir" -name '*_R1_001.fastq.gz' | wc -l)
         reverse_read_count=$(find "$input_dir" -name '*_R2_001.fastq.gz' | wc -l)
         #
@@ -195,7 +195,7 @@ else
         echo -e "-> Size of forward read files: $forward_read_size"
         echo "-> Number of reverse read files: $reverse_read_count"
         echo -e "-> Size of reverse read files: $reverse_read_size"
-        echo -e "\n#============================================================"
+        echo -e "\n#============================================================\n"
         
         
 fi
