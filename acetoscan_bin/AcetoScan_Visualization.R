@@ -1,12 +1,13 @@
 #!/usr/bin/env Rscript
 
 # File: AcetoScan_Visualization.R
-# Last modified: Mon, Nov 11, 2019 15:04
+# Last modified: Mon, Nov 18, 2019 06:17
 # Sign: Abhi
 
 otu_file <- "FTHFS_OTU_table_R.txt"
 tax_file <- "FTHFS_TAX_table_R.txt"
 sam_file <- "FTHFS_SAMPLE_table_R.txt"
+tree_file <- "FTHFS_OTU.tree"
 
 #getwd()
 
@@ -67,6 +68,9 @@ TAX_data_subset_mat_table <- tax_table(TAX_data_subset_mat)
 sam_data <- read.table(sam_file, header = T)
 sam_data <- sample_data(sam_data)
 
+### Reading phylogenetic tree
+tree_data <- read_tree(tree_file)
+
 # Dividing separator variable
 DIV <- "===================="
 DIV5x <- paste(DIV,DIV,DIV,DIV,DIV)
@@ -74,8 +78,8 @@ DIV5x <- paste(DIV,DIV,DIV,DIV,DIV)
 # Making phyloseq object from the tax table and OTU table
 ps0 <- phyloseq(OTU_data_mat_table, TAX_data_subset_mat_table)
 
-# Adding sample data to phyloseq object
-ps <- merge_phyloseq(ps0, sam_data)
+# Adding sample data and phylogenetic tree to phyloseq object
+ps <- merge_phyloseq(ps0, sam_data, tree_data)
 
 # Save infor of phyloseq object
 sink("Visualization_processing_info.txt")
@@ -802,5 +806,36 @@ Alpha_diversity_ <-ggplotly(Alpha_diversity)
 htmlwidgets::saveWidget(as_widget(Alpha_diversity_), "Alpha_diversity.html")
 ######################                                                             
                                                               
+# Phylogenetic tree visualization
+
+tree <- plot_tree(ps, color = "Phylum",
+          method = "sampledodge",
+          base.spacing = 0.03,
+          min.abundance = 10,
+          justify = "left",
+          nodelabf=nodeplotblank,
+          #ladderize = "left",
+          text.size = 1,
+          plot.margin = 0)+
+
+  scale_color_manual(values = my_colours)+
+
+  theme(legend.position = "bottom") +
+  theme(legend.text=element_text(size=7, face = "bold"))+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
+
+  coord_polar(theta = "y")
+
+# saving plot in pdf
+pdf("FTHFH_OTU.tree.pdf", width = 28, height = 18, paper = "a4r")
+plot(tree)
+dev.off()
+
+# save plot as image
+tiff("FTHFH_OTU.tree.tif", width = 6, height = 6, units = "in", res = 500)
+plot(tree)
+dev.off()
+
+######################
                                        
 ### End of script
