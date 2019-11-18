@@ -622,6 +622,7 @@ fi
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table_R.txt" .
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_R.txt" .
 cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_SAMPLE_table_R.txt" .
+cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU.tree" .
 cp "/home/$user/acetoscan/acetoscan_bin/AcetoScan_Visualization.R" .
 
 ###     Running R script
