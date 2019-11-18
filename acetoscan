@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Mon Nov 18, 2019 06:16
+# Last modified: Mon Nov 18, 2019 13:56
 # Sign: Abhi
 
 ###	set pipefail
@@ -352,7 +352,7 @@ fi
 
 
 
-###     function for the processing bar
+###     Function for the Spinner
 
 
 spin=( '/' '-' '\' '|' )
@@ -376,14 +376,15 @@ echo -e "\n#\tOBS: This might take a while!\n"
 
 ###     CUTADAPT <--- from external script
 
-        #       making progress bar for cudadapt script
-                
+        #       Starting spinner for cudadapt                
         processing
         pid=$!
+	disown
         
-        #cutadapt external script        
+        ###	cutadapt external script        
         AcetoScan_cutadapt.sh   # <============= external script
-                
+        
+	#       closing spinner for cudadapt
         echo -ne "Done\n"
         kill $pid 
 
@@ -392,16 +393,17 @@ echo -e "\n#\tOBS: This might take a while!\n"
 echo -e "\n#\tPerforming longest best frame analysis"
 echo -e "\n#\tOBS: This might take a while!\n"
 
-        #       making progress bar for best frame script
-
+        #       Starting spinner for best frame script
         processing
         pid=$!
+	disown
         
         #longorf-acetoscan external script
         
         find ${WKDIR}/output_data/trimmed/ -name "*_trimmed_${reads}.fasta" \
         -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); AcetoScan_longorf.pl --filter "$f" > "Best_${b}.fasta"' \; # <============= external script
         
+	#       closing spinner for best frame script
         echo -ne "Done\n"        
         kill $pid 
 
@@ -411,8 +413,10 @@ cd "${WKDIR}/output_data/trimmed"
 echo -e "\n#\tPreprocessing for clustering"
 echo ""
 
-processing
-pid=$!
+	#       Starting spinner for Preprocessing	
+	processing
+	pid=$!
+	disown
 
 #       Finding and replacing the fasta header with file name
 
@@ -425,9 +429,10 @@ find ${WKDIR}/output_data/ -type f -iname "Best*.fasta" -printf "%f\n" | while r
 
 perl -npe 'if(!/^>/){s/\S{60}/$&\n/g};{s/-/_/g}' All_best.fasta.tmp > All_best.fasta
 
-echo -ne "Done\n"        
-kill $pid
-echo ""
+	#       closing spinner for Preprocessing
+	echo -ne "Done\n"        
+	kill $pid
+	echo ""
 
 ###     Begin clustering with VSEARCH (v2.13.0_linux_x86_64)
 
@@ -484,8 +489,10 @@ perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
 echo -e "\n#\tFiltering non target OTUs"
 echo -e "\n#\tOBS: This might take a while!\n"
 
-processing
-pid=$!
+	#       Starting spinner for blastx filtering
+	processing
+	pid=$!
+	disown
         
         blastx \
                 -query "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" \
@@ -511,8 +518,9 @@ pid=$!
 
         sed -e 's/-/_/g;/^#/d' "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp" > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta"
 
-echo -ne "Done\n"
-kill $pid
+	#       Starting spinner for blastx filtering
+	echo -ne "Done\n"
+	kill $pid
 
 ###    Generating OTU table with filtered/target OTUs
 
@@ -541,8 +549,10 @@ cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt" "${WKDIR}/output_d
 echo -e "\n#\tAssigning taxonomy"
 echo -e "\n#\tOBS: This might take a while!\n"
 
-processing
-pid=$!
+	#       Starting spinner for taxonomic assignment
+	processing
+	pid=$!
+	disown
 
         cut -d ";" -f1 "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta" > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU.fasta"
 
@@ -557,8 +567,9 @@ pid=$!
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp" \
                 -outfmt "6 qseqid saccver pident" 2> /dev/null
 
-echo -ne "Done\n"
-kill $pid
+	#       Starting spinner for taxonomic assignment
+	echo -ne "Done\n"
+	kill $pid
 
 ###    Preparing OTU taxonomy table
 
