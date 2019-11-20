@@ -28,7 +28,7 @@ Libraries <- c("ggplot2",
               "dplyr")
 
 # Turn the warnings off 
-options(warn=-1)
+#options(warn=-1)
 
 # Load required packages with suppressed start-up messages
 suppressPackageStartupMessages(Rpackage(Libraries))
@@ -80,6 +80,8 @@ ps0 <- phyloseq(OTU_data_mat_table, TAX_data_subset_mat_table)
 
 # Adding sample data and phylogenetic tree to phyloseq object
 ps <- merge_phyloseq(ps0, sam_data, tree_data)
+paste()
+ps
 
 # Save infor of phyloseq object
 sink("Visualization_processing_info.txt")
@@ -122,6 +124,19 @@ paste(DIV5x)
 paste("Phylum_prevalence_table: ")
 print(prevalence_table)
 sink()
+
+# Write the details to console/terminal
+
+paste()
+paste(DIV)
+paste("number_of_Phylum: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
+paste("number_of_Class: ", length(get_taxa_unique(ps, taxonomic.rank = "Class")))
+paste("number_of_Order: ", length(get_taxa_unique(ps, taxonomic.rank = "Order")))
+paste("number_of_Family: ", length(get_taxa_unique(ps, taxonomic.rank = "Family")))
+paste("number_of_Genus: ", length(get_taxa_unique(ps, taxonomic.rank = "Genus")))
+paste("number_of_Species: ", length(get_taxa_unique(ps, taxonomic.rank = "Species")))
+paste(DIV)
+paste()
 
 # Write the details of taxa to file
 sink("Visualization_processing_info.txt", append = T)
