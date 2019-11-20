@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Ons Nov 20, 2019 18:37
+# Last modified: Ons Nov 20, 2019 19:17
 # Sign: Abhi
 
 ###	set pipefail
@@ -500,7 +500,7 @@ echo -e "\n#\tOBS: This might take a while!\n"
                 -task blastx \
                 -max_target_seqs 1 \
                 -num_threads "${THREADS}" \
-                -evalue 1e-9 \
+                -evalue 1e-5 \
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/blast_results_for_filtering" \
                 -outfmt "7 qseqid" 2> /dev/null
 
@@ -563,13 +563,17 @@ echo -e "\n#\tOBS: This might take a while!\n"
                 -task blastx \
                 -max_target_seqs 1 \
                 -num_threads "${THREADS}" \
-                -evalue 1e-9 \
-                -out "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp" \
+                -evalue 1e-5 \
+                -out "${WKDIR}/output_data/trimmed/VSEARCH/OTU_blast.txt.tmp" \
                 -outfmt "6 qseqid saccver pident" 2> /dev/null
 
 	#       Starting spinner for taxonomic assignment
 	echo -ne "Done\n"
 	kill $pid
+	
+###     Removing duplicates
+awk '!a[$1]++' "${WKDIR}/output_data/trimmed/VSEARCH/OTU_blast.txt.tmp" >  "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp"
+rm "${WKDIR}/output_data/trimmed/VSEARCH/OTU_blast.txt.tmp"	
 
 ###    Preparing OTU taxonomy table
 
