@@ -383,7 +383,7 @@ echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
 
 ###     CUTADAPT <--- from external script
 
-        #       Starting spinner for cudadapt                
+#       Starting spinner for cudadapt                
         processing
         pid=$!
 	disown
@@ -391,7 +391,7 @@ echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
         ###	cutadapt external script        
         AcetoScan_cutadapt.sh   # <============= external script
         
-	#       closing spinner for cudadapt
+#       closing spinner for cudadapt
         echo -ne "Done\n"
         kill $pid 
 
@@ -400,7 +400,7 @@ echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
 echo -e "\n#\t${YELLOW}Performing longest best frame analysis${RESTORE}"
 echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
 
-        #       Starting spinner for best frame script
+#       Starting spinner for best frame script
         processing
         pid=$!
 	disown
@@ -410,7 +410,7 @@ echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
         find ${WKDIR}/output_data/trimmed/ -name "*_trimmed_${reads}.fasta" \
         -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); AcetoScan_longorf.pl --filter "$f" > "Best_${b}.fasta"' \; # <============= external script
         
-	#       closing spinner for best frame script
+#       closing spinner for best frame script
         echo -ne "Done\n"        
         kill $pid 
 
@@ -420,7 +420,7 @@ cd "${WKDIR}/output_data/trimmed"
 echo -e "\n#\t${YELLOW}Preprocessing for clustering${RESTORE}"
 echo ""
 
-	#       Starting spinner for Preprocessing	
+#       Starting spinner for Preprocessing	
 	processing
 	pid=$!
 	disown
@@ -436,7 +436,7 @@ find ${WKDIR}/output_data/ -type f -iname "Best*.fasta" -printf "%f\n" | while r
 
 perl -npe 'if(!/^>/){s/\S{60}/$&\n/g};{s/-/_/g}' All_best.fasta.tmp > All_best.fasta
 
-	#       closing spinner for Preprocessing
+#       closing spinner for Preprocessing
 	echo -ne "Done\n"        
 	kill $pid
 	echo ""
@@ -496,7 +496,7 @@ perl -pe '/^>/ ? print "\n" : chomp' ./VSEARCH/pre_OTU.fasta | \
 echo -e "\n#\t${YELLOW}Filtering non target OTUs${RESTORE}"
 echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
 
-	#       Starting spinner for blastx filtering
+#       Starting spinner for blastx filtering
 	processing
 	pid=$!
 	disown
@@ -525,7 +525,7 @@ echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
 
         sed -e 's/-/_/g;/^#/d' "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp" > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta"
 
-	#       Starting spinner for blastx filtering
+#       Closing spinner for blastx filtering
 	echo -ne "Done\n"
 	kill $pid
 
@@ -556,7 +556,7 @@ cp "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_OTU_table.txt" "${WKDIR}/output_d
 echo -e "\n#\t${YELLOW}Assigning taxonomy${RESTORE}"
 echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
 
-	#       Starting spinner for taxonomic assignment
+#       Starting spinner for taxonomic assignment
 	processing
 	pid=$!
 	disown
@@ -574,7 +574,7 @@ echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/OTU_blast.txt.tmp" \
                 -outfmt "6 qseqid saccver pident" 2> /dev/null
 
-	#       Starting spinner for taxonomic assignment
+#       closing spinner for taxonomic assignment
 	echo -ne "Done\n"
 	kill $pid
 	
@@ -661,7 +661,7 @@ echo -e "\n#\tIn case of ${LRED}execution halt${RESTORE}, access data in path \n
     --no-restore \
     --silent \
     --quiet \
-    --file="AcetoScan_Visualization.R" > /dev/null
+    --file="AcetoScan_Visualization.R"
 
 ###    Putting everything together in a Result DIRECTORY = acetoscan_result or Visualization
 
@@ -688,13 +688,13 @@ if [ -f "${WKDIR}/output_data/trimmed/VSEARCH/Visualization/Alpha_diversity.html
         cp ${WKDIR}/output_data/trimmed/VSEARCH/Visualization/* .
         rm AcetoScan_Visualization.R
         rm FTHFS_*table_R.txt
-        echo -e "#\tFinal results are in directory \"acetoscan_result\" in path \n\t${YELLOW}${WKDIR}/acetoscan_result${RESTORE}"
+        echo -e "\n\n\n#\tFinal results are in directory \"acetoscan_result\" in path \n\t${YELLOW}${WKDIR}/acetoscan_result${RESTORE}"
         
 else
         rm AcetoScan_Visualization.R
         rm FTHFS_*table_R.txt
-        echo -e "#\tFinal results are in directory \"Visualization\" in path \n\t${YELLOW}${WKDIR}/output_data/trimmed/VSEARCH/Visualization/${RESTORE}"
-        echo -e "#\tAnd OTU table and TAX table in \"acetoscan_result\" in path \n\t${YELLOW}${WKDIR}/acetoscan_result${RESTORE}"
+        echo -e "\n\n\n#\tFinal results are in directory \"Visualization\" in path \n\t${YELLOW}${WKDIR}/output_data/trimmed/VSEARCH/Visualization/${RESTORE}"
+        echo -e "\n\n\n#\tAnd OTU table and TAX table in \"acetoscan_result\" in path \n\t${YELLOW}${WKDIR}/acetoscan_result${RESTORE}"
         
 fi
 
@@ -712,5 +712,7 @@ find ${CDIR} -name "acetoscan_log" -exec sed '/Processing:/d' {} > ${WKDIR}/acet
 find ${CDIR} -name "acetoscan_log" -exec rm {} \;
 
 echo -e "\n#\t${YELLOW}${user}${RESTORE}, Thanks for using ${YELLOW}\"AcetoScan\"${RESTORE}\n\n###"
+
+
 ###    End of script
 
