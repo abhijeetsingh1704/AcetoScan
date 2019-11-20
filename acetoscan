@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Mon Nov 18, 2019 13:56
+# Last modified: Ons Nov 20, 2019 18:37
 # Sign: Abhi
 
 ###	set pipefail
@@ -505,7 +505,7 @@ echo -e "\n#\tOBS: This might take a while!\n"
                 -outfmt "7 qseqid" 2> /dev/null
 
         ###     Processing blast result file, deleting commented lines
-        sed '/^#/d' ./VSEARCH/blast_results_for_filtering > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt"
+        sed '/^#/d' ./VSEARCH/blast_results_for_filtering | uniq > "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt"
 
         ###     Extracting target sequences
 
