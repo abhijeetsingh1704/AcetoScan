@@ -6,7 +6,7 @@
 
 ## Description
 
-Acetoscan is a bash program for the analysis of Illumina MiSeq sequencing data for the FTHFS (Formyl--tetrahydrofolate synthetase) gene/amplicons
+Acetoscan is a program for the analysis of Illumina MiSeq sequencing data for the FTHFS (Formyl--tetrahydrofolate synthetase) gene/amplicons
 
 
 ## Dependencies
@@ -40,7 +40,7 @@ $ sudo ./INSTALL
 
 ## Installation without sudo/ROOT
 
-For installation as local user make user the Dependencies Software are installed and modules are loaded (on server environment)
+For installation as local user make sure the dependency software are installed and modules are loaded (on server environment)
 ```
 chmod +x INSTALL
 
