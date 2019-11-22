@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan_software_check.sh
-# Last modified: fre sep 26, 2019 14:00
+# Last modified: fre Nov 22, 2019 13:27
 # Sign: Abhi
 
 ###     User
@@ -61,7 +61,7 @@ fi
 if [ ! -f /home/$user/acetoscan/acetobase/*.phr ];then
         echo -ne "\n#\tCannot access acetobase"
         echo -ne "\n#\tTrying to Download AcetoBase"
-        wget -O /home/$user/acetoscan/acetobase/AcetoBase_ref.tar.gz https://acetobase.molbio.slu.se/download/acetobase_ref_protein
+        wget --no-check-certificate -O /home/$user/acetoscan/acetobase/AcetoBase_ref.tar.gz https://acetobase.molbio.slu.se/download/ref/1
         tar xf /home/$user/acetoscan/acetobase/AcetoBase_ref.tar.gz -C /home/$user/acetoscan/acetobase/ 
         find /home/$user/ -type f -iname "AcetoBase.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBase.fasta
         cd /home/$user/acetoscan/acetobase/ && makeblastdb -in AcetoBase.fasta -dbtype prot -title AcetoBase -out AcetoBase
