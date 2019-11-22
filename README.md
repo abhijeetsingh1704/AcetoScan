@@ -1,7 +1,7 @@
 # AcetoScan
 
 - Version: 0.1.0 (20191025)
-- Last modified: Fre Oct 25, 2019 12:27
+- Last modified: Fre Nov 22, 2019 14:05
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -14,10 +14,10 @@ Acetoscan is a bash program for the analysis of Illumina MiSeq sequencing data f
 `acetoscan` uses some software dependencies
 ```
 	- Cutadapt 	(>1.18-1)
-	- Vsearch 	(>2.13.1)
+	- VSEARCH 	(>2.13.1)
 	- NCBI-blast+ 	(>2.5.0+)
 	- Bioperl 	(>1.7.2-3)
-	- Mafft		(>7.307)
+	- MAFFT		(>7.307)
 	- Fasttree	(>2.1.9)
 	- R 		(>3.5.2), with libraries:
 		¤ phyloseq 	(1.24.2)
