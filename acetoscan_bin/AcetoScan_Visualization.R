@@ -179,7 +179,9 @@ ModifyTax <- function(x, ind) {
 
 ##  Making manual and distinctive colour palette
 colour_palette = brewer.pal.info[brewer.pal.info$category == 'qual',]
-my_colours = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
+my_colours_1 = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
+my_colours_2 = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
+my_colours <- append(my_colours_1, my_colours_2)
 
 ######################  Phylum Absolute abundance
 Phylum_Absolute_abundance <- plot_bar(ps, fill = "Phylum") + 
@@ -294,7 +296,7 @@ class_level_transformed_psmelt <- psmelt(class_level_transformed)
 # converting the class information as character
 class_level_transformed_psmelt$Class <- as.character(class_level_transformed_psmelt$Class)
 # merge the class with abundance less than 0.25
-class_level_transformed_psmelt$Class[class_level_transformed_psmelt$Abundance < 0.25] <- "x-Minor class (<0.25)"
+class_level_transformed_psmelt$Class[class_level_transformed_psmelt$Abundance < 0.25] <- "x-Minor class (<0.25%)"
 
 # Class level barplot
 Class_level_barplot <- ggplot(data = class_level_transformed_psmelt,
@@ -354,7 +356,7 @@ order_level_transformed_psmelt <- psmelt(order_level_transformed)
 # converting the order information as character
 order_level_transformed_psmelt$Order <- as.character(order_level_transformed_psmelt$Order)
 # merge the order with abundance less than 0.25
-order_level_transformed_psmelt$Order[order_level_transformed_psmelt$Abundance < 0.25] <- "x-Minor order(<0.25)"
+order_level_transformed_psmelt$Order[order_level_transformed_psmelt$Abundance < 0.25] <- "x-Minor order(<0.25%)"
 
 # Order level barplot
 Order_level_barplot <- ggplot(data = order_level_transformed_psmelt,
@@ -415,7 +417,7 @@ family_level_transformed_psmelt <- psmelt(family_level_transformed)
 # converting the family information as character
 family_level_transformed_psmelt$Family <- as.character(family_level_transformed_psmelt$Family)
 # merge the family with abundance less than 1
-family_level_transformed_psmelt$Family[family_level_transformed_psmelt$Abundance < 1] <- "x-Minor family(<1)"
+family_level_transformed_psmelt$Family[family_level_transformed_psmelt$Abundance < 1] <- "x-Minor family(<1%)"
 
 # Family level barplot
 Family_level_barplot <- ggplot(data = family_level_transformed_psmelt,
@@ -514,7 +516,7 @@ genus_level_transformed_psmelt <- psmelt(genus_level_transformed)
 # converting the genus information as character
 genus_level_transformed_psmelt$Genus <- as.character(genus_level_transformed_psmelt$Genus)
 # merge the genus with abundance less than 1
-genus_level_transformed_psmelt$Genus[genus_level_transformed_psmelt$Abundance < 1] <- "x-Minor genus(<1)"
+genus_level_transformed_psmelt$Genus[genus_level_transformed_psmelt$Abundance < 1] <- "x-Minor genus(<1%)"
 
 # Genus level barplot
 Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt, 
@@ -613,7 +615,7 @@ Species_level_transformed_psmelt <- psmelt(Species_level_transformed)
 #converting the Species information as character
 Species_level_transformed_psmelt$Species <- as.character(Species_level_transformed_psmelt$Species)
 #merge the Species with abundance less than 5
-Species_level_transformed_psmelt$Species[Species_level_transformed_psmelt$Abundance < 5] <- "x-Minor Species(<5)"
+Species_level_transformed_psmelt$Species[Species_level_transformed_psmelt$Abundance < 5] <- "x-Minor Species(<5%)"
 
 # Species level barplot
 Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt, 
