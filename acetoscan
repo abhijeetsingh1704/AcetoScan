@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Ons Nov 20, 2019 20:27
+# Last modified: Ons Jan 29, 2020 13:32
 # Sign: Abhi
 
 ### Setting colour variables
@@ -698,21 +698,24 @@ else
         
 fi
 
+###	Moving logfile from previous initial working directory to acetoscan_result directory
+###	And removing logfile from previous initial working directory
+
+find ${CDIR} -name "acetoscan_log" -exec sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g' {} > ${WKDIR}/acetoscan_result/acetoscan_${DATE}.log \;
+find ${WKDIR}/acetoscan_result/ -name "acetoscan_${DATE}.log" -exec sed -i -e '/ambiguous characters./,/done./{//!d};/STEP/d;/(thread/d;/Processing:/d;/Constructing a UPGMA tree/,/done./{//!d};/seconds: Top hits for/d;/Joined/d;/NNI round/d;/seconds: SPR round/d;/ML Lengths/d;/NNI round/d;/Optimizing GTR model/d;/Site likelihoods with/d;/ML split tests for/d' {} \;
+find ${CDIR} -name "acetoscan_log" -exec rm {} \;
+
 ###    Getting final information
 
 end=$(date +%s) # end time of script
 runtime=$(((end - start))) # calculate runtime
 processing_data_size=$(find "$input_dir" -iname "*_${reads}_001.fastq.gz" -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
-echo -e "\n#\tAcetoscan processed: ${YELLOW}$processing_data_size${RESTORE} in ${YELLOW}${runtime}${RESTORE} seconds\n"
+echo -e "\n#\tAcetoscan processed: ${YELLOW} $processing_data_size ${RESTORE} in ${YELLOW} ${runtime} ${RESTORE} seconds\n"
 
-###	Moving logfile from previous initial working directory to acetoscan_result directory
-###	And removing logfile from previous initial working directory
-
-find ${CDIR} -name "acetoscan_log" -exec sed '/Processing:/d' {} > ${WKDIR}/acetoscan_result/acetoscan_${DATE}.log \;
-find ${CDIR} -name "acetoscan_log" -exec rm {} \;
+### Greeting
 
 echo -e "\n#\t${YELLOW}${user}${RESTORE}, Thanks for using ${YELLOW}\"AcetoScan\"${RESTORE}\n\n###"
 
-
 ###    End of script
+
 
