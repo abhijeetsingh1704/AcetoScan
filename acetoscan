@@ -716,8 +716,8 @@ fi
 ###	Moving logfile from previous initial working directory to acetoscan_result directory
 ###	And removing logfile from previous initial working directory
 
-find ${CDIR} -name "acetoscan_log" -exec sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g' {} > ${WKDIR}/acetoscan_result/acetoscan_${DATE}.log \;
-find ${WKDIR}/acetoscan_result/ -name "acetoscan_${DATE}.log" -exec sed -i -e '/ambiguous characters./,/done./{//!d};/STEP/d;/(thread/d;/Processing:/d;/Constructing a UPGMA tree/,/done./{//!d};/seconds: Top hits for/d;/Joined/d;/NNI round/d;/seconds: SPR round/d;/ML Lengths/d;/NNI round/d;/Optimizing GTR model/d;/Site likelihoods with/d;/ML split tests for/d' {} \;
+find ${CDIR} -name "acetoscan_log" -exec sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g' {} > ${WKDIR}/acetoscan_result/0_acetoscan_${DATE}.log \;
+find ${WKDIR}/acetoscan_result/ -name "0_acetoscan_${DATE}.log" -exec sed -i -e '/ambiguous characters./,/done./{//!d};/STEP/d;/(thread/d;/Processing:/d;/Constructing a UPGMA tree/,/done./{//!d};/seconds: Top hits for/d;/Joined/d;/NNI round/d;/seconds: SPR round/d;/ML Lengths/d;/NNI round/d;/Optimizing GTR model/d;/Site likelihoods with/d;/ML split tests for/d' {} \;
 find ${CDIR} -name "acetoscan_log" -exec rm {} \;
 
 ###    Getting final information
