@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Ons Jan 29, 2020 13:32
+# Last modified: Son Feb 02, 2020 17:07
 # Sign: Abhi
 
 ### Setting colour variables
@@ -37,7 +37,7 @@ start=$(date +%s) #start time of script
 
 ###	Variable for the backup
 
-DATE=$(date | sed 's/ /_/g;s/:/-/g' | cut -d_ -f1,2,3,4,5,6)
+DATE=$(date | sed 's/ /_/g;s/:/-/g;s/__/_/g' )
 
 ###     Setting up variables
 
@@ -171,7 +171,7 @@ shift $((OPTIND-1))
 ###     check
 
 if ((OPTIND == 1));then
-echo -e "\n#\t${LRED}Input directory not provided, Aborting!${RESTORE}"
+echo -e "\n#\t${LRED}Input directory not provided, Aborting!!!\n###\n${RESTORE}"
         echo ""
         usage
         exit
@@ -185,7 +185,7 @@ exec 2> >(tee -a acetoscan_log >&2)
 ###     Checking input_dir 
 
 if [ ! -d "$input_dir" ] && [ -x "$input_dir" ]; then
-        echo -e "\n#\t${LRED}Input directory not provided, Aborting!${RESTORE}"
+        echo -e "\n#\t${LRED}Input directory not provided, Aborting!!!\n###\n${RESTORE}"
         echo ""
         usage
         exit
@@ -353,7 +353,7 @@ find "${input_dir}" -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/inp
 ###    Checking if link exist
 
 if [ ! -n "$(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.gz" -print -quit)" ] ; then
-    echo -e "\n#${LRED}Input files \"*_${reads}*.fastq.gz\" not found in ${WKDIR}/input_data/, Aborting !!!${RESTORE}"
+    echo -e "\n#${LRED}Input files \"*_${reads}*.fastq.gz\" not found in ${WKDIR}/input_data/, Aborting!!!\n###\n${RESTORE}"
     exit 1
 fi
 
@@ -435,6 +435,13 @@ find ${WKDIR}/output_data/ -type f -iname "Best*.fasta" -printf "%f\n" | while r
 ###     Formating input for vsearch
 
 perl -npe 'if(!/^>/){s/\S{60}/$&\n/g};{s/-/_/g}' All_best.fasta.tmp > All_best.fasta
+
+###		Checking if All_best.fasta is not empty
+
+if [ ! -s "${WKDIR}/output_data/trimmed/All_best.fasta"]; then
+	echo "\n#\t${YELLOW}No sequence to proceed, Aborting!!!\n###\n${RESTORE}"
+	exit
+fi
 
 #       closing spinner for Preprocessing
 	echo -ne "Done\n"        
@@ -520,6 +527,14 @@ echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
                 do
                         grep -w -A 1 "$line" "${WKDIR}/output_data/trimmed/VSEARCH/pre_OTU.fasta.tmp" >> "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp"
                 done < ${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU_list.txt
+		
+
+###		Checking if filtered_OTU.fasta.tmp is not empty
+
+if [ ! -s "${WKDIR}/output_data/trimmed/VSEARCH/filtered_OTU.fasta.tmp" ]; then
+	echo "\n#\t${YELLOW}No sequence to proceed, Aborting!!!\n###\n${RESTORE}"
+	exit
+fi
 
         # processing filtered OTU multifasta file
 
