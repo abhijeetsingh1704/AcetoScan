@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Son Feb 02, 2020 17:07
+# Last modified: Ons Feb 05, 2020 12:30
 # Sign: Abhi
 
 ### Setting colour variables
@@ -192,11 +192,12 @@ if [ ! -d "$input_dir" ] && [ -x "$input_dir" ]; then
 else
         echo -e "\n#\tContents of input directory: ${YELLOW}$input_dir${RESTORE}"        
         echo -e "\n#============================================================\n"
-        forward_read_filecount=$(find "$input_dir" -name '*_R1_001.fastq.gz' | wc -l)
-        reverse_read_filecount=$(find "$input_dir" -name '*_R2_001.fastq.gz' | wc -l)
+        INfile=$(find "$input_dir" -iname "*_R1_001.fastq.*" | awk -F . '{print $NF}' | head -1 )
+        forward_read_filecount=$(find "$input_dir" -name "*_R1_001.fastq.${INfile}" | wc -l)
+        reverse_read_filecount=$(find "$input_dir" -name "*_R2_001.fastq.${INfile}" | wc -l)
         #
-        forward_read_filesize=$(find "$input_dir" -name '*_R1_001.fastq.gz' -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
-        reverse_read_filesize=$(find "$input_dir" -name '*_R2_001.fastq.gz' -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
+        forward_read_filesize=$(find "$input_dir" -name "*_R1_001.fastq.${INfile}" -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
+        reverse_read_filesize=$(find "$input_dir" -name "*_R2_001.fastq.${INfile}" -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
         #
         echo -e "-> Number of forward read files: $forward_read_filecount"
         echo -e "-> Size of forward read files:   $forward_read_filesize"
@@ -279,6 +280,7 @@ export reads="R${read_type}"
 export MaxL="$max_len"
 export MinL="$min_len"
 export QT="$qual"
+export INfileext="${INfile}"
 
 ###     Checking clustering threshold
 
@@ -348,12 +350,12 @@ fi
 
 #       softlinks
 
-find "${input_dir}" -name "*_${reads}_001.fastq.gz" -exec ln -s {} "${WKDIR}/input_data/" \; 2> /dev/null
+find "${input_dir}" -name "*_${reads}_001.fastq.${INfile}" -exec ln -s {} "${WKDIR}/input_data/" \; #2> /dev/null
 
 ###    Checking if link exist
 
-if [ ! -n "$(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.gz" -print -quit)" ] ; then
-    echo -e "\n#${LRED}Input files \"*_${reads}*.fastq.gz\" not found in ${WKDIR}/input_data/, Aborting!!!\n###\n${RESTORE}"
+if [ ! -n "$(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.${INfile}" -print -quit)" ] ; then
+    echo -e "\n#\t${LRED}Input files \"*_${reads}*.fastq.${INfile}\" not found in ${WKDIR}/input_data/, Aborting !!!\n###\n${RESTORE}"
     exit 1
 fi
 
