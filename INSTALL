@@ -2,7 +2,7 @@
 
 # INSTALL for AcetoScan
 
-#- Last modified: Tor Nov 22, 2019 13:40
+#- Last modified: Wed Feb 05, 2020 11:55
 #- Sign: Abhi
 
 ### Setting colour variables
@@ -30,7 +30,8 @@ echo -e "\n#\t${YELLOW}Checking and installing dependencies for debian/ubuntu ba
 
 if ! command -v "cutadapt" > /dev/null ; then
         echo -e "\n#\t${YELLOW}Installing Cutadapt${RESTORE}"    
-        sudo apt install -y -qq cutadapt
+        sudo pip3 install cutadapt
+        sudo pip3 --user --upgrade cutadapt
 fi
 
 ###     Checking if vsearch is installed
