@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # File: AcetoScan_cutadapt.sh
-# Last modified: fre jul 19, 2019 20:56
+# Last modified: Ons Feb 05, 2020 12:25
 # Sign: Abhi
 
 # Cutadapt script for cleaning ILLUMINA read data, 
 # requires already demplutiplexed data in the form of 
-# SAMPLE_R*_001.fastq.gz.
+# SAMPLE_R*_001.fastq.(gz|bz2).
 
 command -v cutadapt >/dev/null 2>&1 || { echo >&2 "Error: cutadapt not found."; exit 1; }
 
@@ -16,10 +16,10 @@ cutadapt_out="${WKDIR}/output_data/cutadapt.out"
 
 echo "cutadapt $(date) :" > "${cutadapt_out}"
 
-for FwdIn in *"${reads}"*.fastq.gz; do
+for FwdIn in *"${reads}"*.fastq."${INfileext}"; do
 
   if [ ! -e "$FwdIn" ]; then
-        echo "Error: No *.fastq.gz files found in ${PWD}"
+        echo "Error: No *.fastq.'${INfileext}' files found in ${PWD}"
         break
     else
         FwdOut="${FwdIn%%_*}_trimmed_"${reads}".fasta"
