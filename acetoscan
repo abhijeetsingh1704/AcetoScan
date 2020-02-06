@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Ons Feb 05, 2020 17:00
+# Last modified: Ons Feb 06, 2020 20:12
 # Sign: Abhi
 
 ### Setting colour variables
@@ -58,11 +58,11 @@ user=`echo ${SUDO_USER:-${USER}}`
 
 output_dir_def="/home/$user/acetoscan/output_data"
 read_type_def="1"
-max_len_def="277"
-min_len_def="150"
+max_len_def="300"
+min_len_def="120"
 qual_def="20" 
-cluster_threshold_def="0.95"
-cluster_size_def="5"
+cluster_threshold_def="0.80"
+cluster_size_def="2"
 version_def="0.1.0"
 
 ###    Getting processors information
@@ -75,7 +75,7 @@ THREADS=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || getconf _NPROC
 
 usage() {
 echo "Usage   : $0 [-i <input directory>] [-o <output directory>] [-m <max_length>] [-n <min_length>] [-q <quality threshold>] [-r <reads type>] [-t <clustering threshold>] [-c <min_cluster size>]
-Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5" 1>&2; exit 1;
+Example : acetoscan -i /<input path>/ -o /<output path>/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2" 1>&2; exit 1;
 }
 
 
@@ -119,24 +119,24 @@ while getopts "i:o:m:n:q:r:t:c:hv" flags;
 
                         h)
                                 echo "
-Example : acetoscan -i /<input path>/ -o /<output path>/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
+Example : acetoscan -i /<input path>/ -o /<output path>/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2
 
         -i      Input directory containing raw illumina data
         -o      Output directory
                         :default = /home/${user}/acetoscan/output_data
         -m      Maximum length of sequence after quality filtering
-                        :defalut max_length = 277
+                        :defalut max_length = 300
         -n      Minimum length of sequence after quality filtering
-                        :defalut min_length = 150
+                        :defalut min_length = 120
         -q      Quality threshold for the sequences 
                         :default quality threshold = 20
         -r      Read type either forward or reverse reads 
                         1 = forward reads (default)
                         2 = reverse reads
         -t      Clustering threshold
-                        :default cluster threshold = 0.95 (95 %)
+                        :default cluster threshold = 0.80 (80 %)
         -c      Minimum cluster size
-                        :default minimum cluster size = 5
+                        :default minimum cluster size = 2
         -h      print Help
         -v      print acetoscan version"
                                 exit                                
