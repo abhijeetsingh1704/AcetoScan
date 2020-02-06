@@ -1,7 +1,7 @@
 # AcetoScan
 
-- Version: 0.1.0 (20191025)
-- Last modified: Fre Nov 22, 2019 14:05
+- Version: 0.1.0 (20200206)
+- Last modified: TOr Feb 06, 2020 20:14
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -62,7 +62,7 @@ chmod +x INSTALL
 ```
 1. input_data 		- containing softlinked input raw data
 ```
-######			Raw data must in format "Samplename_XYZ_L001_R1_001.fastq.gz" 
+######			Raw data must in format "Samplename_XYZ_L001_R1_001.fastq.(gz or bz2)" 
 https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/miseqreporter/miseq-reporter-generate-fastq-workflow-guide-15042322-01.pdf, page 9, FASTQ File Names
 
 ```				
@@ -75,12 +75,12 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 Use `acetoscan` as follows
 
 ```
-$ acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
+$ acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2
 ```
 #### If installation is not as sudo/root
 
 ```
-$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -n 150 -q 20 -r 1 -t 0.95 -c 5
+$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2
 ```
 	
 ```
@@ -88,18 +88,18 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 277 -
         -o      Output directory
                         :default = /home/${user}/acetoscan/output_data
         -m      Maximum length of sequence after quality filtering
-                        :defalut max_length = 277
+                        :defalut max_length = 300
         -n      Minimum length of sequence after quality filtering
-                        :defalut min_length = 150
+                        :defalut min_length = 120
         -q      Quality threshold for the sequences 
                         :default quality threshold = 20
         -r      Read type either forward or reverse reads 
                         1 = forward reads (default)
                         2 = reverse reads
         -t      Clustering threshold
-                        :default cluster threshold = 0.95 (95 %)
+                        :default cluster threshold = 0.80 (80 %)
         -c      Minimum cluster size
-                        :default minimum cluster size = 5      
+                        :default minimum cluster size = 2      
         -h      print Help
         -v      print acetoscan version
 
