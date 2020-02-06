@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan
-# Last modified: Ons Feb 06, 2020 20:12
+# Last modified: Ons Feb 06, 2020 20:33
 # Sign: Abhi
 
 ### Setting colour variables
@@ -242,7 +242,7 @@ export WKDIR="$output_dir"
 
 if [ "$max_len" == "" ];then
         max_len="$max_len_def"
-        echo -e "\n#\tUsing default max_length: ${YELLOW}277${RESTORE}"
+        echo -e "\n#\tUsing default max_length: ${YELLOW}${max_len_def}${RESTORE}"
 else
        echo -e "\n#\tUsing max_length: ${YELLOW}${max_len}${RESTORE}"
 fi
@@ -251,7 +251,7 @@ fi
 
 if [ "$min_len" == "" ];then
         min_len="$min_len_def"
-        echo -e "\n#\tUsing default min_length: ${YELLOW}150${RESTORE}"
+        echo -e "\n#\tUsing default min_length: ${YELLOW}${min_len_def}${RESTORE}"
 else
        echo -e "\n#\tUsing min_length: ${YELLOW}${min_len}${RESTORE}"
 fi
@@ -260,7 +260,7 @@ fi
 
 if [ "$qual" == "" ];then
         qual="$qual_def"
-        echo -e "\n#\tUsing default quality threshold: ${YELLOW}20${RESTORE}"
+        echo -e "\n#\tUsing default quality threshold: ${YELLOW}${qual_def}${RESTORE}"
 else
        echo -e "\n#\tUsing quality threshold: ${YELLOW}${qual}${RESTORE}"
 fi
@@ -286,7 +286,7 @@ export INfileext="${INfile}"
 
 if [ "$cluster_threshold" == "" ];then
         cluster_threshold="$cluster_threshold_def"
-        echo -e "\n#\tUsing default clustering threshold: ${YELLOW}0.95 (95%)${RESTORE}"
+        echo -e "\n#\tUsing default clustering threshold: ${YELLOW}${cluster_threshold_def}${RESTORE}"
 else
         echo -e "\n#\tClustering threshold: ${YELLOW}$cluster_threshold${RESTORE}"
 fi
@@ -295,7 +295,7 @@ fi
 
 if [ "$cluster_size" == "" ];then
         cluster_size="$cluster_size_def"
-        echo -e "\n#\tUsing default minimum cluster size: ${YELLOW}5${RESTORE}"
+        echo -e "\n#\tUsing default minimum cluster size: ${YELLOW}${cluster_size_def}${RESTORE}"
 else
         echo -e "\n#\tMinimum cluster size: ${YELLOW}$cluster_size${RESTORE}"
 fi
@@ -396,6 +396,11 @@ echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
 #       closing spinner for cudadapt
         echo -ne "Done\n"
         kill $pid 
+
+# 	cleaning input directory links
+
+find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.${INfile}" -exec rm {} \;   
+
 
 ###     Begin Longest best frame analysis <--- from external script
 
