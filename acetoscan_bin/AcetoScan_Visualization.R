@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # File: AcetoScan_Visualization.R
-# Last modified: Mon, Jan 23, 2020 12:07
+# Last modified: Lör, Feb 08, 2020 14:20
 # Sign: Abhi
 
 otu_file <- "FTHFS_OTU_table_R.txt"
@@ -71,23 +71,20 @@ sam_data <- sample_data(sam_data)
 ### Reading phylogenetic tree
 tree_data <- read_tree(tree_file)
 
-# Dividing separator variable
-DIV <- "===================="
-DIV5x <- paste(DIV,DIV,DIV,DIV,DIV)
-
 # Making phyloseq object from the tax table and OTU table
 ps0 <- phyloseq(OTU_data_mat_table, TAX_data_subset_mat_table)
 
 # Adding sample data and phylogenetic tree to phyloseq object
 ps <- merge_phyloseq(ps0, sam_data, tree_data)
-paste(DIV)
+writeLines("\n------------------------- \t Phyloseq object \t-------------------------\n")
 ps
-paste(DIV)
+writeLines("\n------------------------- \t END \t-------------------------\n")
 
 # Save infor of phyloseq object
 sink("Visualization_processing_info.txt")
-paste("phyloseq_object: ")
+writeLines("\n------------------------- \t Phyloseq object \t-------------------------\n")
 print(ps)
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 # Visualize phyloseq object details
@@ -99,9 +96,9 @@ sink()
 ps_table <- table(tax_table(ps)[, "Phylum"], exclude = NULL)
 # save phylum detail
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
-paste("phyloseq_phylum_table: ")
+writeLines("\n------------------------- \t Phylum table \t-------------------------\n")
 print(ps_table)
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 # Compute prevalence of each feature, store as data.frame
@@ -121,42 +118,47 @@ prevalence_table <- plyr::ddply(prevalence_dataframe, "Phylum", function(df1) {
 
 # #save the prevalance table as text file
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
-paste("Phylum_prevalence_table: ")
+writeLines("\n------------------------- \t Phylum_prevalence_table: \t-------------------------\n")
 print(prevalence_table)
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 # Write the details to console/terminal
 
-paste(DIV)
+writeLines("\n------------------------- \t Taxonomy overview \t-------------------------\n")
 paste("number_of_Phylum: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
 paste("number_of_Class: ", length(get_taxa_unique(ps, taxonomic.rank = "Class")))
 paste("number_of_Order: ", length(get_taxa_unique(ps, taxonomic.rank = "Order")))
 paste("number_of_Family: ", length(get_taxa_unique(ps, taxonomic.rank = "Family")))
 paste("number_of_Genus: ", length(get_taxa_unique(ps, taxonomic.rank = "Genus")))
 paste("number_of_Species: ", length(get_taxa_unique(ps, taxonomic.rank = "Species")))
-paste(DIV)
-
+writeLines("\n------------------------- \t END \t-------------------------\n")
 # Write the details of taxa to file
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t Phylum \t-------------------------\n")
 paste("number_of_Phylum: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
 get_taxa_unique(ps, taxonomic.rank = "Phylum")
-paste(DIV5x)
+writeLines("\n------------------------- \t END \t-------------------------\n")
+writeLines("\n------------------------- \t Class \t-------------------------\n")
 paste("number_of_Class: ", length(get_taxa_unique(ps, taxonomic.rank = "Class")))
 get_taxa_unique(ps, taxonomic.rank = "Class")
-paste(DIV5x)
+writeLines("\n------------------------- \t END \t-------------------------\n")
+writeLines("\n------------------------- \t Order \t-------------------------\n")
 paste("number_of_Order: ", length(get_taxa_unique(ps, taxonomic.rank = "Order")))
 get_taxa_unique(ps, taxonomic.rank = "Order")
-paste(DIV5x)
+writeLines("\n------------------------- \t END \t-------------------------\n")
+writeLines("\n------------------------- \t Family \t-------------------------\n")
 paste("number_of_Family: ", length(get_taxa_unique(ps, taxonomic.rank = "Family")))
 get_taxa_unique(ps, taxonomic.rank = "Family")
-paste(DIV5x)
+writeLines("\n------------------------- \t END \t-------------------------\n")
+writeLines("\n------------------------- \t Genus \t-------------------------\n")
 paste("number_of_Genus: ", length(get_taxa_unique(ps, taxonomic.rank = "Genus")))
 get_taxa_unique(ps, taxonomic.rank = "Genus")
-paste(DIV5x)
+writeLines("\n------------------------- \t END \t-------------------------\n")
+writeLines("\n------------------------- \t Species \t-------------------------\n")
 paste("number_of_Species: ", length(get_taxa_unique(ps, taxonomic.rank = "Species")))
 get_taxa_unique(ps, taxonomic.rank = "Species")
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 ########### Fixing functions
@@ -182,6 +184,45 @@ colour_palette = brewer.pal.info[brewer.pal.info$category == 'qual',]
 my_colours_1 = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
 my_colours_2 = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
 my_colours <- append(my_colours_1, my_colours_2)
+
+# plot absolute abundance
+pdf(file = "Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
+plot_bar(ps, fill="Kingdom")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
+  guides(fill = guide_legend(nrow = 3))+
+  ylab("Absolute Abundance (counts)")
+plot_bar(ps, fill="Phylum")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
+  guides(fill = guide_legend(nrow = 3))+
+  ylab("Absolute Abundance (counts)")
+plot_bar(ps, fill="Class")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
+  guides(fill = guide_legend(nrow = 3))+
+  ylab("Absolute Abundance (counts)")
+plot_bar(ps, fill="Order")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
+  guides(fill = guide_legend(nrow = 3))+
+  ylab("Absolute Abundance (counts)")
+plot_bar(ps, fill="Family")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
+  guides(fill = guide_legend(nrow = 3))+
+  ylab("Absolute Abundance (counts)")
+plot_bar(ps, fill="Genus")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
+  guides(fill = guide_legend(nrow = 3))+
+  ylab("Absolute Abundance (counts)")
+plot_bar(ps, fill="Species")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
+  guides(fill = guide_legend(nrow = 3))+
+  ylab("Absolute Abundance (counts)")
+dev.off()
 
 ######################  Phylum Absolute abundance
 Phylum_Absolute_abundance <- plot_bar(ps, fill = "Phylum") + 
@@ -213,8 +254,9 @@ dev.off()
 
 # saving Total_Phylum_numbers_in_absolute abundance_barplot
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Total Phylum numbers in absolute abundance_barplot: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 # save plot as html widget
@@ -272,8 +314,9 @@ dev.off()
 
 # saving Phylum number in phylum level barplot
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Phylum number in phylum level barplot: ", length(unique(phylum_level_transformed_psmelt$Phylum)))
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 #saving plot as html widget
@@ -332,8 +375,9 @@ dev.off()
 
 # saving Class numbers in Class level barplot
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Class number in Class level barplot (> 0.25 %): ", length(unique(class_level_transformed_psmelt$Class)))
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 # saving plot as html widget
@@ -392,8 +436,9 @@ dev.off()
 
 # saving Order number in order level barplot
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Order number in order level barplot (> 0.25 %): ", length(unique(order_level_transformed_psmelt$Order)))
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 #saving plot as html widget
@@ -452,8 +497,9 @@ dev.off()
 
 # saving Family number in family level barplot
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Family number in family level barplot(> 1 %): ", length(unique(family_level_transformed_psmelt$Family)))
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()
 
 #saving plot as html widget
@@ -551,8 +597,9 @@ dev.off()
                                                                
 # saving Genus number in genus level barplot
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Genus number in genus level barplot(> 1 %): ", length(unique(genus_level_transformed_psmelt$Genus)))
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()                                                               
 
 #saving plot as html widget
@@ -650,8 +697,9 @@ dev.off()
  
 # saving Species number in species level barplot
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Species number in species level barplot(> 5%): ", length(unique(Species_level_transformed_psmelt$Species)))
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()                                                             
 
 # saving plot as html widget
@@ -661,7 +709,7 @@ htmlwidgets::saveWidget(as_widget(barplot_Species), "6_Species_barplot.html")
 ########
 
 # heatmapping for abundance more than 5%
-Species_level_transformed_forheatmap <- transform_sample_counts(Species_level, function(x) x / sum(x)*100 )
+Species_level_transformed_forheatmap <- transform_sample_counts(Species_level, function(x) x / sum(x)*100)
 
 Species_level_transformed_forheatmap_morethan5 <- filter_taxa(Species_level_transformed_forheatmap, function(x) sum(x) > 5, TRUE)
 
@@ -709,9 +757,10 @@ ps.ord <- ordinate(ps, "NMDS", "bray" )
                                                               
 # saving ordination detail
 sink("Visualization_processing_info.txt", append = T)
-paste(DIV5x)
+writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Ordination details: ")
 ps.ord
+writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()                                                              
                                                               
 # Plotting ordination
@@ -853,5 +902,5 @@ plot(tree)
 dev.off()
 
 ######################
-                                       
+
 ### End of script
