@@ -302,7 +302,7 @@ fi
 
 ###    Checking threshold validity
 
-MAXTHRESHOLD=1.0
+MAXTHRESHOLD=1.01
 
 if (( ${cluster_threshold%%.*} < ${MAXTHRESHOLD%%.*} || ( ${cluster_threshold%%.*} == ${MAXTHRESHOLD%%.*} \
     && ${cluster_threshold##*.} < ${MAXTHRESHOLD##*.} ) )) > /dev/null ; then    
@@ -596,7 +596,7 @@ echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
                 -num_threads "${THREADS}" \
                 -evalue 1e-5 \
                 -out "${WKDIR}/output_data/trimmed/VSEARCH/OTU_blast.txt.tmp" \
-                -outfmt "6 qseqid saccver pident" 2> /dev/null
+                -outfmt "6 qseqid saccver pident evalue qlen length bitscore qseq" 2> /dev/null
 
 #       closing spinner for taxonomic assignment
 	echo -ne "Done\n"
@@ -609,7 +609,7 @@ rm "${WKDIR}/output_data/trimmed/VSEARCH/OTU_blast.txt.tmp"
 ###    Preparing OTU taxonomy table
 
 sed -e 's/;tax=/,/g' "${WKDIR}/output_data/trimmed/VSEARCH/OTUblast.txt.tmp" | \
-sed '1s/^/#OTU,Subject_Accession,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity\n/' > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_pre"
+sed '1s/^/#OTU,Subject_Accession,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity,Evalue,Query_length,Alignment_length[blastx],Bitscore,Query_seq\n/' > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_pre"
 
 #    making tab to comma
 sed -e 's/\t/,/g' "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_pre" > "${WKDIR}/output_data/trimmed/VSEARCH/FTHFS_TAX_table_full.csv"
@@ -741,5 +741,4 @@ echo -e "\n#\tAcetoscan processed: ${YELLOW} $processing_data_size ${RESTORE} in
 echo -e "\n#\t${YELLOW}${user}${RESTORE}, Thanks for using ${YELLOW}\"AcetoScan\"${RESTORE}\n\n###"
 
 ###    End of script
-
 
