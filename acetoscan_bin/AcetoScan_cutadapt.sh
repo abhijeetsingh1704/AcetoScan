@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan_cutadapt.sh
-# Last modified: Ons Feb 05, 2020 12:25
+# Last modified: Ons Feb 09, 2020 17:35
 # Sign: Abhi
 
 # Cutadapt script for cleaning ILLUMINA read data, 
@@ -16,13 +16,16 @@ cutadapt_out="${WKDIR}/output_data/cutadapt.out"
 
 echo "cutadapt $(date) :" > "${cutadapt_out}"
 
-for FwdIn in *"${reads}"*.fastq."${INfileext}"; do
+for infile in $(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_R1_001.fastq.gz" ); do
 
-  if [ ! -e "$FwdIn" ]; then
+#for FwdIn in *"${reads}"*.fastq."${INfileext}"; do
+
+  if [ ! -L "${infile}" ]; then
         echo "Error: No *.fastq.'${INfileext}' files found in ${PWD}"
         break
     else
-        FwdOut="${FwdIn%%_*}_trimmed_"${reads}".fasta"
+    	  In=`echo ${infile} | rev | cut -d "/" -f1 | cut -d. -f3,4,5,6,7,8,9,10 | rev | sed 's/_L001_R1_001//'`
+        FwdOut="${In}_trimmed_"${reads}".fasta"
         cutadapt \
             -b "CCNACNCCNNNNGGNGANGGNAA" \
             -b "GGNTGNGGNNNNCCNCTNCCNTT" \
@@ -36,7 +39,7 @@ for FwdIn in *"${reads}"*.fastq."${INfileext}"; do
             -q $QT \
             --length-tag "size=" \
             -o "${cutadapt_dir}/${FwdOut}" \
-            "${FwdIn}" >> "${cutadapt_out}"
+            "${infile}" >> "${cutadapt_out}"
     fi
 done
 
