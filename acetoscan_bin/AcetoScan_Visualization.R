@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # File: AcetoScan_Visualization.R
-# Last modified: Lör, Feb 08, 2020 14:20
+# Last modified: Lör, Feb 09, 2020 19:20
 # Sign: Abhi
 
 otu_file <- "FTHFS_OTU_table_R.txt"
@@ -35,7 +35,7 @@ suppressPackageStartupMessages(Rpackage(Libraries))
 
 ######  Reading OTU file
 
-OTU_data <- read.table(otu_file, sep = "\t", header = TRUE, row.names = 1)
+OTU_data <- read.table(otu_file, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 #head(OTU_data)
 #class(OTU_data) 
 
@@ -187,40 +187,40 @@ my_colours <- append(my_colours_1, my_colours_2)
 
 # plot absolute abundance
 pdf(file = "Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
-plot_bar(ps, fill="Kingdom")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+plot_bar(ps, fill="Kingdom")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 85, hjust = 1, vjust = 1, face = "bold"))+
   theme(legend.position = "bottom")+
+  guides(col = guide_legend(ncol = 4))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
-  guides(fill = guide_legend(nrow = 3))+
   ylab("Absolute Abundance (counts)")
-plot_bar(ps, fill="Phylum")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+plot_bar(ps, fill="Phylum")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 85, hjust = 1, vjust = 1, face = "bold"))+
   theme(legend.position = "bottom")+
+  guides(col = guide_legend(ncol = 4))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
-  guides(fill = guide_legend(nrow = 3))+
   ylab("Absolute Abundance (counts)")
-plot_bar(ps, fill="Class")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+plot_bar(ps, fill="Class")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 85, hjust = 1, vjust = 1, face = "bold"))+
   theme(legend.position = "bottom")+
+  guides(col = guide_legend(ncol = 4))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
-  guides(fill = guide_legend(nrow = 3))+
   ylab("Absolute Abundance (counts)")
-plot_bar(ps, fill="Order")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+plot_bar(ps, fill="Order")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 85, hjust = 1, vjust = 1, face = "bold"))+
   theme(legend.position = "bottom")+
+  guides(col = guide_legend(ncol = 4))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
-  guides(fill = guide_legend(nrow = 3))+
   ylab("Absolute Abundance (counts)")
-plot_bar(ps, fill="Family")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+plot_bar(ps, fill="Family")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 85, hjust = 1, vjust = 1, face = "bold"))+
   theme(legend.position = "bottom")+
+  guides(col = guide_legend(ncol = 4))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
-  guides(fill = guide_legend(nrow = 3))+
   ylab("Absolute Abundance (counts)")
-plot_bar(ps, fill="Genus")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+plot_bar(ps, fill="Genus")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 85, hjust = 1, vjust = 1, face = "bold"))+
   theme(legend.position = "bottom")+
+  guides(col = guide_legend(ncol = 4))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
-  guides(fill = guide_legend(nrow = 3))+
   ylab("Absolute Abundance (counts)")
-plot_bar(ps, fill="Species")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold"))+
+plot_bar(ps, fill="Species")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 85, hjust = 1, vjust = 1, face = "bold"))+
   theme(legend.position = "bottom")+
+  guides(col = guide_legend(ncol = 4))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
-  guides(fill = guide_legend(nrow = 3))+
   ylab("Absolute Abundance (counts)")
 dev.off()
 
@@ -886,18 +886,19 @@ tree <- plot_tree(ps, color = "Phylum",
   scale_color_manual(values = my_colours)+
 
   theme(legend.position = "bottom") +
+  guides(col = guide_legend(ncol = 3))+
   theme(legend.text=element_text(size=7, face = "bold"))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
-
+  
   coord_polar(theta = "y")
-
+ 
 # saving plot in pdf
 pdf("FTHFH_OTU.tree.pdf", width = 28, height = 18, paper = "a4r")
 plot(tree)
 dev.off()
 
 # save plot as image
-tiff("FTHFH_OTU.tree.tif", width = 6, height = 6, units = "in", res = 500)
+tiff("FTHFH_OTU.tree.tif", width = 6, height = 6, units = "in", res = 300)
 plot(tree)
 dev.off()
 
