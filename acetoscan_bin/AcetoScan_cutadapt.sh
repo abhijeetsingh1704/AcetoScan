@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan_cutadapt.sh
-# Last modified: Ons Feb 09, 2020 17:35
+# Last modified: Ons Feb 11, 2020 11:10
 # Sign: Abhi
 
 # Cutadapt script for cleaning ILLUMINA read data, 
@@ -16,7 +16,7 @@ cutadapt_out="${WKDIR}/output_data/cutadapt.out"
 
 echo "cutadapt $(date) :" > "${cutadapt_out}"
 
-for infile in $(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_R1_001.fastq.gz" ); do
+for infile in $(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.${INfileext}" ); do
 
 #for FwdIn in *"${reads}"*.fastq."${INfileext}"; do
 
@@ -24,7 +24,7 @@ for infile in $(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_R1_001.
         echo "Error: No *.fastq.'${INfileext}' files found in ${PWD}"
         break
     else
-    	  In=`echo ${infile} | rev | cut -d "/" -f1 | cut -d. -f3,4,5,6,7,8,9,10 | rev | sed 's/_L001_R1_001//'`
+    	In=`echo ${infile} | rev | cut -d "/" -f1 | cut -d. -f3,4,5,6,7,8,9,10 | rev | sed "s/_L001_${reads}_001//"`
         FwdOut="${In}_trimmed_"${reads}".fasta"
         cutadapt \
             -b "CCNACNCCNNNNGGNGANGGNAA" \
