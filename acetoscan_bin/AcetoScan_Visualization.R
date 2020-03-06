@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # File: AcetoScan_Visualization.R
-# Last modified: Lör, Feb 09, 2020 19:20
+# Last modified: Fre, Mar 06, 2020 16:58
 # Sign: Abhi
 
 otu_file <- "FTHFS_OTU_table_R.txt"
@@ -182,8 +182,7 @@ ModifyTax <- function(x, ind) {
 ##  Making manual and distinctive colour palette
 colour_palette = brewer.pal.info[brewer.pal.info$category == 'qual',]
 my_colours_1 = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
-my_colours_2 = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
-my_colours <- append(my_colours_1, my_colours_2)
+my_colours <- rep(my_colours_1, times=5)
 
 # plot absolute abundance
 pdf(file = "Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
