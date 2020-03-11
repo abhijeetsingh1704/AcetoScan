@@ -1,17 +1,18 @@
 # AcetoScan
 
-- Version: 0.1.0 (20200206)
-- Last modified: Tor Feb 06, 2020 20:14
+- Version: 1.0 (20200311)
+- Last modified: Wed, Mar 11, 2020 19:00
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
 
-Acetoscan is a program for the analysis of Illumina MiSeq sequencing data for the FTHFS (Formyl--tetrahydrofolate synthetase) gene/amplicons
+AcetoScan is a software pipeline for the analysis of Illumina MiSeq sequencing data for the FTHFS (Formyl--tetrahydrofolate synthetase) gene/amplicons
 
+AcetoScan can also process fasta sequences to filter out non-target sequences, assigning taxonomy to the FTHFS fasta sequences and generate phylogenetic tree (see AcetoScan commands)
 
 ## Dependencies
 
-`acetoscan` uses some software dependencies
+`AcetoScan` pipeline uses some software dependencies
 ```
 	- Cutadapt 	(>1.18-1)
 	- VSEARCH 	(>2.13.1)
@@ -47,8 +48,6 @@ chmod +x INSTALL
 ./INSTALL
 ```
 
-
-
 ## acetoscan binary
 
 `INSTALL` will create main directory `acetoscan` in `/home/user/` and sub-directories `acetoscan_bin` containing dependendencies binaries & `acetobase` contains reference database
@@ -75,12 +74,12 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 Use `acetoscan` as follows
 
 ```
-$ acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2
+$ acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 -e 1e-3
 ```
 #### If installation is not as sudo/root
 
 ```
-$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2
+$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 1e-3
 ```
 	
 ```
@@ -99,8 +98,29 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -
         -t      Clustering threshold
                         :default cluster threshold = 0.80 (80 %)
         -c      Minimum cluster size
-                        :default minimum cluster size = 2      
-        -h      print Help
-        -v      print acetoscan version
+                        :default minimum cluster size = 2
+        -e      E-value
+                        :default evalue = 1e-3
+        -B      Bootstrap value
+                        :default bootstrap = 1000
+        -h      Print help        
+        -X      Print AcetoScan commands
+        -v      Print AcetoScan version
+        -C      Print AcetoScan citation
 
+```
+## AcetoScan commands other than acetoscan, for processing of fasta sequences
+
+```
+$ acetoscan -X 
+
+or
+
+$ bash /home/$user/acetoscan/acetoscan -X 
+```
+
+```
+1. acetocheck      - for processing fasta sequences and filter out non-target sequences
+2. acetotax        - acetocheck + taxonomic assignments
+3. acetotree       - acetotax + phylogenetic tree generation
 ```
