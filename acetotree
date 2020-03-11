@@ -199,7 +199,12 @@ if [ "$output_file" == "" ]; then
         output_file="${output_file_def}"
         echo -e "\n#\tUsing default output file: ${YELLOW}${output_file_def}${RESTORE}\n"
 else
-        echo -e "\n#\tOutput file: ${output_file}\n"
+        echo -e "\n#\tOutput files:"
+        echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
+        echo -e "\t\t${YELLOW}${output_file}.csv${RESTORE}"
+        echo -e "\t\t${YELLOW}${output_file}.aln${RESTORE}"
+        echo -e "\t\t${YELLOW}${output_file}.tree${RESTORE}"
+        echo -e "\t\t${YELLOW}acetotree_${DATE}.log${RESTORE}"
 fi
 
 ###     Checking output path
