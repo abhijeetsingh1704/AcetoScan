@@ -12,7 +12,7 @@ LRED='\033[01;31m'
 
 # setting pipefail
 
-#set -euo pipefail
+set -euo pipefail
 
 ##      Installation
 
@@ -30,9 +30,12 @@ echo -e "\n#\t${YELLOW}Checking and installing dependencies for debian/ubuntu ba
 if ! command -v "cutadapt" > /dev/null ; then
         echo -e "\n#\t${YELLOW}Installing Cutadapt${RESTORE}" 
         sudo apt install -y -qq python3-pip
-        pip3 install cutadapt
         pip3 install --user --upgrade cutadapt
 fi
+
+###     upgrade cutadapt
+
+pip3 install --user --upgrade cutadapt
 
 ###     Checking if vsearch is installed
 
@@ -97,23 +100,21 @@ if [ `whoami` = 'root' ]; then
         find . -type f -name "acetocheck" -exec cp {} /usr/local/bin/ \; 2>/dev/null
         find . -type f -name "acetotax" -exec cp {} /usr/local/bin/ \; 2>/dev/null
         find . -type f -name "acetotree" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        chmod +x /usr/local/bin/acetoscan
-        chmod +x /usr/local/bin/acetocheck
-        chmod +x /usr/local/bin/acetotax
-        chmod +x /usr/local/bin/acetotree
+        chmod 777 -R /usr/local/bin/acetoscan
+        chmod 777 -R /usr/local/bin/acetocheck
+        chmod 777 -R /usr/local/bin/acetotax
+        chmod 777 -R /usr/local/bin/acetotree
 else
 
         ###     Copying Acetoscan executable to /home/${user}/acetoscan/ for non-super user
         echo -e "\n#\t${YELLOW}Installing acetoscan for ${user} ${RESTORE}"
         mkdir -m 777 -p /home/${user}/acetoscan
-        find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        find . -type f -name "acetocheck" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        find . -type f -name "acetotax" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        find . -type f -name "acetotree" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        chmod +x /usr/local/bin/acetoscan
-        chmod +x /usr/local/bin/acetocheck
-        chmod +x /usr/local/bin/acetotax
-        chmod +x /usr/local/bin/acetotree
+        find . -type f -name "acetoscan" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
+        find . -type f -name "acetocheck" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
+        find . -type f -name "acetotax" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
+        find . -type f -name "acetotree" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
+        chmod 777 -R /home/${user}/acetoscan/*
+        
 
 fi
 
@@ -126,7 +127,9 @@ mkdir -m 777 -p /home/${user}/acetoscan/output_data
 ###     copying acetoscan dependencies to acetoscan_bin
 
 cp ./acetoscan_bin/* /home/${user}/acetoscan/acetoscan_bin/
-chmod +x /home/${user}/acetoscan/acetoscan_bin/*
+chmod 777 -R /home/${user}/acetoscan
+chmod 777 -R /home/${user}/acetoscan/acetoscan_bin
+chmod 777 -R /home/${user}/acetoscan/acetobase
 
 ###     Downloading AcetoBase
 
@@ -134,7 +137,15 @@ echo -e "\n#\t${YELLOW}Downloading and formatting AcetoBase ${RESTORE}"
 wget --no-check-certificate -O /home/${user}/acetoscan/acetobase/AcetoBase_ref.tar.gz https://acetobase.molbio.slu.se/download/ref/1
 tar xf /home/${user}/acetoscan/acetobase/AcetoBase_ref.tar.gz -C /home/${user}/acetoscan/acetobase/ 
 find /home/${user}/acetoscan/ -type f -iname "AcetoBase.fasta" -exec cp {} /home/${user}/acetoscan/acetobase/AcetoBase.fasta \;
+
+###     formatting blast database
+
 cd /home/${user}/acetoscan/acetobase/ && makeblastdb -in AcetoBase.fasta -dbtype prot -title AcetoBase -out AcetoBase
+find /home/${user}/acetoscan/acetobase/ -type f -iname "AcetoBase.*" -exec chmod 777 {} \;
+
+rm -r /home/${user}/acetoscan/acetobase/AcetoBase_ref.tar.gz
+rm -r /home/${user}/acetoscan/acetobase/tmp
+
 
 echo -e "\n#\t${YELLOW}Installation DONE for ${user} ${RESTORE}"
 
