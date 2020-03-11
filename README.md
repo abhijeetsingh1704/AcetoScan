@@ -123,7 +123,7 @@ $ bash /home/$user/acetoscan/acetoscan -X
 3. acetotree       - acetotax + phylogenetic tree generation
 ```
 
-### acetocheck
+## acetocheck
 Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence
 
 ```
@@ -148,7 +148,7 @@ acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
         -C	Print AcetoScan citation
 ```
 
-## Use
+### Use
 ```
 acetocheck -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
 ```
@@ -157,7 +157,7 @@ acetocheck -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e
 2. acetotax_< Date >_< Time >.log
 
 
-### acetotax
+## acetotax
 Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence and taxonomic annotations of the fasta sequences
 
 ```
@@ -183,7 +183,7 @@ acetotax -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
         -C      Print AcetoScan citation
 ```
 
-## Use
+### Use
 ```
 acetotax -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
 ```
@@ -193,7 +193,7 @@ acetotax -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1
 3. acetotax_< Date >_< Time >.log
 	
 	
-### acetotree
+## acetotree
 Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence and taxonomic annotations of the fasta sequences and generation of phylogenetic tree
 
 ```
@@ -223,7 +223,7 @@ acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000
         -C      Print AcetoScan citation
 ```
 
-## Use
+### Use
 ```
 acetotree -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
 ```
