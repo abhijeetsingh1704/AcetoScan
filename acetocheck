@@ -101,7 +101,7 @@ Example : acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
         -h      Print help
         -X      Print AcetoScan commands        
         -v      Print AcetoScan version
-        -C		Print AcetoScan citation"
+        -C	Print AcetoScan citation"
                                 exit                                
                                 ;;
 
