@@ -97,10 +97,10 @@ Example : acetotax -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
                         :default = acetotax_<DATE>_<TIME>.fasta
         -e      E-value
                         :default evalue = 1e-3
-        -h      Print help
-        -X      Print AcetoScan commands        
+        -h      Print help        
+        -X      Print AcetoScan commands
         -v      Print AcetoScan version
-        -C	Print AcetoScan citation"
+        -C      Print AcetoScan citation"
                                 exit                                
                                 ;;
 
@@ -191,9 +191,12 @@ fi
 
 if [ "$output_file" == "" ]; then
         output_file="${output_file_def}"
-        echo -e "\n#\tUsing default output file: ${YELLOW}${output_file_def}${RESTORE}\n"
+        echo -e "\n#\tUsing default output file: ${YELLOW}${output_file_def}.fasta${RESTORE}\n"
 else
-        echo -e "\n#\tOutput file: ${output_file}\n"
+        echo -e "\n#\tOutput files:"
+        echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
+        echo -e "\t\t${YELLOW}${output_file}.csv${RESTORE}"
+        echo -e "\t\t${YELLOW}acetotax_${DATE}.log${RESTORE}"
 fi
 
 ###     Checking output path
