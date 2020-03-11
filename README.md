@@ -122,3 +122,114 @@ $ bash /home/$user/acetoscan/acetoscan -X
 2. acetotax        - acetocheck + taxonomic assignments
 3. acetotree       - acetotax + phylogenetic tree generation
 ```
+
+### acetocheck
+Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence
+
+```
+$ acetocheck -h 
+
+or
+
+$ bash /home/$user/acetoscan/acetocheck -h
+```
+
+```
+acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
+
+-i      Input_file
+        -o      Output file
+                        :default = acetocheck_<DATE>_<TIME>.fasta
+        -e      E-value
+                        :default evalue = 1e-3
+        -h      Print help
+        -X      Print AcetoScan commands        
+        -v      Print AcetoScan version
+        -C	Print AcetoScan citation
+```
+
+## Use
+```
+acetocheck -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
+```
+#### output
+1. my_sequences.fasta
+2. acetotax_< Date >_< Time >.log
+
+
+### acetotax
+Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence and taxonomic annotations of the fasta sequences
+
+```
+$ acetotax -h 
+
+or
+
+$ bash /home/$user/acetoscan/acetotax -h
+```
+
+```
+acetotax -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
+
+        -i      Input_file
+        -o      Output file
+                        :default = acetotax_<DATE>_<TIME>.csv
+                        :default = acetotax_<DATE>_<TIME>.fasta
+        -e      E-value
+                        :default evalue = 1e-3
+        -h      Print help        
+        -X      Print AcetoScan commands
+        -v      Print AcetoScan version
+        -C      Print AcetoScan citation
+```
+
+## Use
+```
+acetotax -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
+```
+#### output
+1. my_sequences.fasta
+2. my_sequences.csv
+3. acetotax_< Date >_< Time >.log
+	
+	
+### acetotree
+Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence and taxonomic annotations of the fasta sequences and generation of phylogenetic tree
+
+```
+$ acetotree -h 
+
+or
+
+$ bash /home/$user/acetoscan/acetotree -h
+```
+
+```
+acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000
+
+        -i      Input_file
+        -o      Output file
+                        :default = acetotree_<DATE>_<TIME>.tree
+                        :default = acetotree_<DATE>_<TIME>.aln
+                        :default = acetotree_<DATE>_<TIME>.csv
+                        :default = acetotree_<DATE>_<TIME>.fasta
+        -e      E-value
+                        :default evalue = 1e-3
+        -B      Bootstrap value
+                        :default bootstrap = 1000
+        -h      Print help        
+        -X      Print AcetoScan commands
+        -v      Print AcetoScan version
+        -C      Print AcetoScan citation
+```
+
+## Use
+```
+acetotree -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
+```
+#### output
+1. my_sequences.fasta
+2. my_sequences.csv
+3. my_sequences.aln
+4. my_sequences.tree
+5. acetotax_< Date >_< Time >.log
