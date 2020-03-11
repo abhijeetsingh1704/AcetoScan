@@ -28,9 +28,10 @@ echo -e "\n#\t${YELLOW}Checking and installing dependencies for debian/ubuntu ba
 
 
 if ! command -v "cutadapt" > /dev/null ; then
-        echo -e "\n#\t${YELLOW}Installing Cutadapt${RESTORE}"    
-        sudo pip3 install cutadapt
-        sudo pip3 --user --upgrade cutadapt
+        echo -e "\n#\t${YELLOW}Installing Cutadapt${RESTORE}" 
+        sudo apt install python3-pip
+        pip3 install cutadapt
+        pip3 --user --upgrade cutadapt
 fi
 
 ###     Checking if vsearch is installed
