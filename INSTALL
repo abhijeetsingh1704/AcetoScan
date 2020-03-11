@@ -1,15 +1,14 @@
 #!/bin/bash
 
-# INSTALL for AcetoScan
-
-#- Last modified: Wed Feb 05, 2020 11:55
-#- Sign: Abhi
+# file: INSTALL
+# Last modified: Wed, Mar 11, 2020 19:00
+# Sign: Abhi
 
 ### Setting colour variables
+
 RESTORE='\033[0m'
 YELLOW='\033[01;33m'
 LRED='\033[01;31m' 
-
 
 # setting pipefail
 
@@ -94,14 +93,26 @@ fi
 if [ `whoami` = 'root' ]; then
         echo -e "\n#\t${YELLOW}Installing acetoscan for ${user} ${RESTORE}"
         find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+        find . -type f -name "acetocheck" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+        find . -type f -name "acetotax" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+        find . -type f -name "acetotree" -exec cp {} /usr/local/bin/ \; 2>/dev/null
         chmod +x /usr/local/bin/acetoscan
+        chmod +x /usr/local/bin/acetocheck
+        chmod +x /usr/local/bin/acetotax
+        chmod +x /usr/local/bin/acetotree
 else
 
         ###     Copying Acetoscan executable to /home/${user}/acetoscan/ for non-super user
         echo -e "\n#\t${YELLOW}Installing acetoscan for ${user} ${RESTORE}"
         mkdir -m 777 -p /home/${user}/acetoscan
-        find . -type f -name "acetoscan" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
-        chmod +x /home/${user}/acetoscan/acetoscan
+        find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+        find . -type f -name "acetocheck" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+        find . -type f -name "acetotax" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+        find . -type f -name "acetotree" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+        chmod +x /usr/local/bin/acetoscan
+        chmod +x /usr/local/bin/acetocheck
+        chmod +x /usr/local/bin/acetotax
+        chmod +x /usr/local/bin/acetotree
 
 fi
 
@@ -126,4 +137,4 @@ cd /home/${user}/acetoscan/acetobase/ && makeblastdb -in AcetoBase.fasta -dbtype
 
 echo -e "\n#\t${YELLOW}Installation DONE for ${user} ${RESTORE}"
 
-###     End of script 
+###     End of script
