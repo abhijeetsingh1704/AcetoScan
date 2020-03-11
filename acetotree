@@ -222,7 +222,7 @@ if [ "$bootstr" == "" ];then
         bootstr="$bootstr_def"
         echo -e "\n#\tUsing default bootstr: ${YELLOW}${bootstr_def}${RESTORE}"
 else
-        echo -e "\n#\tE-value: ${YELLOW}$bootstr${RESTORE}"
+        echo -e "\n#\tBootstrap value: ${YELLOW}$bootstr${RESTORE}"
 fi
 
 ###		making a new temporary file
