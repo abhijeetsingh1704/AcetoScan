@@ -101,8 +101,6 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -
                         :default minimum cluster size = 2
         -e      E-value
                         :default evalue = 1e-3
-        -B      Bootstrap value
-                        :default bootstrap = 1000
         -h      Print help        
         -X      Print AcetoScan commands
         -v      Print AcetoScan version
