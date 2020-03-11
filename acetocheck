@@ -94,13 +94,14 @@ Example : acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
 
         -i      Input_file
         -o      Output file
-                        :default = acetocheck_<DATE>_<TIME>.fasta
+                        :default = acetotax_<DATE>_<TIME>.csv
+                        :default = acetotax_<DATE>_<TIME>.fasta
         -e      E-value
                         :default evalue = 1e-3
-        -h      Print help
-        -X      Print AcetoScan commands        
+        -h      Print help        
+        -X      Print AcetoScan commands
         -v      Print AcetoScan version
-        -C	Print AcetoScan citation"
+        -C      Print AcetoScan citation"
                                 exit                                
                                 ;;
 
@@ -192,7 +193,9 @@ if [ "$output_file" == "" ]; then
         output_file="${output_file_def}"
         echo -e "\n#\tUsing default output file: ${YELLOW}${output_file_def}${RESTORE}\n"
 else
-        echo -e "\n#\tOutput file: ${output_file}\n"
+        echo -e "\n#\tOutput files:"
+        echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
+        echo -e "\t\t${YELLOW}acetocheck_${DATE}.log${RESTORE}"
 fi
 
 ###     Checking output path
@@ -305,7 +308,7 @@ while read line;
 
 ###		Renaming the required file to desired output file
 
-mv "${input_path}/filt.ack" "${output_file}"
+mv "${input_path}/filt.ack" "${output_file}.fasta"
 
 ###		Removing temporary files
 
@@ -330,8 +333,8 @@ echo -e "\n#\tacetocheck processed:
 
 ###		Outfile file stat
 
-numntOut=`grep -v ">" ${output_file} | wc | awk '{print $3-$1}'`
-numseqOut=`grep -c ">" ${output_file}`
+numntOut=`grep -v ">" ${output_file}.fasta | wc | awk '{print $3-$1}'`
+numseqOut=`grep -c ">" ${output_file}.fasta`
 
 ###		Number of unspecific sequences
 
