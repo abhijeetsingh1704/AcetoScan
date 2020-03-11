@@ -12,7 +12,7 @@ LRED='\033[01;31m'
 
 # setting pipefail
 
-set -euo pipefail
+#set -euo pipefail
 
 ##      Installation
 
