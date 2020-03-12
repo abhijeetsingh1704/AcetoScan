@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: acetotree
-# Last modified: Wed, Mar 11, 2020 19:00
+# Last modified: Tor, Mar 12, 2020 10:00
 # Sign: Abhi
 
 ### Setting colour variables
@@ -197,7 +197,12 @@ fi
 
 if [ "$output_file" == "" ]; then
         output_file="${output_file_def}"
-        echo -e "\n#\tUsing default output file: ${YELLOW}${output_file_def}${RESTORE}\n"
+        echo -e "\n#\tUsing default output file:"
+        echo -e "\t\t${YELLOW}${output_file_def}.fasta${RESTORE}"
+        echo -e "\t\t${YELLOW}${output_file_def}.csv${RESTORE}"
+        echo -e "\t\t${YELLOW}${output_file_def}.aln${RESTORE}"
+        echo -e "\t\t${YELLOW}${output_file_def}.tree${RESTORE}"
+        echo -e "\t\t${YELLOW}${output_file_def}.log${RESTORE}"
 else
         echo -e "\n#\tOutput files:"
         echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
