@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # File: AcetoScan_Visualization.R
-# Last modified: Fre, Mar 06, 2020 16:58
+# Last modified: Tor, Mar 12, 2020 10:00
 # Sign: Abhi
 
 otu_file <- "FTHFS_OTU_table_R.txt"
@@ -21,11 +21,11 @@ Rpackage <- function(pkg){
 
 # Defining required package list
 Libraries <- c("ggplot2", 
-              "phyloseq",
-              "plotly",
-              "RColorBrewer",
-              "plyr",
-              "dplyr")
+               "phyloseq",
+               "plotly",
+               "RColorBrewer",
+               "plyr",
+               "dplyr")
 
 # Turn the warnings off 
 #options(warn=-1)
@@ -111,9 +111,9 @@ prevalence_dataframe <- data.frame(Prevalence = prevalence_dataframe,
                                    tax_table(ps))
 # Compute the mean prevalences and total abundance of the features in each phylum
 prevalence_table <- plyr::ddply(prevalence_dataframe, "Phylum", function(df1) {
-    data.frame(mean_prevalence = mean(df1$Prevalence),
-               total_abundance = sum(df1$TotalAbundance, na.rm = TRUE),
-               stringsAsFactors = FALSE)
+  data.frame(mean_prevalence = mean(df1$Prevalence),
+             total_abundance = sum(df1$TotalAbundance, na.rm = TRUE),
+             stringsAsFactors = FALSE)
 })
 
 # #save the prevalance table as text file
@@ -168,15 +168,15 @@ tax.tab <- tibble(tax_table(ps))
 
 # function for the modification of OTU table
 ModifyTax <- function(x, ind) {
-    #   xth row in the dataframe
-    #   ind taxonomy level to change
-    if (is.na(x[ind])) {
-        nonNa <- which(!is.na(x[-ind]))
-        maxNonNa <- max(nonNa)
-        x[ind] <- paste(x[maxNonNa], ".", x[ind])
-    } else {
-        x[ind] <- x[ind]
-    }
+  #   xth row in the dataframe
+  #   ind taxonomy level to change
+  if (is.na(x[ind])) {
+    nonNa <- which(!is.na(x[-ind]))
+    maxNonNa <- max(nonNa)
+    x[ind] <- paste(x[maxNonNa], ".", x[ind])
+  } else {
+    x[ind] <- x[ind]
+  }
 }
 
 ##  Making manual and distinctive colour palette
@@ -225,21 +225,21 @@ dev.off()
 
 ######################  Phylum Absolute abundance
 Phylum_Absolute_abundance <- plot_bar(ps, fill = "Phylum") + 
-    theme(legend.position = "bottom") + 
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold", size = 8)) +
-    theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 8, face = "bold")) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    ylab("Absolute Abundance (counts)")+
-    ggtitle("Phylum absolute abundance")+
-    theme(plot.title = element_text(size = 10, face = "bold"))
+  theme(legend.position = "bottom") + 
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold", size = 8)) +
+  theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 8, face = "bold")) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
+  ylab("Absolute Abundance (counts)")+
+  ggtitle("Phylum absolute abundance")+
+  theme(plot.title = element_text(size = 10, face = "bold"))
 
 # save plot as pdf
 pdf("Barplot_Phylum_Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
@@ -281,25 +281,25 @@ phylum_level_transformed_psmelt$Phylum <- as.character(phylum_level_transformed_
 
 # Phylum level barplot
 Phylum_level_barplot <- ggplot(data = phylum_level_transformed_psmelt,
-        aes(x = Sample, y = Abundance, fill = Phylum)) + 
-    geom_bar(aes(fill = Phylum), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = my_colours)+
-    theme(legend.position = "bottom") +
-    guides(fill = guide_legend(nrow = 3)) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    ylab("Relative Abundance (%)") +
-    theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    theme(legend.title = element_text(size = 10, face = "bold", colour = "black"))+
-    ggtitle("Phylum level")+
-    theme(plot.title = element_text(size = 10, face = "bold"))
+                               aes(x = Sample, y = Abundance, fill = Phylum)) + 
+  geom_bar(aes(fill = Phylum), linetype = "blank", stat = "identity", position = "stack") +
+  scale_fill_manual(values = my_colours)+
+  theme(legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 3)) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
+  ylab("Relative Abundance (%)") +
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  theme(legend.title = element_text(size = 10, face = "bold", colour = "black"))+
+  ggtitle("Phylum level")+
+  theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
 pdf("1_Phylum_barplot.pdf", width = 28, height = 18, paper = "a4r")
@@ -342,25 +342,25 @@ class_level_transformed_psmelt$Class[class_level_transformed_psmelt$Abundance < 
 
 # Class level barplot
 Class_level_barplot <- ggplot(data = class_level_transformed_psmelt,
-        aes(x = Sample, y = Abundance, fill = Class)) +
-    geom_bar(aes(fill = Class), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = my_colours)+
-    theme(legend.position = "bottom") +
-    guides(fill = guide_legend(nrow = 5)) +
-    guides(fill = guide_legend(title = "Class", title.position = "top", title.theme = element_text(face = "bold"))) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")+
-    ggtitle("Class level (> 0.25 %)")+
-    theme(plot.title = element_text(size = 10, face = "bold"))
+                              aes(x = Sample, y = Abundance, fill = Class)) +
+  geom_bar(aes(fill = Class), linetype = "blank", stat = "identity", position = "stack") +
+  scale_fill_manual(values = my_colours)+
+  theme(legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 5)) +
+  guides(fill = guide_legend(title = "Class", title.position = "top", title.theme = element_text(face = "bold"))) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  ylab("Relative Abundance (%)")+
+  ggtitle("Class level (> 0.25 %)")+
+  theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
 pdf("2_Class_barplot.pdf", width = 28, height = 18, paper = "a4r")
@@ -403,25 +403,25 @@ order_level_transformed_psmelt$Order[order_level_transformed_psmelt$Abundance < 
 
 # Order level barplot
 Order_level_barplot <- ggplot(data = order_level_transformed_psmelt,
-        aes(x = Sample, y = Abundance, fill = Order)) + 
-    geom_bar(aes(fill=Order), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = my_colours)+
-    theme(legend.position = "bottom") +
-    guides(fill=guide_legend(nrow = 5)) +
-    guides(fill=guide_legend(title = "Order", title.position = "top", title.theme = element_text(face = "bold"))) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")+
-    ggtitle("Order level (> 0.25 %)")+
-    theme(plot.title = element_text(size = 10, face = "bold"))
+                              aes(x = Sample, y = Abundance, fill = Order)) + 
+  geom_bar(aes(fill=Order), linetype = "blank", stat = "identity", position = "stack") +
+  scale_fill_manual(values = my_colours)+
+  theme(legend.position = "bottom") +
+  guides(fill=guide_legend(nrow = 5)) +
+  guides(fill=guide_legend(title = "Order", title.position = "top", title.theme = element_text(face = "bold"))) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  ylab("Relative Abundance (%)")+
+  ggtitle("Order level (> 0.25 %)")+
+  theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
 pdf("3_Order_barplot.pdf", width = 28, height = 18, paper = "a4r")
@@ -465,24 +465,24 @@ family_level_transformed_psmelt$Family[family_level_transformed_psmelt$Abundance
 
 # Family level barplot
 Family_level_barplot <- ggplot(data = family_level_transformed_psmelt,
-        aes(x = Sample, y = Abundance, fill = Family)) + 
-    geom_bar(aes(fill = Family), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = my_colours)+
-    theme(legend.position = "bottom") +
-    guides(fill=guide_legend(title = "Family", title.position = "top", title.theme = element_text(face = "bold"))) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(legend.key.height = unit(0.2, "cm"), legend.key.width = unit(0.3, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")+
-    ggtitle("Family level (> 1 %)")+
-    theme(plot.title = element_text(size = 10, face = "bold"))
+                               aes(x = Sample, y = Abundance, fill = Family)) + 
+  geom_bar(aes(fill = Family), linetype = "blank", stat = "identity", position = "stack") +
+  scale_fill_manual(values = my_colours)+
+  theme(legend.position = "bottom") +
+  guides(fill=guide_legend(title = "Family", title.position = "top", title.theme = element_text(face = "bold"))) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(legend.key.height = unit(0.2, "cm"), legend.key.width = unit(0.3, "cm")) +
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  ylab("Relative Abundance (%)")+
+  ggtitle("Family level (> 1 %)")+
+  theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
 pdf("4_Family_barplot.pdf", width = 28, height = 18, paper = "a4r")
@@ -514,28 +514,28 @@ family_level_transformed_forheatmap <- transform_sample_counts(family_level, fun
 family_level_transformed_forheatmap_morethan1 <- filter_taxa(family_level_transformed_forheatmap, function(x) sum(x) > 1, TRUE)
 
 Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan1, 
-        taxa.label = "Family", 
-        title = "Family level (> 1 %)",
-        sample.order = "UNIQUENAMES",                       
-        low = "#FEFE62", high = "#D35FB7", na.value = "white") + 
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(legend.position = "right") +
-    theme(legend.text = element_blank()) +
-    theme(legend.title = element_text(face = "bold", size = 10)) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold", size = 8)) +
-    theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, face = "bold", size = 7)) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10))
+                               taxa.label = "Family", 
+                               title = "Family level (> 1 %)",
+                               sample.order = "UNIQUENAMES",                       
+                               low = "#FEFE62", high = "#D35FB7", na.value = "white") + 
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(legend.position = "right") +
+  theme(legend.text = element_blank()) +
+  theme(legend.title = element_text(face = "bold", size = 10)) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold", size = 8)) +
+  theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, face = "bold", size = 7)) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10))
 
 #saving plot in pdf
 pdf("4_Family_heatmap.pdf", width = 28, height = 18, paper = "a4r")
 plot(Heatmap_family)
 dev.off()
-                                                             
+
 # save plot as image
 tiff("4_Family_heatmap.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Heatmap_family)
@@ -565,35 +565,35 @@ genus_level_transformed_psmelt$Genus[genus_level_transformed_psmelt$Abundance < 
 
 # Genus level barplot
 Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt, 
-        aes(x = Sample, y = Abundance, fill = Genus)) + 
-    geom_bar(aes(color = Genus, fill = Genus), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = my_colours)+
-    theme(legend.position = "bottom") +
-    guides(fill=guide_legend(title = "Genus", title.position = "top", title.theme = element_text(face = "bold"))) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.3, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")+
-    ggtitle("Genus level (> 1 %)")+
-    theme(plot.title = element_text(size = 10, face = "bold"))                                                     
+                              aes(x = Sample, y = Abundance, fill = Genus)) + 
+  geom_bar(aes(color = Genus, fill = Genus), linetype = "blank", stat = "identity", position = "stack") +
+  scale_fill_manual(values = my_colours)+
+  theme(legend.position = "bottom") +
+  guides(fill=guide_legend(title = "Genus", title.position = "top", title.theme = element_text(face = "bold"))) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.3, "cm")) +
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  ylab("Relative Abundance (%)")+
+  ggtitle("Genus level (> 1 %)")+
+  theme(plot.title = element_text(size = 10, face = "bold"))                                                     
 
 #saving plot in pdf
 pdf("5_Genus_barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Genus_level_barplot)
 dev.off()
-                                                             
+
 # save plot as image
 tiff("5_Genus_barplot.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Genus_level_barplot)
 dev.off()                                           
-                                                               
+
 # saving Genus number in genus level barplot
 sink("Visualization_processing_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
@@ -604,7 +604,7 @@ sink()
 #saving plot as html widget
 barplot_genus<-ggplotly(Genus_level_barplot)
 htmlwidgets::saveWidget(as_widget(barplot_genus), "5_Genus_barplot.html")
-  
+
 ###########
 
 # heatmapping for abundance more than 1%
@@ -613,22 +613,22 @@ genus_level_transformed_forheatmap <- transform_sample_counts(genus_level, funct
 genus_level_transformed_forheatmap_morethan1 <- filter_taxa(genus_level_transformed_forheatmap, function(x) sum(x) > 1, TRUE)
 
 Heatmap_Genus <- plot_heatmap(genus_level_transformed_forheatmap_morethan1, 
-        taxa.label = "Genus",
-        sample.order = "UNIQUENAMES",
-        low = "#FEFE62", high = "#D35FB7", na.value = "white",
-        title = "Genus level (> 1 %)") + 
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(legend.position = "right") +
-    theme(legend.title = element_text(face = "bold", size = 10)) +
-    theme(legend.text = element_blank()) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold", size = 10)) +
-    theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 7, face = "bold")) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 12))
+                              taxa.label = "Genus",
+                              sample.order = "UNIQUENAMES",
+                              low = "#FEFE62", high = "#D35FB7", na.value = "white",
+                              title = "Genus level (> 1 %)") + 
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(legend.position = "right") +
+  theme(legend.title = element_text(face = "bold", size = 10)) +
+  theme(legend.text = element_blank()) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold", size = 10)) +
+  theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 7, face = "bold")) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 12))
 
 # saving plot in pdf
 pdf("5_Genus_heatmap.pdf", width = 28, height = 18, paper = "a4r")
@@ -639,7 +639,7 @@ dev.off()
 tiff("5_Genus_heatmap.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Heatmap_Genus)
 dev.off()
-                                                            
+
 # saving plot as html widget
 Genus_Heatmap<-ggplotly(Heatmap_Genus)
 htmlwidgets::saveWidget(as_widget(Genus_Heatmap), "5_Genus_heatmap.html")
@@ -665,35 +665,35 @@ Species_level_transformed_psmelt$Species[Species_level_transformed_psmelt$Abunda
 
 # Species level barplot
 Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt, 
-        aes(x = Sample, y = Abundance, fill = Species)) + 
-    geom_bar(aes(color = Species, fill = Species), linetype = "blank", stat = "identity", position = "stack") +
-    scale_fill_manual(values = my_colours)+
-    theme(legend.position = "bottom") +
-    guides(fill=guide_legend(title = "Species", title.position = "top", title.theme = element_text(face = "bold"))) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
-    theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.3, "cm")) +
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    ylab("Relative Abundance (%)")+
-    ggtitle("Species level (> 5 %)")+
-    theme(plot.title = element_text(size = 10, face = "bold"))
+                                aes(x = Sample, y = Abundance, fill = Species)) + 
+  geom_bar(aes(color = Species, fill = Species), linetype = "blank", stat = "identity", position = "stack") +
+  scale_fill_manual(values = my_colours)+
+  theme(legend.position = "bottom") +
+  guides(fill=guide_legend(title = "Species", title.position = "top", title.theme = element_text(face = "bold"))) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.text.y = element_text(colour = "black", hjust = 1, vjust = 1, face = "bold")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 10)) +
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.3, "cm")) +
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  ylab("Relative Abundance (%)")+
+  ggtitle("Species level (> 5 %)")+
+  theme(plot.title = element_text(size = 10, face = "bold"))
 
-    #saving plot in pdf
+#saving plot in pdf
 pdf("6_Species_barplot.pdf", width = 28, height = 18, paper = "a4r")
 plot(Species_level_barplot)
 dev.off()
-                                                            
+
 # save plot as image
 tiff("6_Species_barplot.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Species_level_barplot)
 dev.off()                                                            
- 
+
 # saving Species number in species level barplot
 sink("Visualization_processing_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
@@ -713,28 +713,28 @@ Species_level_transformed_forheatmap <- transform_sample_counts(Species_level, f
 Species_level_transformed_forheatmap_morethan5 <- filter_taxa(Species_level_transformed_forheatmap, function(x) sum(x) > 5, TRUE)
 
 Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan5, 
-        taxa.label = "Species",
-        sample.order = "UNIQUENAMES",
-        low = "#FEFE62", high = "#D35FB7", na.value = "white",
-        title = "Species level (> 5 %)") + 
-    theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
-    theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
-    theme(legend.position = "right") +
-    theme(legend.title = element_text(face = "bold", size = 10)) +
-    theme(legend.text = element_blank()) +
-    theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold", size = 10)) +
-    theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 7, face = "bold")) +
-    theme(axis.line.y.left = element_line(colour = "black")) +
-    theme(axis.line.x.bottom = element_line(colour = "black")) +
-    theme(axis.line.x.top = element_line(colour = "black")) +
-    theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8)) +
-    theme(axis.title.y = element_text(colour = "black", face = "bold", size = 12))
+                               taxa.label = "Species",
+                               sample.order = "UNIQUENAMES",
+                               low = "#FEFE62", high = "#D35FB7", na.value = "white",
+                               title = "Species level (> 5 %)") + 
+  theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
+  theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
+  theme(legend.position = "right") +
+  theme(legend.title = element_text(face = "bold", size = 10)) +
+  theme(legend.text = element_blank()) +
+  theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold", size = 10)) +
+  theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 7, face = "bold")) +
+  theme(axis.line.y.left = element_line(colour = "black")) +
+  theme(axis.line.x.bottom = element_line(colour = "black")) +
+  theme(axis.line.x.top = element_line(colour = "black")) +
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8)) +
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 12))
 
 # saving plot in pdf
 pdf("6_Species_heatmap.pdf", width = 28, height = 18, paper = "a4r")
 plot(Heatmap_Species)
 dev.off()
-                                                              
+
 # save plot as image
 tiff("6_Species_heatmap.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Heatmap_Species)
@@ -744,16 +744,16 @@ dev.off()
 Species_Heatmap<-ggplotly(Heatmap_Species)
 htmlwidgets::saveWidget(as_widget(Species_Heatmap), "6_Species_heatmap.html")
 ######################
-                                                              
-                                                              
+
+
 ########
 
 # Ordination
-                                                              
+
 set.seed(10)
 ps.ord <- ordinate(ps, "NMDS", "bray" )
 #ps.ord
-                                                              
+
 # saving ordination detail
 sink("Visualization_processing_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
@@ -761,12 +761,12 @@ paste("Ordination details: ")
 ps.ord
 writeLines("\n------------------------- \t END \t-------------------------\n")
 sink()                                                              
-                                                              
+
 # Plotting ordination
-                                                              
- NMDS_Phylum_1 <- plot_ordination(ps, ps.ord,
-                              type="taxa",
-                              color = "Phylum")+
+
+NMDS_Phylum_1 <- plot_ordination(ps, ps.ord,
+                                 type="taxa",
+                                 color = "Phylum")+
   geom_point(size=2, stroke=1)+
   theme(legend.title = element_text(face = "bold", size = 10))+
   facet_wrap(~Phylum)+
@@ -785,8 +785,8 @@ sink()
 pdf("NMDS_Phylum_1.pdf", width = 28, height = 18, paper = "a4r")
 plot(NMDS_Phylum_1)
 dev.off()
-                                                              
- # save plot as image
+
+# save plot as image
 tiff("NMDS_Phylum_1.tif", width = 12, height = 6, units = "in", res = 250)
 plot(NMDS_Phylum_1)
 dev.off()                                                             
@@ -795,12 +795,12 @@ dev.off()
 NMDS_Phylum_1_ <-ggplotly(NMDS_Phylum_1)
 htmlwidgets::saveWidget(as_widget(NMDS_Phylum_1_), "NMDS_Phylum_1.html")
 ######################
-                                                              
- # Plotting ordination 2
-                                                              
- NMDS_Phylum_2 <- plot_ordination(ps, ps.ord,
-                              type="taxa",
-                              color = "Phylum")+
+
+# Plotting ordination 2
+
+NMDS_Phylum_2 <- plot_ordination(ps, ps.ord,
+                                 type="taxa",
+                                 color = "Phylum")+
   geom_point(size=2, stroke=1)+
   theme(legend.title = element_text(face = "bold", size = 10))+
   theme(axis.text.x = element_text(colour = "black", angle = 0, hjust = 1, vjust = 1, face = "bold", size = 8))+
@@ -818,8 +818,8 @@ htmlwidgets::saveWidget(as_widget(NMDS_Phylum_1_), "NMDS_Phylum_1.html")
 pdf("NMDS_Phylum_2.pdf", width = 28, height = 18, paper = "a4r")
 plot(NMDS_Phylum_2)
 dev.off()
-                                                              
- # save plot as image
+
+# save plot as image
 tiff("NMDS_Phylum_2.tif", width = 12, height = 6, units = "in", res = 250)
 plot(NMDS_Phylum_2)
 dev.off()                                                             
@@ -828,15 +828,15 @@ dev.off()
 NMDS_Phylum_2_ <-ggplotly(NMDS_Phylum_2)
 htmlwidgets::saveWidget(as_widget(NMDS_Phylum_2_), "NMDS_Phylum_2.html")
 ######################                                                             
-                                                              
+
 
 ########                                                              
-                                                              
+
 # Alpha diversity analysis
-                                                              
+
 Alpha_diversity <-   plot_richness(ps, 
-              measures = c("Observed", "Shannon", "Simpson"), 
-              nrow=3)+
+                                   measures = c("Observed", "Shannon", "Simpson"), 
+                                   nrow=3)+
   theme(panel.background = element_rect(fill = NA),
         panel.grid.major = element_line(colour = "grey90", linetype = "dashed"),
         panel.ontop = F)+
@@ -854,12 +854,12 @@ Alpha_diversity <-   plot_richness(ps,
         strip.background.x = element_rect(colour = NA, fill = "grey90"))+
   theme(axis.line.y.left = element_line(colour = "black"))+
   theme(axis.line.x.bottom = element_line(colour = "black"))                                                                                                                           
-                                                              
+
 # saving plot in pdf
 pdf("Alpha_diversity.pdf", width = 28, height = 18, paper = "a4r")
 plot(Alpha_diversity)
 dev.off()
-                                                              
+
 # save plot as image
 tiff("Alpha_diversity.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Alpha_diversity)
@@ -869,36 +869,71 @@ dev.off()
 Alpha_diversity_ <-ggplotly(Alpha_diversity)
 htmlwidgets::saveWidget(as_widget(Alpha_diversity_), "Alpha_diversity.html")
 ######################                                                             
-                                                              
+
 # Phylogenetic tree visualization
 
-tree <- plot_tree(ps, color = "Phylum",
-          method = "sampledodge",
-          base.spacing = 0.03,
-          min.abundance = 10,
-          justify = "left",
-          nodelabf=nodeplotblank,
-          #ladderize = "left",
-          text.size = 1,
-          plot.margin = 0)+
-
+tree1 <- plot_tree(ps, color = "Phylum",
+                  method = "sampledodge",
+                  base.spacing = 0.03,
+                  min.abundance = 100,
+                  title = "Min. abundance = 100",
+                  label.tips = "taxa_names",
+                  #justify = "left",
+                  nodelabf=nodeplotblank,
+                  ladderize = "left",
+                  text.size = 1,
+                  plot.margin = 0)+
   scale_color_manual(values = my_colours)+
-
   theme(legend.position = "bottom") +
-  guides(col = guide_legend(ncol = 3))+
+  guides(col = guide_legend(ncol = 4))+
   theme(legend.text=element_text(size=7, face = "bold"))+
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
+  facet_wrap(~Phylum)+
+  theme(plot.title = element_text(size = 8))
   
-  coord_polar(theta = "y")
- 
+  #+coord_polar(theta = "y")
+
 # saving plot in pdf
-pdf("FTHFH_OTU.tree.pdf", width = 28, height = 18, paper = "a4r")
-plot(tree)
+pdf("FTHFH_OTU.tree1.pdf", width = 10, height = 10, paper = "a4r")
+plot(tree1)
 dev.off()
 
 # save plot as image
-tiff("FTHFH_OTU.tree.tif", width = 6, height = 6, units = "in", res = 300)
-plot(tree)
+tiff("FTHFH_OTU.tree1.tif", width = 10, height = 10, units = "in", res = 300)
+plot(tree1)
+dev.off()
+
+#####
+
+tree2 <- plot_tree(ps, 
+                   color = "Phylum",
+                   method = "sampledodge",
+                   base.spacing = 0.03,
+                   min.abundance = 100,
+                   label.tips = "taxa_names",
+                   #justify = "left",
+                   nodelabf=nodeplotblank,
+                   ladderize = "left",
+                   text.size = 1,
+                   title = "Min. abundance = 100",
+                   plot.margin = 0)+
+  scale_color_manual(values = my_colours)+
+  theme(legend.position = "bottom") +
+  guides(col = guide_legend(ncol = 4))+
+  theme(legend.text=element_text(size=7, face = "bold"))+
+  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
+  theme(plot.title = element_text(size = 8))
+
+#+coord_polar(theta = "y")
+
+# saving plot in pdf
+pdf("FTHFH_OTU.tree2.pdf", width = 10, height = 10, paper = "a4r")
+plot(tree2)
+dev.off()
+
+# save plot as image
+tiff("FTHFH_OTU.tree2.tif", width = 10, height = 10, units = "in", res = 300)
+plot(tree2)
 dev.off()
 
 ######################
