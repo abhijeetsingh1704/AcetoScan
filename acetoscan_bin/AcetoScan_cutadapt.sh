@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File: AcetoScan_cutadapt.sh
-# Last modified: Ons Feb 11, 2020 11:10
+# Last modified: Tor, Mar 16, 2020 17:18
 # Sign: Abhi
 
 # Cutadapt script for cleaning ILLUMINA read data, 
@@ -34,7 +34,7 @@ for infile in $(find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads
             --max-n 0 \
             --maximum-length $MaxL \
             --minimum-length $MinL \
-            --discard-untrimmed \
+            --untrimmed-output ${WKDIR}/output_data/untrimmed \
             -j 0 \
             -q $QT \
             --length-tag "size=" \
