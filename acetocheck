@@ -1,24 +1,25 @@
 #!/bin/bash
 
 # File: acetocheck
-# Last modified: Tor, Mar 12, 2020 10:00
-# Sign: Abhi
+# Last modified: tis mar 17, 2020  12:34
+# Sign: JN
 
-###	Setting colour variables
+###    Setting colour variables
 
 RESTORE='\033[0m'
 YELLOW='\033[01;33m'
-LRED='\033[01;31m' 
+LRED='\033[01;31m'
 
-###	set pipefail
+###    Set pipefail
 
 set -euo pipefail
 
-###	getting currect working directory to variable
+###    Getting currect working directory to variable
 
-CDIR=$(pwd)
+## JN: Unused variable
+#CDIR=$(pwd)
 
-### acetocheck script
+###    acetocheck script
 
 echo -e "${LRED}\
  _____________________________________________________________
@@ -37,21 +38,24 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
 start=$(date +%s) #start time of script
 
-### Variable for the backup
+###    Variable for the backup
 
-DATE=$(date +"%F_%r" | sed 's/:/_/g;s/ //g;s/-//g')
+## JN: Utilize the syntax in date instead of parsing the output.
+## JN: Tested on GNU/Linux implementaion of date.
+#DATE=$(date +"%F_%r" | sed 's/:/_/g;s/ //g;s/-//g')
+DATE=$(date +"%Y%m%d_%H_%M_%S")
 
-###     Username
+###    Username
 
-user=`echo ${SUDO_USER:-${USER}}`
+user="${SUDO_USER:-${USER}}"
 
-###     Setting up variables
+###    Setting up variables
 
-input_file=""            
+input_file=""
 output_file=""
 evalue=""
 
-###     Defaults variables
+###    Defaults variables
 
 output_file_def="acetocheck_${DATE}"
 version_def="1.0"
@@ -61,36 +65,36 @@ evalue_def="1e-3"
 
 THREADS=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || getconf _NPROCESSORS_ONLN 2> /dev/null)
 
-###     Defining flags
+###    Defining flags
 
-#       function
-
+## JN: Use return insted of exit in the usage function
+## JN: Options inside square brackets are usually optional.
 usage() {
-echo "Usage   : $0 [-i </input path/input file>] [-o <output path/output file>] [-e <E-value>]
-Example : acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3" 1>&2; exit 1;
+    echo "Usage   : $0 [-i </input path/input file>] [-o <output path/output file>] [-e <E-value>]
+Example : $0 -i /path/<input file> -o /path/<output file> -e 1e-3" 1>&2;
+    return 1;
 }
 
-#       flags
+###    Read user arguments
 
-while getopts "i:o:e:hvCX" flags; 
-        do      
-                case "${flags}" in
-                        
-                        i)
-                                input_file=${OPTARG}
-                                ;;
+while getopts "i:o:e:hvCX" flags; do
+    case "${flags}" in
 
-                        o)
-                                output_file=${OPTARG}
-                                ;;
-                                
-                        e)
-                                evalue=${OPTARG}
-                                ;;        
+        i)
+            input_file=${OPTARG}
+            ;;
 
-                        h)
-                                echo "
-Example : acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
+        o)
+            output_file=${OPTARG}
+            ;;
+
+        e)
+            evalue=${OPTARG}
+            ;;
+
+        h)
+            echo "
+Example : acetocheck -i /path/<input file> -o /path/<output file> -e 1e-3
 
         -i      Input_file
         -o      Output file
@@ -98,129 +102,157 @@ Example : acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
                         :default = acetotax_<DATE>_<TIME>.fasta
         -e      E-value
                         :default evalue = 1e-3
-        -h      Print help        
+        -h      Print help
         -X      Print AcetoScan commands
         -v      Print AcetoScan version
         -C      Print AcetoScan citation"
-                                exit                                
-                                ;;
+            exit
+            ;;
 
-                        v)
-                                echo -e "#\tAcetoScan version: ${YELLOW}${version_def}${RESTORE}"
-                                echo -e "#\tVisit \"${YELLOW}https://acetobase.molbio.slu.se/${RESTORE}\" for more information."
-                                exit
-                                ;;
-                        
-                        C)
-                                echo -e "#\tCitations: If you use ${YELLOW}AcetoScan pipeline${RESTORE}, please cite as:\n"
-                                echo -e "#\tAcetoScan:"
-                                echo -e "#\tAbhijeet Singh, Johan A. A. Nylander, Anna Schnürer, Bettina Müller" 
-                                echo -e "#\tHigh throughput sequencing and automated analysis of formyltetrahydrofolate" 
-                                echo -e "#\tsynthetase (FTHFS) gene amplicons to estimate acetogenic population dynamics,"
-                                echo -e "#\t<Journal Name>, Volume <2019>, <2019>, <webadress>\n"
-                                
-                                echo -e "#\tAcetoBase:"
-                                echo -e "#\tAbhijeet Singh, Bettina Müller, Hans-Henrik Fuxelius, Anna Schnürer" 
-                                echo -e "#\tAcetoBase: a functional gene repository and database for"
-                                echo -e "#\tformyltetrahydrofolate synthetase sequences,"
-                                echo -e "#\tDatabase, Volume 2019, 2019, baz142, https://doi.org/10.1093/database/baz142"
-                                exit
-                                ;;
-                                
-                        X)
-                                echo -e "#\tAcetoScan commands:\n"
-                                echo -e "\t\tacetoscan\t- for complete processing of raw illumina MiSeq output data"
-                                echo -e "\t\tacetocheck\t- for processing fasta sequences and filtering out non-target sequences"
-                                echo -e "\t\tacetotree\t- acetotax + phylogenetic tree generation"
-                                exit
-                                ;;        
+        v)
+            echo -e "#\tAcetoScan version: ${YELLOW}${version_def}${RESTORE}"
+            echo -e "#\tVisit \"${YELLOW}https://acetobase.molbio.slu.se/${RESTORE}\" for more information."
+            exit
+            ;;
 
-                        *)
-                                usage
-                                exit
-                                ;;
+        C)
+            echo -e "#\tCitations: If you use ${YELLOW}AcetoScan pipeline${RESTORE}, please cite as:\n"
+            echo -e "#\tAcetoScan:"
+            echo -e "#\tAbhijeet Singh, Johan A. A. Nylander, Anna Schnürer, Bettina Müller"
+            echo -e "#\tHigh throughput sequencing and automated analysis of formyltetrahydrofolate"
+            echo -e "#\tsynthetase (FTHFS) gene amplicons to estimate acetogenic population dynamics,"
+            echo -e "#\t<Journal Name>, Volume <2019>, <2019>, <webadress>\n"
+            echo -e "#\tAcetoBase:"
+            echo -e "#\tAbhijeet Singh, Bettina Müller, Hans-Henrik Fuxelius, Anna Schnürer"
+            echo -e "#\tAcetoBase: a functional gene repository and database for"
+            echo -e "#\tformyltetrahydrofolate synthetase sequences,"
+            echo -e "#\tDatabase, Volume 2019, 2019, baz142, https://doi.org/10.1093/database/baz142"
+            exit
+            ;;
 
-                        :)      
-                                usage
-                                exit
-                                ;;
-                        
-                        \?)
-                                usage
-                                exit
-                                ;;
+        X)
+            echo -e "#\tAcetoScan commands:\n"
+            echo -e "\t\tacetoscan\t- for complete processing of raw illumina MiSeq output data"
+            echo -e "\t\tacetocheck\t- for processing fasta sequences and filtering out non-target sequences"
+            echo -e "\t\tacetotree\t- acetotax + phylogenetic tree generation"
+            exit
+            ;;
 
-                esac
-        done
+        *)
+            usage
+            exit
+            ;;
+
+        :)
+            usage
+            exit
+            ;;
+
+        \?)
+            usage
+            exit
+            ;;
+
+    esac
+done
 
 shift $((OPTIND-1))
 
-###     check
+###    Check
 
-if ((OPTIND == 1));then
-echo -e "\n#\t${LRED}Input file not provided, Aborting!!!\n###\n${RESTORE}"
-        echo ""
-        usage
-        exit
+## JN: The check below only checks is there are any options, not necessarily the infile.
+## JN: We wish to check both if the infile option was provided, AND, that the infile exists.
+## JN: I added some extra checks below.
+if ((OPTIND == 1)); then
+    echo -e "\n#\t${LRED}No input provided, Aborting!!!\n###\n${RESTORE}"
+    echo ""
+    usage
+    exit 1
 fi
 
-###		Getting input path
+###    Getting input path
 
-I_file=$(readlink -f ${input_file})
-input_path=`echo ${I_file%/*}`
+## JN: Using dirname on realpath. This will take care of both "file name only",
+## JN: and "full path including file name".
+## JN: I also suggest adding one variable, "filename", to keep the file name only.
+#I_file=$(readlink -f "${input_file}")
+#input_path="${I_file%/*}"
+#input_path=$(dirname "$(realpath "${input_file}")")
+#filename=$(basename "${input_file}")
 
-###		Generating logfile
+###    Generating logfile
 
-exec > >(tee -a ${input_path}/acetocheck_${DATE} )
-exec 2> >(tee -a ${input_path}/acetocheck_${DATE} >&2)
+#exec > >(tee -a "${input_path}/acetocheck_${DATE}" )
+#exec 2> >(tee -a "${input_path}/acetocheck_${DATE}" >&2)
 
-if test ! -f "$input_file"; then
-        echo -e "\n#\t${LRED}Input file not provided, Aborting!!!\n###\n${RESTORE} ${YELLOW}"
-        usage 
-        echo "\n###${RESTORE}"
-        exit
-           
+if [ -z "${input_file}" ] ; then
+    echo -e "\n#\t${LRED}Input file not provided, Aborting!!!\n###\n${RESTORE} ${YELLOW}"
+    usage
+    echo -e "\n###${RESTORE}"
+    exit 1
+fi
+
+if [ ! -f "${input_file}" ] ; then
+    echo -e "\n#\t${LRED}Input file ${input_file} could not be found, Aborting!!!\n###\n${RESTORE} ${YELLOW}"
+    usage
+    echo -e "\n###${RESTORE}"
+    exit 1
 else
-        echo -e "\n#\tContents of input file ${YELLOW}`echo ${input_file} | rev | cut -d/ -f1 | rev`${RESTORE}"        
-        echo -e "#\t${YELLOW}`grep -v ">" ${input_file} | wc | awk '{print $3-$1}'`${RESTORE} bases in ${YELLOW}`grep -c ">" ${input_file}`${RESTORE} sequences for `echo ${input_file} | rev | cut -d/ -f1 | rev`"
-        
-        
+    ## JN: Good strategy to check for input before setting other variables.
+    input_path=$(dirname "$(realpath "${input_file}")")
+    filename=$(basename "${input_file}")
+    exec > >(tee -a "${input_path}/acetocheck_${DATE}" )
+    exec 2> >(tee -a "${input_path}/acetocheck_${DATE}" >&2)
+    ## JN: $(echo "${input_file}" | rev | cut -d/ -f1 | rev) can be replaced with $(basename "${input_file}")
+    ## JN: And, it seems as if you need the file name in other parts of the code, so it might be worth
+    ## JN: creating an extra variable early with the content of "$(basename "${input_file}")" (see above).
+    #echo -e "\n#\tContents of input file ${YELLOW}$(echo "${input_file}" | rev | cut -d/ -f1 | rev)${RESTORE}"
+    echo -e "\n#\tContents of input file ${YELLOW}$(basename "${input_file}")${RESTORE}"
+    ## JN: Consider taking small steps instead of one long, complex, statement.
+    ## JN: And, will be reusing npos and nseq later.
+    #echo -e "#\t${YELLOW}$(grep -v '>' "${input_file}" | wc | awk '{print $3-$1}')${RESTORE} bases in ${YELLOW}$(grep -c '>' "${input_file}")${RESTORE} sequences for $(echo "${input_file}" | rev | cut -d/ -f1 | rev)"
+    npos=$(grep -v '>' "${input_file}" | wc | awk '{print $3-$1}')
+    nseq=$(grep -c '>' "${input_file}")
+    echo -e "#\t${YELLOW}${npos}${RESTORE} bases in ${YELLOW}${nseq}${RESTORE} sequences for ${filename}"
 fi
 
-###     Checking output_file 
+###    Checking output_file
 
 if [ "$output_file" == "" ]; then
-        output_file="${output_file_def}"
-        echo -e "\n#\tUsing default output file:"
-        echo -e "\t\t${YELLOW}${output_file_def}.fasta${RESTORE}"
-        echo -e "\t\t${YELLOW}${output_file_def}.log${RESTORE}"
-        
+    output_file="${output_file_def}"
+    echo -e "\n#\tUsing default output file:"
+    echo -e "\t\t${YELLOW}${output_file_def}.fasta${RESTORE}"
+    echo -e "\t\t${YELLOW}${output_file_def}.log${RESTORE}"
 else
-        echo -e "\n#\tOutput files:"
-        echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
-        echo -e "\t\t${YELLOW}acetocheck_${DATE}.log${RESTORE}"
+    echo -e "\n#\tOutput files:"
+    echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
+    echo -e "\t\t${YELLOW}acetocheck_${DATE}.log${RESTORE}"
 fi
 
-###     Checking output path
+###    Checking output path
 
-O_file=$(readlink -f ${output_file})
-output_path=`echo ${O_file%/*}`
+#O_file=$(readlink -f "${output_file}")
+#output_path=`echo ${O_file%/*}`
+#output_path="${O_file%/*}"
+output_path=$(dirname "$(realpath "${output_file}")")
 
-###		Checking evalue
+###    Checking evalue
 
-if [ "$evalue" == "" ];then
-        evalue="$evalue_def"
-        echo -e "\n#\tUsing default evalue: ${YELLOW}${evalue_def}${RESTORE}"
+if [ "$evalue" == "" ]; then
+    evalue="$evalue_def"
+    echo -e "\n#\tUsing default evalue: ${YELLOW}${evalue_def}${RESTORE}"
 else
-        echo -e "\n#\tE-value: ${YELLOW}$evalue${RESTORE}"
+    echo -e "\n#\tE-value: ${YELLOW}$evalue${RESTORE}"
 fi
 
-###		making a new temporary file
+###    Making a new temporary file
 
-tempfile1=$(echo `echo ${input_file}| rev | cut -d/ -f1 | rev | cut -d. -f1`.ack)
+## JN: do you need to remove suffix to the tempfile? Easier to just add a suffix:
+#tempfile1="$(echo "${input_file}" | rev | cut -d/ -f1 | rev | cut -d. -f1).ack"
+tempfile1="${filename}.ack"
 
-perl -pe '/^>/ ? print "\n" : chomp' ${input_file} | sed '/^$/d;s/ /_/g;s/,/_/g;s/:/_/g;s/(/_/g;s/)/_/g;s/__*/_/g' > ${input_path}/${tempfile1}
-
+perl -pe '/^>/ ? print "\n" : chomp' "${input_file}" | \
+    sed '/^$/d;s/ /_/g;s/,/_/g;s/:/_/g;s/(/_/g;s/)/_/g;s/__*/_/g' > "${input_path}/${tempfile1}"
 
 ###    Checking dependencies
 
@@ -228,47 +260,47 @@ echo -e "\n#\t${YELLOW}Performing dependencies check${RESTORE}"
 export PATH="/home/$user/acetoscan/acetoscan_bin/:${PATH}"
 AcetoScan_software_check.sh # <======== External script
 
-
-###     Function for the Spinner
-
+###    Function for the Spinner
 
 spin=( '/' '-' '\' '|' )
 
 processing() {
-              while [ 1 ]
-                do
-                   for s in "${spin[@]}"
-                        do
-                                echo -ne "\r[Processing:]$s"
-                                sleep 0.25
-                        done
-                done &
+    while true ; do
+        for s in "${spin[@]}" ; do
+            echo -ne "\r[Processing:]$s"
+            sleep 0.25
+        done
+    done &
 }
 
-###     Begin Longest best frame analysis <--- from external script
+###    Begin Longest best frame analysis <--- from external script
 
 echo -e "\n#\t${YELLOW}Performing longest best frame analysis${RESTORE}"
 echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
 
-###     Starting spinner for best frame script
-        processing
-        pid=$!
-		disown
+bestframe() {
+    ###    Starting spinner for best frame script
+    processing
+    pid=$!
+    disown
 
-###		longorf-acetoscan external script
-        
-        find ${input_path} -name "${tempfile1}" \
+    ###    Call AcetoScan_longorf.pl external script
+
+    find "${input_path}" -name "${tempfile1}" \
         -exec AcetoScan_longorf.pl {} > "${input_path}/${tempfile1}.bst" \; # <============= external script
-        
-#       closing spinner for best frame script
-        echo -ne "Done\n"        
-        kill $pid 
 
-###		Checking if longorf-acetoscan output is not empty
+    ###    Closing spinner for best frame script
+    echo -ne "Done\n"
+    kill "$pid"
+}
+
+bestframe
+
+###    Checking if longorf-acetoscan output is not empty
 
 if [ ! -s "${input_path}/${tempfile1}.bst" ]; then
-	echo -e "\n#\t${LRED}No sequence to proceed, Aborting!!!\n###\n${RESTORE}"
-	exit
+    echo -e "\n#\t${LRED}No sequence to proceed, Aborting!!!\n###\n${RESTORE}"
+    exit 1
 fi
 
 ###    Filtering non target sequences with BlastX from NCBI Blast+ (2.8.1)
@@ -276,44 +308,50 @@ fi
 echo -e "\n#\t${YELLOW}Filtering non target sequences${RESTORE}"
 echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
 
-#       Starting spinner for blastx filtering
+blastxfiltering() {
+    #    Starting spinner for blastx filtering
+    ## JN: Hardcoded path to AcetoBase! Needs to be changed eventually!
+    ## JN: AcetoBasepath="/path/to/AcetoBase"
+    processing
+    pid=$!
+    disown
 
-	processing
-	pid=$!
-	disown
-        
-        blastx \
-                -query "${input_path}/${tempfile1}.bst" \
-                -db "/home/$user/acetoscan/acetobase/AcetoBase" \
-                -task blastx \
-                -max_target_seqs 1 \
-                -num_threads "${THREADS}" \
-                -evalue ${evalue} \
-                -out "${input_path}/b4f.ack" \
-                -outfmt "7 qseqid" 2> /dev/null
+    blastx \
+        -query "${input_path}/${tempfile1}.bst" \
+        -db "/home/${user}/acetoscan/acetobase/AcetoBase" \
+        -task blastx \
+        -max_target_seqs 1 \
+        -num_threads "${THREADS}" \
+        -evalue "${evalue}" \
+        -out "${input_path}/b4f.ack" \
+        -outfmt "7 qseqid" 2> /dev/null
 
+    ###    Processing blast result file, deleting commented lines
 
-###     Processing blast result file, deleting commented lines
+    sed '/^#/d' "${input_path}/b4f.ack" | uniq > "${input_path}/b4fl.ack"
 
-sed '/^#/d' "${input_path}/b4f.ack" | uniq > "${input_path}/b4fl.ack"
+    ###    Extracting target sequences
+    ## JN: Consider using "while IFS= read -r line"
+    ## JN: And, when having a file created by the append operator, it might be
+    ## JN: safe to create it (an empty file) before appending.
+    printf '' > "${input_path}/filt.ack"
+    while IFS= read -r line; do
+        grep -w -A 1 "$line" "${input_path}/${tempfile1}.bst" >> "${input_path}/filt.ack"
+    done < "${input_path}/b4fl.ack"
 
-###     Extracting target sequences
+    ###    Closing spinner for blastx filtering
 
-while read line;
-      do
-         grep -w -A 1 "$line" "${input_path}/${tempfile1}.bst" >> "${input_path}/filt.ack"
-      done < "${input_path}/b4fl.ack"
-		
-#       Closing spinner for blastx filtering
+    echo -ne "Done\n"
+    kill $pid
+}
 
-	echo -ne "Done\n"
-	kill $pid
+blastxfiltering
 
-###		Renaming the required file to desired output file
+###    Renaming the required file to desired output file
 
 mv "${input_path}/filt.ack" "${output_file}.fasta"
 
-###		Removing temporary files
+###    Removing temporary files
 
 rm "${input_path}/${tempfile1}" \
    "${input_path}/${tempfile1}.bst" \
@@ -324,38 +362,42 @@ rm "${input_path}/${tempfile1}" \
 
 end=$(date +%s) # end time of script
 runtime=$(((end - start))) # calculate runtime
-numnt=`grep -v ">" ${input_file} | wc | awk '{print $3-$1}'`
-numseq=`grep -c ">" ${input_file}`
+## JN: Reusing nseq and npos above
+#numnt=`grep -v ">" ${input_file} | wc | awk '{print $3-$1}'`
+#numseq=`grep -c ">" ${input_file}`
 pros_data_size=$(find "${input_path}" -iname "${input_file}" -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
-echo -e "\n#\tacetocheck processed: 
+echo -e "\n#\tacetocheck processed:
 \n\t${YELLOW}${input_file}${RESTORE}
-\t[bases]\t\t- ${YELLOW}${numnt}${RESTORE}
-\t[sequences]\t- ${YELLOW}${numseq}${RESTORE}
+\t[bases]\t\t- ${YELLOW}${npos}${RESTORE}
+\t[sequences]\t- ${YELLOW}${nseq}${RESTORE}
 \t[size]\t\t- ${YELLOW}${pros_data_size}${RESTORE}
 \t[time(sec)]\t- ${YELLOW}${runtime}${RESTORE}"
 
-###		Outfile file stat
+###    Outfile file stat
 
-numntOut=`grep -v ">" ${output_file}.fasta | wc | awk '{print $3-$1}'`
-numseqOut=`grep -c ">" ${output_file}.fasta`
+## JN: numntOut unused
+#numntOut=$(grep -v '>' "${output_file}.fasta" | wc | awk '{print $3-$1}')
+numseqOut=$(grep -c '>' "${output_file}.fasta")
 
-###		Number of unspecific sequences
+###    Number of unspecific sequences
 
-numOut=$(( ${numseq} - ${numseqOut} ))
+numOut=$(( "${nseq}" - "${numseqOut}" ))
 
-###		Output file stat reporting
+###    Output file stat reporting
 
-echo -e "\n\tInput\t\t- ${YELLOW}${numseq} sequences ${RESTORE}"
+echo -e "\n\tInput\t\t- ${YELLOW}${nseq} sequences ${RESTORE}"
 echo -e "\tOutput\t\t- ${YELLOW}${numseqOut} sequences ${RESTORE}"
 echo -e "\t${LRED}Non-targets\t- ${numOut} sequences ${RESTORE}"
 
-
-### 	Greeting
+###    Greeting
 
 echo -e "\n#\t${YELLOW}${user}${RESTORE}, Thanks for using ${YELLOW}\"AcetoScan/acetocheck\"${RESTORE}\n\n###"
 
-###		fixing log file   
+###    Fixing log file
 
-find ${input_path} -name "acetocheck_${DATE}" -exec sed -i 's/\x1B\[[0-9;]\+[A-Za-z]//g;/Processing:/d' {} \; 
+find "${input_path}" -name "acetocheck_${DATE}" -exec sed -i 's/\x1B\[[0-9;]\+[A-Za-z]//g;/Processing:/d' {} \;
 mv "${input_path}/acetocheck_${DATE}" "${output_path}/acetocheck_${DATE}.log"
+
 ###    End of script
+exit 0
+
