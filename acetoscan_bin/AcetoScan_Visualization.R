@@ -1,17 +1,15 @@
 #!/usr/bin/env Rscript
 
-# File: AcetoScan_Visualization.R
-# Last modified: Tor, Mar 12, 2020 10:00
-# Sign: Abhi
+#   File: AcetoScan_Visualization.R
+#   Last modified: Tor, Mar 19, 2020 10:00
+#   Sign: Abhi
 
-otu_file <- "FTHFS_OTU_table_R.txt"
-tax_file <- "FTHFS_TAX_table_R.txt"
-sam_file <- "FTHFS_SAMPLE_table_R.txt"
-tree_file <- "FTHFS_OTU.tree"
+otu_file <- "FTHFS_otutab.csv"
+tax_file <- "FTHFS_taxtab.csv"
+sam_file <- "FTHFS_samtab.csv"
+tree_file <- "FTHFS_otu.tree"
 
-#getwd()
-
-# Function for loading OR installing if missing R packages
+#   Function for loading OR installing if missing R packages
 Rpackage <- function(pkg){
   pkgR <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(pkgR))
@@ -19,53 +17,64 @@ Rpackage <- function(pkg){
   sapply(pkg, require, character.only = TRUE)
 }
 
-# Defining required package list
-Libraries <- c("ggplot2", 
+#   Defining required package list
+Libraries <- c("ggplot2",
                "phyloseq",
                "plotly",
                "RColorBrewer",
                "plyr",
-               "dplyr")
+               "dplyr",
+               "vegan")
 
-# Turn the warnings off 
+# Turn the warnings off
 #options(warn=-1)
 
-# Load required packages with suppressed start-up messages
+#   Load required packages with suppressed start-up messages
 suppressPackageStartupMessages(Rpackage(Libraries))
 
 ######  Reading OTU file
 
-OTU_data <- read.table(otu_file, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
-#head(OTU_data)
-#class(OTU_data) 
+OTU_data <- read.table(otu_file,
+                       sep = ",",
+                       header = TRUE,
+                       row.names = 1,
+                       check.names = FALSE)
 
-# Making matrix
+#   Making matrix
 OTU_data_mat <- as.matrix(as.data.frame(OTU_data))
 
-# Making phyloseq otu table
+#   Making phyloseq otu table
 OTU_data_mat_table <- otu_table(OTU_data_mat, taxa_are_rows = TRUE)
 
 ###### Reading TAX table
 
-TAX_data <- read.table(tax_file, sep = "\t", header = TRUE, stringsAsFactors = F)
-#head(TAX_data)
-#class(TAX_data) 
+TAX_data1 <- read.table(tax_file,
+                       sep = ",",
+                       header = T,
+                       stringsAsFactors = F)
 
-# subsetting the data
+TAX_data <- subset(TAX_data1, select = -c(Subject_Accession,Percentage_identity:Query_seq))
+
+#   subsetting the data
 TAX_data_subset <- TAX_data[, -1]
 #TAX_data_subset
 
-# getting OTU names from otu table "OTU_data"
+#   getting OTU names from otu table "OTU_data"
 rownames(TAX_data_subset) <- rownames(OTU_data_mat_table)
 
-# making matrix of subset tax_data
-TAX_data_subset_mat <- as.matrix((TAX_data_subset))
+#   making matrix of subset tax_data
+TAX_data_subset_mat <- as.matrix(TAX_data_subset)
 
-# making phyloseq tax table
+#   making phyloseq tax table
 TAX_data_subset_mat_table <- tax_table(TAX_data_subset_mat)
 
 ###### Reading sample data
-sam_data <- read.table(sam_file, header = T)
+sam_data <- read.table(sam_file,
+                       sep = ",",
+                       row.names = 1,
+                       check.names = FALSE,
+                       header = T)
+
 sam_data <- sample_data(sam_data)
 
 ### Reading phylogenetic tree
@@ -163,7 +172,7 @@ sink()
 
 ########### Fixing functions
 ##Calculate abundance of different ranks
-#   taxonomy table   
+#   taxonomy table
 tax.tab <- tibble(tax_table(ps))
 
 # function for the modification of OTU table
@@ -224,8 +233,8 @@ plot_bar(ps, fill="Species")+scale_fill_manual(values = my_colours)+theme(axis.t
 dev.off()
 
 ######################  Phylum Absolute abundance
-Phylum_Absolute_abundance <- plot_bar(ps, fill = "Phylum") + 
-  theme(legend.position = "bottom") + 
+Phylum_Absolute_abundance <- plot_bar(ps, fill = "Phylum") +
+  theme(legend.position = "bottom") +
   theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
   theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
@@ -281,9 +290,9 @@ phylum_level_transformed_psmelt$Phylum <- as.character(phylum_level_transformed_
 
 # Phylum level barplot
 Phylum_level_barplot <- ggplot(data = phylum_level_transformed_psmelt,
-                               aes(x = Sample, y = Abundance, fill = Phylum)) + 
+                               aes(x = Sample, y = Abundance, fill = Phylum)) +
   geom_bar(aes(fill = Phylum), linetype = "blank", stat = "identity", position = "stack") +
-  scale_fill_manual(values = my_colours)+
+  scale_fill_manual(values = my_colours, na.value="white")+
   theme(legend.position = "bottom") +
   guides(fill = guide_legend(nrow = 3)) +
   theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
@@ -344,7 +353,7 @@ class_level_transformed_psmelt$Class[class_level_transformed_psmelt$Abundance < 
 Class_level_barplot <- ggplot(data = class_level_transformed_psmelt,
                               aes(x = Sample, y = Abundance, fill = Class)) +
   geom_bar(aes(fill = Class), linetype = "blank", stat = "identity", position = "stack") +
-  scale_fill_manual(values = my_colours)+
+  scale_fill_manual(values = my_colours, na.value="white")+
   theme(legend.position = "bottom") +
   guides(fill = guide_legend(nrow = 5)) +
   guides(fill = guide_legend(title = "Class", title.position = "top", title.theme = element_text(face = "bold"))) +
@@ -403,9 +412,9 @@ order_level_transformed_psmelt$Order[order_level_transformed_psmelt$Abundance < 
 
 # Order level barplot
 Order_level_barplot <- ggplot(data = order_level_transformed_psmelt,
-                              aes(x = Sample, y = Abundance, fill = Order)) + 
+                              aes(x = Sample, y = Abundance, fill = Order)) +
   geom_bar(aes(fill=Order), linetype = "blank", stat = "identity", position = "stack") +
-  scale_fill_manual(values = my_colours)+
+  scale_fill_manual(values = my_colours, na.value="white")+
   theme(legend.position = "bottom") +
   guides(fill=guide_legend(nrow = 5)) +
   guides(fill=guide_legend(title = "Order", title.position = "top", title.theme = element_text(face = "bold"))) +
@@ -465,9 +474,9 @@ family_level_transformed_psmelt$Family[family_level_transformed_psmelt$Abundance
 
 # Family level barplot
 Family_level_barplot <- ggplot(data = family_level_transformed_psmelt,
-                               aes(x = Sample, y = Abundance, fill = Family)) + 
+                               aes(x = Sample, y = Abundance, fill = Family)) +
   geom_bar(aes(fill = Family), linetype = "blank", stat = "identity", position = "stack") +
-  scale_fill_manual(values = my_colours)+
+  scale_fill_manual(values = my_colours, na.value="white")+
   theme(legend.position = "bottom") +
   guides(fill=guide_legend(title = "Family", title.position = "top", title.theme = element_text(face = "bold"))) +
   theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
@@ -513,11 +522,11 @@ family_level_transformed_forheatmap <- transform_sample_counts(family_level, fun
 
 family_level_transformed_forheatmap_morethan1 <- filter_taxa(family_level_transformed_forheatmap, function(x) sum(x) > 1, TRUE)
 
-Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan1, 
-                               taxa.label = "Family", 
+  Heatmap_family <- plot_heatmap(family_level_transformed_forheatmap_morethan1,
+                               taxa.label = "Family",
                                title = "Family level (> 1 %)",
-                               sample.order = "UNIQUENAMES",                       
-                               low = "#FEFE62", high = "#D35FB7", na.value = "white") + 
+                               sample.order = "Sample_Names",
+                               low = "#FEFE62", high = "#D35FB7", na.value = "white") +
   theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
   theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
   theme(legend.position = "right") +
@@ -539,7 +548,7 @@ dev.off()
 # save plot as image
 tiff("4_Family_heatmap.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Heatmap_family)
-dev.off()                                                             
+dev.off()
 
 # saving plot as html widget
 family_heatmap<-ggplotly(Heatmap_family)
@@ -564,10 +573,10 @@ genus_level_transformed_psmelt$Genus <- as.character(genus_level_transformed_psm
 genus_level_transformed_psmelt$Genus[genus_level_transformed_psmelt$Abundance < 1] <- "x-Minor genus(<1%)"
 
 # Genus level barplot
-Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt, 
-                              aes(x = Sample, y = Abundance, fill = Genus)) + 
+Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt,
+                              aes(x = Sample, y = Abundance, fill = Genus)) +
   geom_bar(aes(color = Genus, fill = Genus), linetype = "blank", stat = "identity", position = "stack") +
-  scale_fill_manual(values = my_colours)+
+  scale_fill_manual(values = my_colours, na.value="white")+
   theme(legend.position = "bottom") +
   guides(fill=guide_legend(title = "Genus", title.position = "top", title.theme = element_text(face = "bold"))) +
   theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
@@ -582,7 +591,7 @@ Genus_level_barplot <- ggplot(data = genus_level_transformed_psmelt,
   theme(axis.line.x.top = element_line(colour = "black")) +
   ylab("Relative Abundance (%)")+
   ggtitle("Genus level (> 1 %)")+
-  theme(plot.title = element_text(size = 10, face = "bold"))                                                     
+  theme(plot.title = element_text(size = 10, face = "bold"))
 
 #saving plot in pdf
 pdf("5_Genus_barplot.pdf", width = 28, height = 18, paper = "a4r")
@@ -592,14 +601,14 @@ dev.off()
 # save plot as image
 tiff("5_Genus_barplot.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Genus_level_barplot)
-dev.off()                                           
+dev.off()
 
 # saving Genus number in genus level barplot
 sink("Visualization_processing_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Genus number in genus level barplot(> 1 %): ", length(unique(genus_level_transformed_psmelt$Genus)))
 writeLines("\n------------------------- \t END \t-------------------------\n")
-sink()                                                               
+sink()
 
 #saving plot as html widget
 barplot_genus<-ggplotly(Genus_level_barplot)
@@ -612,11 +621,11 @@ genus_level_transformed_forheatmap <- transform_sample_counts(genus_level, funct
 
 genus_level_transformed_forheatmap_morethan1 <- filter_taxa(genus_level_transformed_forheatmap, function(x) sum(x) > 1, TRUE)
 
-Heatmap_Genus <- plot_heatmap(genus_level_transformed_forheatmap_morethan1, 
+Heatmap_Genus <- plot_heatmap(genus_level_transformed_forheatmap_morethan1,
                               taxa.label = "Genus",
-                              sample.order = "UNIQUENAMES",
+                              sample.order = "Sample_Names",
                               low = "#FEFE62", high = "#D35FB7", na.value = "white",
-                              title = "Genus level (> 1 %)") + 
+                              title = "Genus level (> 1 %)") +
   theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
   theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
   theme(legend.position = "right") +
@@ -664,10 +673,10 @@ Species_level_transformed_psmelt$Species <- as.character(Species_level_transform
 Species_level_transformed_psmelt$Species[Species_level_transformed_psmelt$Abundance < 5] <- "x-Minor Species(<5%)"
 
 # Species level barplot
-Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt, 
-                                aes(x = Sample, y = Abundance, fill = Species)) + 
+Species_level_barplot <- ggplot(data = Species_level_transformed_psmelt,
+                                aes(x = Sample, y = Abundance, fill = Species)) +
   geom_bar(aes(color = Species, fill = Species), linetype = "blank", stat = "identity", position = "stack") +
-  scale_fill_manual(values = my_colours)+
+  scale_fill_manual(values = my_colours, na.value="white")+
   theme(legend.position = "bottom") +
   guides(fill=guide_legend(title = "Species", title.position = "top", title.theme = element_text(face = "bold"))) +
   theme(axis.text.x = element_text(colour = "black", angle = 45, hjust = 1, vjust = 1, face = "bold")) +
@@ -692,14 +701,14 @@ dev.off()
 # save plot as image
 tiff("6_Species_barplot.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Species_level_barplot)
-dev.off()                                                            
+dev.off()
 
 # saving Species number in species level barplot
 sink("Visualization_processing_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Species number in species level barplot(> 5%): ", length(unique(Species_level_transformed_psmelt$Species)))
 writeLines("\n------------------------- \t END \t-------------------------\n")
-sink()                                                             
+sink()
 
 # saving plot as html widget
 barplot_Species<-ggplotly(Species_level_barplot)
@@ -712,11 +721,11 @@ Species_level_transformed_forheatmap <- transform_sample_counts(Species_level, f
 
 Species_level_transformed_forheatmap_morethan5 <- filter_taxa(Species_level_transformed_forheatmap, function(x) sum(x) > 5, TRUE)
 
-Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan5, 
+Heatmap_Species <-plot_heatmap(Species_level_transformed_forheatmap_morethan5,
                                taxa.label = "Species",
-                               sample.order = "UNIQUENAMES",
+                               sample.order = "Sample_Names",
                                low = "#FEFE62", high = "#D35FB7", na.value = "white",
-                               title = "Species level (> 5 %)") + 
+                               title = "Species level (> 5 %)") +
   theme(strip.text.x = element_text(size = 10, colour = "black", face = "bold")) +
   theme(strip.text.x = element_text(margin = margin(0.025, 0, 0.025, 0, "cm"))) +
   theme(legend.position = "right") +
@@ -738,13 +747,22 @@ dev.off()
 # save plot as image
 tiff("6_Species_heatmap.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Heatmap_Species)
-dev.off()                                                              
+dev.off()
 
 # saving plot as html widget
 Species_Heatmap<-ggplotly(Heatmap_Species)
 htmlwidgets::saveWidget(as_widget(Species_Heatmap), "6_Species_heatmap.html")
 ######################
 
+#	Plot all relative abundance in one file
+pdf(file = "Relative_abundance.pdf", width = 28, height = 18, paper = "a4r")
+plot(Phylum_level_barplot)
+plot(Class_level_barplot)
+plot(Order_level_barplot)
+plot(Family_level_barplot)
+plot(Genus_level_barplot)
+plot(Species_level_barplot)
+dev.off()
 
 ########
 
@@ -760,7 +778,7 @@ writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Ordination details: ")
 ps.ord
 writeLines("\n------------------------- \t END \t-------------------------\n")
-sink()                                                              
+sink()
 
 # Plotting ordination
 
@@ -789,7 +807,7 @@ dev.off()
 # save plot as image
 tiff("NMDS_Phylum_1.tif", width = 12, height = 6, units = "in", res = 250)
 plot(NMDS_Phylum_1)
-dev.off()                                                             
+dev.off()
 
 # saving plot as html widget
 NMDS_Phylum_1_ <-ggplotly(NMDS_Phylum_1)
@@ -822,20 +840,20 @@ dev.off()
 # save plot as image
 tiff("NMDS_Phylum_2.tif", width = 12, height = 6, units = "in", res = 250)
 plot(NMDS_Phylum_2)
-dev.off()                                                             
+dev.off()
 
 # saving plot as html widget
 NMDS_Phylum_2_ <-ggplotly(NMDS_Phylum_2)
 htmlwidgets::saveWidget(as_widget(NMDS_Phylum_2_), "NMDS_Phylum_2.html")
-######################                                                             
+######################
 
 
-########                                                              
+########
 
 # Alpha diversity analysis
 
-Alpha_diversity <-   plot_richness(ps, 
-                                   measures = c("Observed", "Shannon", "Simpson"), 
+Alpha_diversity <-   plot_richness(ps,
+                                   measures = c("Observed", "Shannon", "Simpson"),
                                    nrow=3)+
   theme(panel.background = element_rect(fill = NA),
         panel.grid.major = element_line(colour = "grey90", linetype = "dashed"),
@@ -843,9 +861,9 @@ Alpha_diversity <-   plot_richness(ps,
   labs(x="Sample", y="Alpha diversity measure")+
   theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
   theme(axis.title.x = element_text(face="bold", size=10))+
-  theme(axis.title.y = element_text(face="bold", size=10))+ 
+  theme(axis.title.y = element_text(face="bold", size=10))+
   theme(axis.text.x  = element_text(face="bold",size=8,angle=60,hjust=1,vjust=1,colour = "black"))+
-  theme(axis.text.y  = element_text(face="bold",size=8, colour = "black"))+ 
+  theme(axis.text.y  = element_text(face="bold",size=8, colour = "black"))+
   theme(legend.text=element_text(size=7))+
   theme(legend.title=element_text(size=10, face = "bold", colour = "black"))+
   theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
@@ -853,7 +871,7 @@ Alpha_diversity <-   plot_richness(ps,
   theme(strip.background = element_rect(colour = "black", fill = "white"),
         strip.background.x = element_rect(colour = NA, fill = "grey90"))+
   theme(axis.line.y.left = element_line(colour = "black"))+
-  theme(axis.line.x.bottom = element_line(colour = "black"))                                                                                                                           
+  theme(axis.line.x.bottom = element_line(colour = "black"))
 
 # saving plot in pdf
 pdf("Alpha_diversity.pdf", width = 28, height = 18, paper = "a4r")
@@ -863,24 +881,24 @@ dev.off()
 # save plot as image
 tiff("Alpha_diversity.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Alpha_diversity)
-dev.off()                                                              
+dev.off()
 
 # saving plot as html widget
 Alpha_diversity_ <-ggplotly(Alpha_diversity)
 htmlwidgets::saveWidget(as_widget(Alpha_diversity_), "Alpha_diversity.html")
-######################                                                             
+######################
 
 # Phylogenetic tree visualization
 
 tree1 <- plot_tree(ps, color = "Phylum",
                   method = "sampledodge",
-                  base.spacing = 0.03,
+                  base.spacing = 0,
                   min.abundance = 100,
                   title = "Min. abundance = 100",
                   label.tips = "taxa_names",
-                  #justify = "left",
+                  justify = "jagged",
                   nodelabf=nodeplotblank,
-                  ladderize = "left",
+                  ladderize = "right",
                   text.size = 1,
                   plot.margin = 0)+
   scale_color_manual(values = my_colours)+
@@ -890,7 +908,7 @@ tree1 <- plot_tree(ps, color = "Phylum",
   theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm")) +
   facet_wrap(~Phylum)+
   theme(plot.title = element_text(size = 8))
-  
+
   #+coord_polar(theta = "y")
 
 # saving plot in pdf
@@ -903,17 +921,21 @@ tiff("FTHFH_OTU.tree1.tif", width = 10, height = 10, units = "in", res = 300)
 plot(tree1)
 dev.off()
 
+# saving plot as html widget
+tree1_ <-ggplotly(tree1)
+htmlwidgets::saveWidget(as_widget(tree1_), "FTHFH_OTU.tree1.html")
+
 #####
 
-tree2 <- plot_tree(ps, 
-                   color = "Phylum",
+tree2 <- plot_tree(ps,
+                   color = "Family",
                    method = "sampledodge",
-                   base.spacing = 0.03,
+                   base.spacing = 0,
                    min.abundance = 100,
                    label.tips = "taxa_names",
-                   #justify = "left",
+                   justify = "jagged",
                    nodelabf=nodeplotblank,
-                   ladderize = "left",
+                   ladderize = "right",
                    text.size = 1,
                    title = "Min. abundance = 100",
                    plot.margin = 0)+
@@ -921,9 +943,9 @@ tree2 <- plot_tree(ps,
   theme(legend.position = "bottom") +
   guides(col = guide_legend(ncol = 4))+
   theme(legend.text=element_text(size=7, face = "bold"))+
-  theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.4, "cm"))+
-  theme(plot.title = element_text(size = 8))
-
+  theme(legend.key.height = unit(0.2, "cm"), legend.key.width = unit(0.3, "cm"))+
+  theme(plot.title = element_text(size = 4))
+tree2
 #+coord_polar(theta = "y")
 
 # saving plot in pdf
@@ -936,6 +958,156 @@ tiff("FTHFH_OTU.tree2.tif", width = 10, height = 10, units = "in", res = 300)
 plot(tree2)
 dev.off()
 
+# saving plot as html widget
+tree2_ <-ggplotly(tree2)
+htmlwidgets::saveWidget(as_widget(tree2_), "FTHFH_OTU.tree2.html")
 ######################
 
+# Computing weighted unifrac
+set.seed(10)
+ps_unifrac <- UniFrac(ps, weighted = T)
+# computing PCOA from weighted unifrac
+set.seed(100)
+ps_unifrac.pcoa=cmdscale(ps_unifrac, eig=TRUE)
+#
+Axis_1_value <- paste("PCoA 1 - ", round(ps_unifrac.pcoa$eig[1]/sum(ps_unifrac.pcoa$eig)*100), "%")
+Axis_1_value
+Axis_2_value <- paste("PCoA 2 - ", round(ps_unifrac.pcoa$eig[2]/sum(ps_unifrac.pcoa$eig)*100), "%")
+Axis_2_value
+# MAKING DF FROM THE pcoa POINTS
+PCoA <- data.frame(PCoA1 = ps_unifrac.pcoa$points[,1], PCoA2 = ps_unifrac.pcoa$points[,2],
+                   check.rows = T,
+                   check.names = T)
+#PCoA
+#plot(PCoA)
+#
+sample_df_all <- data.frame(sample_data(ps))
+# merging PCOA and sample data
+sample_df_PCOA <- merge(sample_df_all, PCoA, by = 0,
+                        sort = TRUE)
+#sample_df_PCOA
+#envEF
+#ps_unifrac.pcoa_envEF
+##
+ps_unifrac.pcoa_envEF=envfit(ps_unifrac.pcoa, sample_df_all)
+#
+#ps_unifrac.pcoa_envEF
+##########
+# calculating the scores
+ps_unifrac.pcoa_envEF_scores <- as.data.frame(scores(ps_unifrac.pcoa_envEF, display = "factors"))
+# giving name of arrow
+ps_unifrac.pcoa_envEF_scores <- cbind(ps_unifrac.pcoa_envEF_scores, Species = rownames(sample_df_all))
+#ps_unifrac.pcoa_envEF_scores
+
+# saving ordination detail
+sink("Visualization_processing_info.txt", append = T)
+writeLines("\n------------------------- \t START \t-------------------------\n")
+paste("Weighted unifrac principal coordinate analysis details: ")
+ps_unifrac.pcoa_envEF_scores
+writeLines("\n------------------------- \t END \t-------------------------\n")
+sink()
+#  plotting
+my_plot <- ggplot()+
+
+  # making intercept at zero position
+  geom_hline(yintercept = 0, linetype="dashed",color="grey20")+
+  geom_vline(xintercept = 0, linetype="dashed",color="grey20")+
+  # lines on axis
+  theme(axis.line.y.left = element_line(colour = "black"))+
+  theme(axis.line.x.bottom = element_line(colour = "black"))+
+  # axis text
+  theme(axis.text.x = element_text(colour = "black", face = "bold", size = 10))+
+  theme(axis.text.y = element_text(colour = "black", face = "bold", size = 10))+
+  # axis label style
+  theme(axis.title.x = element_text(colour = "black",face = "bold",size = 10))+
+  theme(axis.title.y = element_text(colour = "black",face = "bold",size = 10))+
+  # making points
+  geom_point(mapping=aes(x=sample_df_PCOA$PCoA1, y=sample_df_PCOA$PCoA2,
+                         color=factor(sample_df_PCOA$Row.names)), size=2)+
+  # colour
+  scale_colour_manual(values = my_colours)+
+  #point lables
+  geom_text(data= sample_df_PCOA,
+            x=sample_df_PCOA$PCoA1, y=sample_df_PCOA$PCoA2,
+            mapping= aes(label = sample_df_PCOA$Row.names),
+            size=1.5, vjust=-1)+
+  # Legend on right
+  theme(legend.position = "bottom")+
+  guides(fill=guide_legend(ncol = 5))+
+  # removing legend title
+  theme(legend.title=element_blank())+
+  theme(legend.key.height = unit(0.3,"cm"), legend.key.width = unit(0.4,"cm"))+
+  theme(legend.text = element_text(size = 5))+
+  # x and y axis label
+  xlab(Axis_1_value)+
+  ylab(Axis_2_value)+
+  #
+  ggtitle("Weighted Unifrac Principal Coordinate Analysis")
+
+# saving plot in pdf
+pdf("weighted_unifrac_PCoA.pdf", width = 10, height = 10, paper = "a4r")
+  plot(my_plot)
+dev.off()
+
+# saving plot as image
+tiff("weighted_unifrac_PCoA.tif", width = 8, height = 6, units = "in", res = 250)
+plot(my_plot)
+dev.off()
+
+# saving plot as html widget
+my_plot_ <-ggplotly(my_plot)
+htmlwidgets::saveWidget(as_widget(my_plot_), "weighted_unifrac_PCoA.html")
+
+
+#  plotting without legends
+my_plot2 <- ggplot()+
+  
+  # making intercept at zero position
+  geom_hline(yintercept = 0, linetype="dashed",color="grey20")+
+  geom_vline(xintercept = 0, linetype="dashed",color="grey20")+
+  # lines on axis
+  theme(axis.line.y.left = element_line(colour = "black"))+
+  theme(axis.line.x.bottom = element_line(colour = "black"))+
+  # axis text
+  theme(axis.text.x = element_text(colour = "black", face = "bold", size = 10))+
+  theme(axis.text.y = element_text(colour = "black", face = "bold", size = 10))+
+  # axis label style
+  theme(axis.title.x = element_text(colour = "black",face = "bold",size = 10))+
+  theme(axis.title.y = element_text(colour = "black",face = "bold",size = 10))+
+  # making points
+  geom_point(mapping=aes(x=sample_df_PCOA$PCoA1, y=sample_df_PCOA$PCoA2,
+                         color=factor(sample_df_PCOA$Row.names)), size=2)+
+  # colour
+  scale_colour_manual(values = my_colours)+
+  #point lables
+  geom_text(data= sample_df_PCOA,
+            x=sample_df_PCOA$PCoA1, y=sample_df_PCOA$PCoA2,
+            mapping= aes(label = sample_df_PCOA$Row.names),
+            size=1.5, vjust=-1)+
+  # Legend None
+  theme(legend.position = "none")+
+  #guides(fill=guide_legend(ncol = 2))+
+  # removing legend title
+  # theme(legend.title=element_blank())+
+  # theme(legend.key.height = unit(0.3,"cm"), legend.key.width = unit(0.4,"cm"))+
+  # theme(legend.text = element_text(size = 8))+
+  # x and y axis label
+  xlab(Axis_1_value)+
+  ylab(Axis_2_value)+
+  #
+  ggtitle("Weighted Unifrac Principal Coordinate Analysis")
+
+# saving plot in pdf
+pdf("weighted_unifrac_PCoA_2.pdf", width = 10, height = 10, paper = "a4r")
+plot(my_plot2)
+dev.off()
+
+# saving plot as image
+tiff("weighted_unifrac_PCoA_2.tif", width = 8, height = 6, units = "in", res = 250)
+plot(my_plot2)
+dev.off()
+
+# saving plot as html widget
+my_plot_2 <-ggplotly(my_plot2)
+htmlwidgets::saveWidget(as_widget(my_plot_2), "weighted_unifrac_PCoA_2.html")
 ### End of script
