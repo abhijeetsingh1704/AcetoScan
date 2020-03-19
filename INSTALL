@@ -1,152 +1,158 @@
 #!/bin/bash
 
-# file: INSTALL
-# Last modified: Wed, Mar 11, 2020 19:00
-# Sign: Abhi
+#   File: INSTALL
+#   Last modified: Tor, Mar 19, 2020 10:00
+#   Sign: Abhi
 
 ### Setting colour variables
 
-RESTORE='\033[0m'
-YELLOW='\033[01;33m'
-LRED='\033[01;31m' 
+    RESTORE='\033[0m'
+    YELLOW='\033[01;33m'
+    LRED='\033[01;31m'
 
-# setting pipefail
+### Setting pipefail
 
-set -euo pipefail
+    set -euo pipefail
 
-##      Installation
+### Installation
 
-###     Username
+### Username
 
-user=`echo ${SUDO_USER:-${USER}}`
+    user="${SUDO_USER:-${USER}}"
 
-##      Checking and installing Dependencies
+### Checking and installing Dependencies
 
-echo -e "\n#\t${YELLOW}Checking and installing dependencies for debian/ubuntu based systems${RESTORE}"
+    echo -e "\n#\t${YELLOW}Checking and installing dependencies for debian/ubuntu based systems${RESTORE}"
 
-###     Checking if cutadapt is installed
+### Checking if cutadapt is installed
 
+    if ! command -v "cutadapt" > /dev/null ; then
+            echo -e "\n#\t${YELLOW}Installing Cutadapt${RESTORE}"
+            sudo apt install -y -qq python3-pip
+            pip3 install --user --upgrade cutadapt
+    fi
 
-if ! command -v "cutadapt" > /dev/null ; then
-        echo -e "\n#\t${YELLOW}Installing Cutadapt${RESTORE}" 
-        sudo apt install -y -qq python3-pip
-        pip3 install --user --upgrade cutadapt
-fi
+### Upgrade cutadapt
 
-###     upgrade cutadapt
+    pip3 install --user --upgrade cutadapt
 
-pip3 install --user --upgrade cutadapt
+### Checking if vsearch is installed
 
-###     Checking if vsearch is installed
+    if ! command -v "vsearch" > /dev/null ; then
+            echo -e "\n#\t${YELLOW}Installing VSEARCH${RESTORE}"
+            wget -c --no-check-certificate "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
+            tar xzf vsearch-2.13.1-linux-x86_64.tar.gz
+            cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch
+    fi
 
-if ! command -v "vsearch" > /dev/null ; then
-        echo -e "\n#\t${YELLOW}Installing VSEARCH${RESTORE}"
-        wget -c --no-check-certificate "https://github.com/torognes/vsearch/releases/download/v2.13.1/vsearch-2.13.1-linux-x86_64.tar.gz"
-        tar xzf vsearch-2.13.1-linux-x86_64.tar.gz
-        cp vsearch-2.13.1-linux-x86_64/bin/vsearch /usr/local/bin/vsearch
-fi
+### Checking if Blast is installed
 
-###     Checking if Blast is installed
+    if ! command -v "blastx" > /dev/null ; then
+            echo -e "\n#\t${YELLOW}Installing NCBI-blast+${RESTORE}"
+            sudo apt install -y -qq ncbi-blast+
+    fi
 
-if ! command -v "blastx" > /dev/null ; then
-        echo -e "\n#\t${YELLOW}Installing NCBI-blast+${RESTORE}"
-        sudo apt install -y -qq ncbi-blast+ 
-fi
+### Checking if MAFFT is installed
 
-###     Checking if MAFFT is installed
+    if ! command -v "mafft" > /dev/null ; then
+            echo -e "\n#\t${YELLOW}Installing Mafft${RESTORE}"
+            sudo apt install -y -qq mafft
+    fi
 
-if ! command -v "mafft" > /dev/null ; then
-        echo -e "\n#\t${YELLOW}Installing Mafft${RESTORE}"
-        sudo apt install -y -qq mafft 
-fi
+### Checking if FastTree is installed
 
-###     Checking if FastTree is installed
+    if ! command -v "fasttree" > /dev/null ; then
+            echo -e "\n#\t${YELLOW}Installing Fasttree${RESTORE}"
+            sudo apt install -y -qq fasttree
+    fi
 
-if ! command -v "fasttree" > /dev/null ; then
-        echo -e "\n#\t${YELLOW}Installing Fasttree${RESTORE}"
-        sudo apt install -y -qq fasttree 
-fi
+### Checking if bioperl is installed
 
-###     Checking if bioperl is installed
+    if ! command -v perl -MBio::SeqIO -e 'printf "%vd\n", $Bio::SeqIO::VERSION, "\n"' > /dev/null ; then
+            echo -e "\n#\t${YELLOW}Checking BioPerl${RESTORE}"
+            sudo apt install -y -qq bioperl
+    fi
 
-if ! command -v perl -MBio::SeqIO -e 'printf "%vd\n", $Bio::SeqIO::VERSION, "\n"' > /dev/null ; then
-        echo -e "\n#\t${YELLOW}Checking BioPerl${RESTORE}"
-        sudo apt install -y -qq bioperl 
-fi
+### Checking if R and Rscript are installed
 
+    if ! command -v "R" > /dev/null ; then
+            echo -e "\n#\t${YELLOW}Installing R${RESTORE}"
+            sudo apt install -y -qq libnode-dev
+            sudo apt install -y -qq r-base
+            sudo apt install -y -qq r-base-dev
+            echo -e "\n#\t${YELLOW}Checking/Fixing R dependencies${RESTORE}"
+            sudo apt install -y -qq r-bioc-phyloseq
+            sudo apt install -y -qq r-cran-dplyr
+            sudo apt install -y -qq r-cran-ggplot2
+            sudo apt install -y -qq r-cran-plotly
+            sudo apt install -y -qq r-cran-plyr
+            sudo apt install -y -qq r-cran-vegan
+            sudo apt install -y -qq r-cran-rcolorbrewer
+    fi
 
-###     Checking if R and Rscript are installed
+### Fixing the directory for AcetoScan program
 
-if ! command -v "R" > /dev/null ; then
-        echo -e "\n#\t${YELLOW}Installing R${RESTORE}"
-        sudo apt install -y -qq libnode-dev 
-        sudo apt install -y -qq r-base 
-        sudo apt install -y -qq r-base-dev 
-        echo -e "\n#\t${YELLOW}Checking/Fixing R dependencies${RESTORE}"
-        sudo apt install -y -qq r-bioc-phyloseq 
-        sudo apt install -y -qq r-cran-dplyr 
-        sudo apt install -y -qq r-cran-ggplot2 
-        sudo apt install -y -qq r-cran-plotly 
-        sudo apt install -y -qq r-cran-plyr 
-        sudo apt install -y -qq r-cran-rcolorbrewer
-        
-fi
+    mkdir -m 777 -p /home/${user}/acetoscan/acetoscan_bin
+    mkdir -m 777 -p /home/${user}/acetoscan/acetobase
+    mkdir -m 777 -p /home/${user}/acetoscan/output_data
 
-###     Copying Acetoscan executable to /usr/local/bin
+### Copying Acetoscan executable to /usr/local/bin
 
-if [ `whoami` = 'root' ]; then
-        echo -e "\n#\t${YELLOW}Installing acetoscan for ${user} ${RESTORE}"
-        find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        find . -type f -name "acetocheck" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        find . -type f -name "acetotax" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        find . -type f -name "acetotree" -exec cp {} /usr/local/bin/ \; 2>/dev/null
-        chmod 777 -R /usr/local/bin/acetoscan
-        chmod 777 -R /usr/local/bin/acetocheck
-        chmod 777 -R /usr/local/bin/acetotax
-        chmod 777 -R /usr/local/bin/acetotree
-else
+    if [ `whoami` = 'root' ]; then
 
-        ###     Copying Acetoscan executable to /home/${user}/acetoscan/ for non-super user
-        echo -e "\n#\t${YELLOW}Installing acetoscan for ${user} ${RESTORE}"
-        mkdir -m 777 -p /home/${user}/acetoscan
-        find . -type f -name "acetoscan" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
-        find . -type f -name "acetocheck" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
-        find . -type f -name "acetotax" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
-        find . -type f -name "acetotree" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
-        chmod 777 -R /home/${user}/acetoscan/*
-        
-
-fi
-
-###     fixing the directory for AcetoScan program
-
-mkdir -m 777 -p /home/${user}/acetoscan/acetoscan_bin
-mkdir -m 777 -p /home/${user}/acetoscan/acetobase
-mkdir -m 777 -p /home/${user}/acetoscan/output_data
-
-###     copying acetoscan dependencies to acetoscan_bin
-
-cp ./acetoscan_bin/* /home/${user}/acetoscan/acetoscan_bin/
-chmod 777 -R /home/${user}/acetoscan
-chmod 777 -R /home/${user}/acetoscan/acetoscan_bin
-chmod 777 -R /home/${user}/acetoscan/acetobase
-
-###     Downloading AcetoBase
-
-echo -e "\n#\t${YELLOW}Downloading and formatting AcetoBase ${RESTORE}"
-wget --no-check-certificate -O /home/${user}/acetoscan/acetobase/AcetoBase_ref.tar.gz https://acetobase.molbio.slu.se/download/ref/1
-tar xf /home/${user}/acetoscan/acetobase/AcetoBase_ref.tar.gz -C /home/${user}/acetoscan/acetobase/ 
-find /home/${user}/acetoscan/ -type f -iname "AcetoBase.fasta" -exec cp {} /home/${user}/acetoscan/acetobase/AcetoBase.fasta \;
-
-###     formatting blast database
-
-cd /home/${user}/acetoscan/acetobase/ && makeblastdb -in AcetoBase.fasta -dbtype prot -title AcetoBase -out AcetoBase
-find /home/${user}/acetoscan/acetobase/ -type f -iname "AcetoBase.*" -exec chmod 777 {} \;
-
-rm -r /home/${user}/acetoscan/acetobase/AcetoBase_ref.tar.gz
-rm -r /home/${user}/acetoscan/acetobase/tmp
+        #   Copying acetoscan executable to //usr/local/bin/ for super user
+            echo -e "\n#\t${YELLOW}Installing acetoscan for ${user} ${RESTORE}"
+            find . -type f -name "acetoscan" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+            find . -type f -name "acetocheck" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+            find . -type f -name "acetotax" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+            find . -type f -name "acetotree" -exec cp {} /usr/local/bin/ \; 2>/dev/null
+            chmod 777 -R /usr/local/bin/acetoscan
+            chmod 777 -R /usr/local/bin/acetocheck
+            chmod 777 -R /usr/local/bin/acetotax
+            chmod 777 -R /usr/local/bin/acetotree
+    else
+        #   Copying acetoscan executable to /home/${user}/acetoscan/ for non-super user
+            echo -e "\n#\t${YELLOW}Installing acetoscan for ${user} ${RESTORE}"
+            mkdir -m 777 -p /home/${user}/acetoscan
+            find . -type f -name "acetoscan" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
+            find . -type f -name "acetocheck" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
+            find . -type f -name "acetotax" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
+            find . -type f -name "acetotree" -exec cp {} /home/${user}/acetoscan/ \; 2>/dev/null
+            chmod 777 -R /home/${user}/acetoscan/*
+    fi
 
 
-echo -e "\n#\t${YELLOW}Installation DONE for ${user} ${RESTORE}"
 
-###     End of script
+### Copying acetoscan dependencies to acetoscan_bin and allow access to all
+
+    cp ./acetoscan_bin/* /home/${user}/acetoscan/acetoscan_bin/
+    chmod 777 -R /home/${user}/acetoscan
+    chmod 777 -R /home/${user}/acetoscan/acetoscan_bin
+    chmod 777 -R /home/${user}/acetoscan/acetobase
+
+### Downloading and formatting AcetoBase
+
+    #   Downloading
+
+        wget --no-check-certificate -O /home/$user/acetoscan/acetobase/AcetoBase_ref.tar.gz https://acetobase.molbio.slu.se/download/ref/1
+
+    #   Extracting
+
+        tar xzf /home/$user/acetoscan/acetobase/AcetoBase_ref.tar.gz -C /home/$user/acetoscan/acetobase/
+
+    #   Formatting blast database
+
+        find /home/$user/ -type f -iname "AcetoBase.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBase.fasta
+        cd /home/$user/acetoscan/acetobase/ && makeblastdb -in AcetoBase.fasta -dbtype prot -title AcetoBase -out AcetoBase
+
+    #   finding and removing temporary directory from download
+
+        find /home/$user/acetoscan/acetobase/ -type d -name "tmp" -exec rm -r {} \;
+
+### Installation complete
+
+    echo -e "\n#\t${YELLOW}Installation DONE for ${user} ${RESTORE}"
+
+### End of script
+
+    exit 0
