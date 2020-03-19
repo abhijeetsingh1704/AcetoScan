@@ -1,201 +1,210 @@
 #!/bin/bash
 
-# File: acetotree
-# Last modified: Tor, Mar 12, 2020 10:00
-# Sign: Abhi
+#   File: acetotree
+#   Last modified: Tor, Mar 19, 2020 10:00
+#   Sign: Abhi
 
 ### Setting colour variables
-RESTORE='\033[0m'
-YELLOW='\033[01;33m'
-LRED='\033[01;31m' 
 
-###	set pipefail
+    RESTORE='\033[0m'
+    YELLOW='\033[01;33m'
+    LRED='\033[01;31m'
 
-set -euo pipefail
+### Set pipefail
 
-###	getting currect working directory to variable
+    set -euo pipefail
 
-CDIR=$(pwd)
+### Acetotree script
 
-###	acetotree script
-
-echo -e "${LRED}\
+    echo -e "${LRED}\
  ________________________________________________________
 |     _    ____ _____ _____ ___ _____ ____  _____ _____  |
 |    / \  / ___| ____|_   _/ _ \_   _|  _ \| ____| ____| |
 |   / _ \| |   |  _|   | || | | || | | |_) |  _| |  _|   |
 |  / ___ \ |___| |___  | || |_| || | |  _ <| |___| |___  |
 | /_/   \_\____|_____| |_| \___/ |_| |_| \_\_____|_____| |
-|________________________________________________________|                                                      
+|________________________________________________________|
 ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 #\t${YELLOW}-abhijeetsingh.aau@gmail.com${RESTORE}
 #\t${YELLOW}-acetoscan version - 1.0${RESTORE}
 "
-###    Recording the time whent he script was started
 
-start=$(date +%s) #start time of script
+### Recording the time whent he script was started
 
-### Variable for the backup
+    start=$(date +%s) #start time of script
 
-DATE=$(date +"%F_%r" | sed 's/:/_/g;s/ //g;s/-//g')
+### Variable for the date
 
-###     Username
+    DATE=$(date +"%Y%m%d_%H_%M_%S")
 
-user=`echo ${SUDO_USER:-${USER}}`
+### Username
 
-###     Setting up variables
+    user="${SUDO_USER:-${USER}}"
 
-input_file=""            
-output_file=""
-evalue=""
-bootstr=""
+### Setting up variables
 
-###     Defaults variables
+    input_file=""
+    output_file=""
+    evalue=""
+    threads=""
+    bootstr=""
 
-output_file_def="acetotree_${DATE}"
-version_def="1.0"
-evalue_def="1e-3"
-bootstr_def="1000"
+### Defaults variables
 
-###    Getting processors information
+    output_file_def="acetotree_${DATE}"
+    version_def="1.0"
+    evalue_def="1e-3"
+    bootstr_def="1000"
 
-THREADS=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || getconf _NPROCESSORS_ONLN 2> /dev/null)
+    #   Getting processors information
 
-###     Defining flags
+        threads_def=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || getconf _NPROCESSORS_ONLN 2> /dev/null)
 
-#       function
+### Defining flags
 
-usage() {
-echo "Usage   : $0 [-i </input path/input file>] [-o <output path/output file>] [-e <E-value>] [-B <bootstrap value >]
-Example : acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000" 1>&2; exit 1;
-}
+    #   Function
 
-#       flags
+        usage() {
+            echo -e "\tUsage\t: $0 -i </input path/input file> [-o <output path/output file>] [-e <E-value>] [-B <bootstrap value >] [-P 8]\n\n"
+            echo -e "\tExample\t: $0 -i /path/<input file>/ [-o /path/<output file>/] [-e 1e-3] [-B 1000] [-P 8]\n\n###" 1>&2;
+            return 1;
+        }
 
-while getopts "i:o:e:B:hvCX" flags; 
-        do      
+    #   Flags
+
+        while getopts "i:o:e:B:hvCX" flags; do
                 case "${flags}" in
-                        
-                        i)
-                                input_file=${OPTARG}
-                                ;;
 
-                        o)
-                                output_file=${OPTARG}
-                                ;;
-                                
-                        e)
-                                evalue=${OPTARG}
-                                ;;
-                                
-                        B)
-                                bootstr=${OPTARG}
-                                ;;        
+                    i)
+                        input_file=${OPTARG}
+                        ;;
+                    o)
+                        output_file=${OPTARG}
+                        ;;
+                    e)
+                        evalue=${OPTARG}
+                        ;;
+                    B)
+                        bootstr=${OPTARG}
+                        ;;
+                    P)
+                        threads=${OPTARG}
+                        ;;
+                    h)
+                        echo -e "#\tExample\t: $0 -i /path/<input file> -o /path/<output file> -e 1e-3 -P 8\n\n"
+                        echo -e "\t-i\tInput_file - multifasta file with squences"
+                        echo -e "\t-o\tOutput file\n\t\t\t:default =  acetotree_<DATE>_<TIME>.fasta\n\t\t\t:default = acetotree_<DATE>_<TIME>.csv\n\t\t\t:default = acetotree_<DATE>_<TIME>.aln\n\t\t\t:default = acetotree_<DATE>_<TIME>.tree"
+                        echo -e "\t-e\tE-value\n\t\t\t:default evalue = 1e-3"
+                        echo -e "\t-P\tParallel processes/threads\n\t\t\t:default no. of parallels = all available threads"
+                        echo -e "\t-h\tPrint help"
+                        echo -e "\t-X\tPrint AcetoScan commands"
+                        echo -e "\t-v\tPrint AcetoScan version"
+                        echo -e "\t-C\tPrint AcetoScan citation\n\n###"
+                        exit
+                        ;;
+                    v)
+                        echo -e "#\tAcetoScan version: ${YELLOW}${version_def}${RESTORE}"
+                        echo -e "#\tVisit \"${YELLOW}https://acetobase.molbio.slu.se/${RESTORE}\" for more information.\n\n###"
+                        exit
+                        ;;
+                    C)
+                        echo -e "#\tCitations: If you use ${YELLOW}AcetoScan pipeline${RESTORE}, please cite as:\n"
+                        echo -e "#\tAcetoScan:"
+                        echo -e "\tAbhijeet Singh, Johan A. A. Nylander, Anna Schnürer, Bettina Müller"
+                        echo -e "\tHigh throughput sequencing and automated analysis of formyltetrahydrofolate"
+                        echo -e "\tsynthetase (FTHFS) gene amplicons to estimate acetogenic population dynamics,"
+                        echo -e "\t<Journal Name>, Volume <2020>, <2020>, <webadress>\n"
 
-                        h)
-                                echo "
-Example : acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000
-
-        -i      Input_file
-        -o      Output file
-                        :default = acetotree_<DATE>_<TIME>.tree
-                        :default = acetotree_<DATE>_<TIME>.aln
-                        :default = acetotree_<DATE>_<TIME>.csv
-                        :default = acetotree_<DATE>_<TIME>.fasta
-        -e      E-value
-                        :default evalue = 1e-3
-        -B      Bootstrap value
-                        :default bootstrap = 1000
-        -h      Print help        
-        -X      Print AcetoScan commands
-        -v      Print AcetoScan version
-        -C      Print AcetoScan citation"
-                                exit                                
-                                ;;
-
-                        v)
-                                echo -e "#\tAcetoScan version: ${YELLOW}${version_def}${RESTORE}"
-                                echo -e "#\tVisit \"${YELLOW}https://acetobase.molbio.slu.se/${RESTORE}\" for more information."
-                                exit
-                                ;;
-                        
-                        C)
-                                echo -e "#\tCitations: If you use ${YELLOW}AcetoScan pipeline${RESTORE}, please cite as:\n"
-                                echo -e "#\tAcetoScan:"
-                                echo -e "#\tAbhijeet Singh, Johan A. A. Nylander, Anna Schnürer, Bettina Müller" 
-                                echo -e "#\tHigh throughput sequencing and automated analysis of formyltetrahydrofolate" 
-                                echo -e "#\tsynthetase (FTHFS) gene amplicons to estimate acetogenic population dynamics,"
-                                echo -e "#\t<Journal Name>, Volume <2019>, <2019>, <webadress>\n"
-                                
-                                echo -e "#\tAcetoBase:"
-                                echo -e "#\tAbhijeet Singh, Bettina Müller, Hans-Henrik Fuxelius, Anna Schnürer" 
-                                echo -e "#\tAcetoBase: a functional gene repository and database for"
-                                echo -e "#\tformyltetrahydrofolate synthetase sequences,"
-                                echo -e "#\tDatabase, Volume 2019, 2019, baz142, https://doi.org/10.1093/database/baz142"
-                                exit
-                                ;;
-                                
-                        X)
-                                echo -e "#\tAcetoScan commands:\n"
-                                echo -e "\t\tacetoscan\t- for complete processing of raw illumina MiSeq output data"
-                                echo -e "\t\tacetocheck\t- for processing fasta sequences and filtering out non-target sequences"
-                                echo -e "\t\tacetotax\t- acetocheck + taxonomic assignments"
-                                echo -e "\t\tacetotree\t- acetotax + phylogenetic tree generation"
-                                exit
-                                ;;        
-
-                        *)
-                                usage
-                                exit
-                                ;;
-
-                        :)      
-                                usage
-                                exit
-                                ;;
-                        
-                        \?)
-                                usage
-                                exit
-                                ;;
-
+                        echo -e "#\tAcetoBase:"
+                        echo -e "\tAbhijeet Singh, Bettina Müller, Hans-Henrik Fuxelius, Anna Schnürer"
+                        echo -e "\tAcetoBase: a functional gene repository and database for"
+                        echo -e "\tformyltetrahydrofolate synthetase sequences,"
+                        echo -e "\tDatabase, Volume 2019, 2019, baz142, https://doi.org/10.1093/database/baz142\n\n###"
+                        exit
+                        ;;
+                    X)
+                        echo -e "#\tAcetoScan commands:\n"
+                        echo -e "\tacetoscan\t- for complete processing of raw illumina MiSeq output data"
+                        echo -e "\tacetocheck\t- for processing fasta sequences and filtering out non-target sequences"
+                        echo -e "\tacetotax\t- acetocheck + taxonomic assignments"
+                        echo -e "\tacetotree\t- acetotax + phylogenetic tree generation\n\n###"
+                        exit
+                        ;;
+                    *)
+                        usage
+                        exit
+                        ;;
+                    :)
+                        usage
+                        exit
+                        ;;
+                    \?)
+                        usage
+                        exit
+                        ;;
                 esac
-        done
+            done
 
-shift $((OPTIND-1))
+    shift $((OPTIND-1))
 
-if ((OPTIND == 1));then
-echo -e "\n#\t${LRED}Input file not provided, Aborting!!!\n###\n${RESTORE}"
+### Check for input options
+
+    if ((OPTIND == 1));then
+    echo -e "\n#\t${LRED}Input file not provided, Aborting!!!\n###\n${RESTORE}"
         echo ""
         usage
-        exit
-fi
+        exit 1
+    fi
 
-###		Getting input path
+###    Getting input
 
-I_file=$(readlink -f ${input_file})
-input_path=`echo ${I_file%/*}`
+    #   Check if input file provided
 
-###		Generating logfile
+        if [ -z "${input_file}" ] ; then
+            echo -e "\n#\t${LRED}Input file not provided, Aborting!!!\n###\n${RESTORE} ${YELLOW}"
+            usage
+            echo -e "\n###${RESTORE}"
+            exit 1
+        fi
 
-exec > >(tee -a ${input_path}/acetotree_${DATE} )
-exec 2> >(tee -a ${input_path}/acetotree_${DATE} >&2)
+    #   Check if input file is accessible
 
-if test ! -f "$input_file"; then
-        echo -e "\n#\t${LRED}Input file not provided, Aborting!!!\n###\n${RESTORE} ${YELLOW}"
-        usage 
-        echo "\n###${RESTORE}"
-        exit
-           
-else
-        echo -e "\n#\tContents of input file ${YELLOW}`echo ${input_file} | rev | cut -d/ -f1 | rev`${RESTORE}"        
-        echo -e "#\t${YELLOW}`grep -v ">" ${input_file} | wc | awk '{print $3-$1}'`${RESTORE} bases in ${YELLOW}`grep -c ">" ${input_file}`${RESTORE} sequences for `echo ${input_file} | rev | cut -d/ -f1 | rev`"
-        
-fi
+        if [ ! -f "${input_file}" ] ; then
+            echo -e "\n#\t${LRED}Input file ${input_file} could not be found, Aborting!!!\n###\n${RESTORE} ${YELLOW}"
+            usage
+            echo -e "\n###${RESTORE}"
+            exit 1
+        else
+            #   Making variable paths
 
-###     Checking output_file 
+                input_path=$(dirname "$(realpath "${input_file}")")
+                filename=$(basename "${input_file}")
 
-if [ "$output_file" == "" ]; then
+            #   Checking file contents
+
+                echo -e "\n#\tContents of input file ${YELLOW}$(basename "${input_file}")${RESTORE}"
+
+            #   Counting number of bases
+
+                npos=$(grep -v '>' "${input_file}" | wc | awk '{print $3-$1}')
+
+            #   Counting number of sequences
+
+                nseq=$(grep -c '>' "${input_file}")
+
+            #   Displaying file contents
+
+                echo -e "#\t${YELLOW}${npos}${RESTORE} bases in ${YELLOW}${nseq}${RESTORE} sequences for ${filename}"
+        fi
+
+### Generating log file
+
+    exec > >(tee -a "${input_path}/acetotree_${DATE}" )
+    exec 2> >(tee -a "${input_path}/acetotree_${DATE}" >&2)
+
+### Checking output file provided or using default
+
+    if [ "$output_file" == "" ]; then
         output_file="${output_file_def}"
         echo -e "\n#\tUsing default output file:"
         echo -e "\t\t${YELLOW}${output_file_def}.fasta${RESTORE}"
@@ -203,251 +212,325 @@ if [ "$output_file" == "" ]; then
         echo -e "\t\t${YELLOW}${output_file_def}.aln${RESTORE}"
         echo -e "\t\t${YELLOW}${output_file_def}.tree${RESTORE}"
         echo -e "\t\t${YELLOW}${output_file_def}.log${RESTORE}"
-else
+    else
         echo -e "\n#\tOutput files:"
         echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
         echo -e "\t\t${YELLOW}${output_file}.csv${RESTORE}"
         echo -e "\t\t${YELLOW}${output_file}.aln${RESTORE}"
         echo -e "\t\t${YELLOW}${output_file}.tree${RESTORE}"
         echo -e "\t\t${YELLOW}acetotree_${DATE}.log${RESTORE}"
-fi
+    fi
 
-###     Checking output path
+### Checking output path
 
-O_file=$(readlink -f ${output_file})
-output_path=`echo ${O_file%/*}`
+    output_path=$(dirname "$(realpath "${output_file}")")
 
-###		Checking evalue
+### Checking evalue
 
-if [ "$evalue" == "" ];then
+    if [ "$evalue" == "" ]; then
         evalue="$evalue_def"
         echo -e "\n#\tUsing default evalue: ${YELLOW}${evalue_def}${RESTORE}"
-else
+    else
         echo -e "\n#\tE-value: ${YELLOW}$evalue${RESTORE}"
-fi
+    fi
 
-###		Checking bootstrap value
+### Checking bootstrap value
 
-if [ "$bootstr" == "" ];then
+    if [ "$bootstr" == "" ]; then
         bootstr="$bootstr_def"
-        echo -e "\n#\tUsing default bootstr: ${YELLOW}${bootstr_def}${RESTORE}"
-else
+        echo -e "\n#\tUsing default bootstrap value: ${YELLOW}${bootstr_def}${RESTORE}"
+    else
         echo -e "\n#\tBootstrap value: ${YELLOW}$bootstr${RESTORE}"
-fi
+    fi
 
-###		making a new temporary file
+### Checking number of threads
 
-tempfile1=$(echo `echo ${input_file}| rev | cut -d/ -f1 | rev | cut -d. -f1`.ack)
+    if [ "$threads" == "" ]; then
+        threads="$threads_def"
+        echo -e "\n#\tUsing default number of threads: ${YELLOW}${threads_def}${RESTORE}"
+    else
+        echo -e "\n#\tUsing number of threads: ${YELLOW}${threads}${RESTORE}"
+    fi
 
-perl -pe '/^>/ ? print "\n" : chomp' ${input_file} | sed '/^$/d;s/ /_/g;s/,/_/g;s/:/_/g;s/(/_/g;s/)/_/g;s/__*/_/g' > ${input_path}/${tempfile1}
+### Checking dependencies
 
+    echo -e "\n#\t${YELLOW}Performing dependencies check${RESTORE}"
+    export PATH="/home/$user/acetoscan/acetoscan_bin/:${PATH}"
+    AcetoScan_software_check.sh # <= External script
 
-###    Checking dependencies
+### Making a new temporary file
 
-echo -e "\n#\t${YELLOW}Performing dependencies check${RESTORE}"
-export PATH="/home/$user/acetoscan/acetoscan_bin/:${PATH}"
-AcetoScan_software_check.sh # <======== External script
+    tempfile1="${filename}.ack"
 
+### Cleaning and preparing input file
 
-###     Function for the Spinner
+    perl -pe '/^>/ ? print "\n" : chomp' "${input_file}" | \
+        sed '/^$/d;s/ /_/g;s/,/_/g;s/:/_/g;s/(/_/g;s/)/_/g;s/__*/_/g' > "${input_path}/${tempfile1}"
 
-spin=( '/' '-' '\' '|' )
+### Function for the Spinner
 
-processing() {
-              while [ 1 ]
-                do
-                   for s in "${spin[@]}"
-                        do
-                                echo -ne "\r[Processing:]$s"
-                                sleep 0.25
-                        done
-                done &
-}
+    spin=( '/' '-' '\' '|' )
 
-###     Begin Longest best frame analysis <--- from external script
+    processing() {
+        while true ; do
+            for s in "${spin[@]}" ; do
+                echo -ne "\r[Processing:]$s"
+                sleep 0.25
+            done
+        done &
+    }
 
-echo -e "\n#\t${YELLOW}Performing longest best frame analysis${RESTORE}"
-echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
+### Begin Longest best frame analysis <- from external script
 
-###     Starting spinner for best frame script
-        processing
-        pid=$!
-		disown
+    echo -e "\n#\t${YELLOW}Performing longest best frame analysis${RESTORE}"
+    echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
 
-###		longorf-acetoscan external script
-        
-        find ${input_path} -name "${tempfile1}" \
-        -exec AcetoScan_longorf.pl {} > "${input_path}/${tempfile1}.bst" \; # <============= external script
-        
-#       closing spinner for best frame script
-        echo -ne "Done\n"        
-        kill $pid 
+    #   Defining best frame function
 
-###		Checking if longorf-acetoscan output is not empty
+        bestframe() {
 
-if [ ! -s "${input_path}/${tempfile1}.bst" ]; then
-    echo -e "\n#\t${LRED}No sequence to proceed, Aborting!!!\n###\n${RESTORE}"
-    exit
-fi
-   
-###    Filtering non target sequences with BlastX from NCBI Blast+ (2.8.1)
+        #   Starting spinner for best frame script
 
-echo -e "\n#\t${YELLOW}Filtering non target sequences${RESTORE}"
-echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
+            processing
+            pid=$!
+            disown
 
-#       Starting spinner for blastx filtering
+        #   Call AcetoScan_longorf.pl external script
 
-    processing
-    pid=$!
-    disown
-        
-        blastx \
+            find "${input_path}" -name "${tempfile1}" \
+            -exec AcetoScan_longorf.pl {} > "${input_path}/${tempfile1}.bst" \; # <============= external script
+
+        #   Checking if longorf-acetoscan output is not empty
+
+            if [ ! -s "${input_path}/${tempfile1}.bst" ]; then
+                echo -e "\n#\t${LRED}No sequence to proceed, Aborting!!!\n###\n${RESTORE}"
+                exit 1
+            fi
+
+        #   Closing spinner for best frame script
+            echo -ne "Done\n"
+            kill "$pid"
+    }
+
+    #   Calling best frame function to do the job
+
+        bestframe
+
+### Filtering non target sequences with BlastX from NCBI Blast+ (2.8.1)
+
+    echo -e "\n#\t${YELLOW}Filtering non target sequences${RESTORE}"
+    echo -e "\n#\t${LRED}OBS: This might take a while!\n${RESTORE}"
+
+    #   Defining the variable path
+
+        path_acetobase="/home/${user}/acetoscan/acetobase/AcetoBase"
+
+    #   Defining blastx filtering function
+
+        blastxfilter() {
+
+        #   Starting spinner for best frame script
+
+            processing
+            pid=$!
+            disown
+
+        #   Filtering non target sequences
+
+            blastx \
                 -query "${input_path}/${tempfile1}.bst" \
-                -db "/home/$user/acetoscan/acetobase/AcetoBase" \
+                -db "${path_acetobase}" \
                 -task blastx \
                 -max_target_seqs 1 \
-                -num_threads "${THREADS}" \
-                -evalue ${evalue} \
-                -out "${input_path}/b4f.ack" \
-                -outfmt "7 qseqid" 2> /dev/null
+                -num_threads "${threads}" \
+                -evalue "${evalue}" \
+                -out "${input_path}/b4fl.ack" \
+                -outfmt "6 qseqid" 2> /dev/null
 
+        #   Extracting target sequences
 
-###     Processing blast result file, deleting commented lines
+            printf '' > "${input_path}/filt.ack"
+            while IFS= read -r line; do
+                grep -w -A 1 "$line" "${input_path}/${tempfile1}.bst" >> "${input_path}/filt.ack"
+            done < "${input_path}/b4fl.ack"
 
-sed '/^#/d' "${input_path}/b4f.ack" | uniq > "${input_path}/b4fl.ack"
+        #   Closing spinner for blastx filtering
 
-###     Extracting target sequences
+            echo -ne "Done\n"
+            kill $pid
+        }
 
-while read line;
-      do
-         grep -w -A 1 "$line" "${input_path}/${tempfile1}.bst" >> "${input_path}/filt.ack"
-      done < "${input_path}/b4fl.ack"
+    #   Calling best frame function to do the job
 
-#       Closing spinner for blastx filtering
+        blastxfilter
 
-    echo -ne "Done\n"
-    kill $pid
+### Assigning taxonomy
 
-###     Removing duplicates
+    echo -e "\n#\t${YELLOW}Assigning taxonomy${RESTORE}"
+    echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
 
-awk '!a[$1]++' "${input_path}/filt.ack" >  "${input_path}/filt2.ack"
+    #   Defining taxassign function
 
-###    Assigning taxonomy 
+        taxassign() {
 
-echo -e "\n#\t${YELLOW}Assigning taxonomy${RESTORE}"
-echo -e "\n#\t${LRED}OBS: This might take a while!${RESTORE}\n"
+            #   Starting spinner for taxonomy assignment
 
-#       Starting spinner for taxonomic assignment
-        processing
-        pid=$!
-        disown
+                processing
+                pid=$!
+                disown
 
-# assigning taxonomy by translated nucleotide query with protein database
-        blastx \
-                -query "${input_path}/filt2.ack" \
-                -db "/home/$user/acetoscan/acetobase/AcetoBase" \
-                -task blastx \
-                -max_target_seqs 1 \
-                -num_threads "${THREADS}" \
-                -evalue 1e-3 \
-                -out "${input_path}/tax.atx" \
-                -outfmt "6 qseqid saccver pident evalue qlen length bitscore qseq" 2> /dev/null
+            #   assigning taxonomy by translated nucleotide query with protein database
 
-#       closing spinner for taxonomic assignment
-	echo -ne "Done\n"
-	kill $pid
+                blastx \
+                    -query "${input_path}/filt.ack" \
+                    -db "${path_acetobase}" \
+                    -task blastx \
+                    -max_target_seqs 1 \
+                    -num_threads "${threads}" \
+                    -evalue 1e-3 \
+                    -out "${input_path}/tax.tmp" \
+                    -outfmt "6 qseqid saccver pident evalue qlen length bitscore qseq" 2> /dev/null
 
-###     Processing tax table
+            #   Removing duplicates
 
-sed -e 's/;tax=/,/g' "${input_path}/tax.atx" | sed '1s/^/#Query header,Subject_Accession,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity,Evalue,Query_length,Alignment_length[blastx],Bitscore,Query_seq\n/;s/\t/,/g' > "${input_path}/tax.atx.csv"
+                awk '!a[$1]++' "${input_path}/tax.tmp" > "${input_path}/tax2.tmp"
 
-###       Multiple sequence alignment by mafft
+            #   Preparing OTU taxonomy table
 
-echo -e "\n#\t${YELLOW}Performing Multiple Sequence Alignment${RESTORE}\n"
-mafft --reorder --thread "${THREADS}" "${input_path}/filt2.ack" > att.aln
+                sed -e 's/;tax=/,/g' "${input_path}/tax2.tmp" | \
+                sed '1s/^/OTU,Subject_Accession,Kingdom,Phylum,Class,Order,Family,Genus,Species,Percentage_identity,Evalue,Query_length,Alignment_length[blastx],Bitscore,Query_seq\n/' | \
+                sed -e 's/\t/,/g' | \
+                sed 's/d://g' | \
+                sed 's/p://g' | \
+                sed 's/c://g' | \
+                sed 's/o://g' | \
+                sed 's/f://g' | \
+                sed 's/g://g' | \
+                sed 's/s://g' | \
+                sed 's/None/NA/g' > "${input_path}/taxtab.csv"
 
-###       Phylogenetic tree construction by FastTree
-echo -e "\n#\t${YELLOW}Preparing phylogenetic tree${RESTORE}\n"
-fasttree -nt \
-         -gtr \
-         -cat 20 \
-         -mlacc 10 \
-         -nni 10 \
-         -spr 5 \
-         -gamma \
-         -bionj \
-         -boot ${bootstr} att.aln > att.tree
+            #   Closing spinner for taxonomy assignment
 
-###     Renaming output files
+                echo -ne "Done\n"
+                kill $pid
 
-mv "${input_path}/filt2.ack" "${output_file}.fasta"
-mv "${input_path}/tax.atx.csv" "${output_file}.csv"
-mv "${input_path}/att.aln" "${output_file}.aln"
-mv "${input_path}/att.tree" "${output_file}.tree"
+        }
 
-###     Removing temporary files
+    #   Calling tax assign function to do the job
 
-rm "${input_path}/filt.ack" \
-   "${input_path}/tax.atx" \
-   "${input_path}/${tempfile1}.bst" \
-   "${input_path}/${tempfile1}" \
-   "${input_path}/b4f.ack" \
-   "${input_path}/b4fl.ack"
-   
-###    Getting final information
+        taxassign
 
-end=$(date +%s) # end time of script
-runtime=$(((end - start))) # calculate runtime
-numnt=`grep -v ">" ${input_file} | wc | awk '{print $3-$1}'`
-numseq=`grep -c ">" ${input_file}`
-pros_data_size=$(find "${input_path}" -iname "${input_file}" -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
-echo -e "\n#\tacetotree processed: 
-\n\t${YELLOW}${input_file}${RESTORE}
-\t[bases]\t\t- ${YELLOW}${numnt}${RESTORE}
-\t[sequences]\t- ${YELLOW}${numseq}${RESTORE}
-\t[size]\t\t- ${YELLOW}${pros_data_size}${RESTORE}
-\t[time(sec)]\t- ${YELLOW}${runtime}${RESTORE}"
+### Multiple sequence alignment by mafft
 
-###		Outfile file stat
+    echo -e "\n#\t${YELLOW}Performing Multiple Sequence Alignment${RESTORE}\n"
 
-numntOut=`grep -v ">" ${output_file}.fasta | wc | awk '{print $3-$1}'`
-numseqOut=`grep -c ">" ${output_file}.fasta`
+    mafft \
+        --reorder \
+        --thread "${threads}" "${input_path}/filt.ack" > "${input_path}/att.aln"
 
-###		Number of unspecific sequences
+### Phylogenetic tree construction by FastTree
 
-numOut=$(( ${numseq} - ${numseqOut} ))
+    echo -e "\n#\t${YELLOW}Preparing phylogenetic tree${RESTORE}\n"
 
-###		Output file stat reporting
+    fasttree \
+        -nt \
+        -gtr \
+        -cat 20 \
+        -mlacc 10 \
+        -mlnni 10 \
+        -spr 5 \
+        -gamma \
+        -bionj \
+        -boot ${bootstr} "${input_path}/att.aln" > "${input_path}/att.tree"
 
-echo -e "\n\tInput\t\t- ${YELLOW}${numseq} sequences ${RESTORE}"
-echo -e "\tOutput\t\t- ${YELLOW}${numseqOut} sequences ${RESTORE}"
-echo -e "\t${LRED}Non-targets\t- ${numOut} sequences ${RESTORE}"
+### Renaming the required file to desired output file
 
-###     Taxonomic information
+    mv "${input_path}/filt.ack" "${output_file}.fasta"
+    mv "${input_path}/taxtab.csv" "${output_file}.csv"
+    mv "${input_path}/att.aln" "${output_file}.aln"
+    mv "${input_path}/att.tree" "${output_file}.tree"
 
-echo -e "\n#\tTaxonomic assignment"
-echo -e "\t[sequences]\t- ${YELLOW} ${numseqOut} ${RESTORE}"
+### Removing temporary files
 
-###     Phylogenetic tree information
+    find "${input_path}" -type f -name "${tempfile1}" -exec rm {} \;
+    find "${input_path}" -type f -name "${tempfile1}.bst" -exec rm {} \;
+    find "${input_path}" -type f -name "b4fl.ack" -exec rm {} \;
+    find "${input_path}" -type f -name "tax.tmp" -exec rm {} \;
+    find "${input_path}" -type f -name "tax2.tmp" -exec rm {} \;
 
-echo -e "\n#\tPhylogenetic tree"
-echo -e "\n\t${YELLOW}${output_file}.tree${RESTORE}"
-echo -e "\t[Distances] - Jukes-Cantor"
-echo -e "\t[Topology refinement] - maximum-likelihood with nearest-neighbor interchanges - ML-NNI (10 rounds)"
-echo -e "\t[Topology refinement] - Subtree pruning and Regrafting - SPR (5 rounds)"
+### Getting final information
 
-echo -e "\t[Model fitting] - Generalized Time-Reversible (GTR)"
-echo -e "\t[Model approximation] - CAT (site heterogeneous categories) (20 rounds)"
-echo -e "\t[Bootstrap] - ${bootstr} (default: 1000 rounds)"
-echo -e "\t[Distance optimization] - BIONJ"
+    #   End time of script
 
-### 	Greeting
+        end=$(date +%s)
 
-echo -e "\n#\t${YELLOW}${user}${RESTORE}, Thanks for using ${YELLOW}\"AcetoScan/acetotree\"${RESTORE}\n\n###"
+    #   Calculate runtime
 
-###		fixing log file   
+        runtime=$(((end - start)))
 
-find ${input_path} -name "acetotree_${DATE}" -exec sed -i 's/\x1B\[[0-9;]\+[A-Za-z]//g;/Processing:/d;/STEP/d;/Constructing a UPGMA tree/,/done./{//!d};/STEP/d;/(thread/d;/Processing:/d;/Constructing a UPGMA tree/,/done./{//!d};/seconds: Top hits for/d;/Joined/d;/NNI round/d;/seconds: SPR round/d;/ML Lengths/d;/NNI round/d;/Optimizing GTR model/d;/Site likelihoods with/d;/ML split tests for/d' {} \; 
-mv "${input_path}/acetotree_${DATE}" "${output_path}/acetotree_${DATE}.log"
+    #   Data size
 
-###    End of script
+        pros_data_size=$(find "${input_path}" -iname "${filename}" -print0 | du --files0-from=- -ch | grep "total" | cut -f1)
+
+    #   Displaying process info
+
+            echo -e "\n#\tacetotree processed:\n"
+            echo -e "\t\t${YELLOW}${filename}${RESTORE}"
+            echo -e "\t\t[bases]\t\t- ${YELLOW}${npos}${RESTORE}"
+            echo -e "\t\t[sequences]\t- ${YELLOW}${nseq}${RESTORE}"
+            echo -e "\t\t[size]\t\t- ${YELLOW}${pros_data_size}${RESTORE}"
+            echo -e "\t\t[time(sec)]\t- ${YELLOW}${runtime}${RESTORE}"
+
+### Outfile file stat
+
+    nseqOut=$(grep -c '>' "${output_file}.fasta")
+
+### Number of unspecific sequences
+
+    numOut=$(( "${nseq}" - "${nseqOut}" ))
+
+### Output file stat reporting
+
+    echo -e "\n\tInput\t\t- ${YELLOW}${nseq} sequences ${RESTORE}"
+    echo -e "\tOutput\t\t- ${YELLOW}${nseqOut} sequences ${RESTORE}"
+    echo -e "\t${LRED}Non-targets\t- ${numOut} sequences ${RESTORE}"
+
+### Taxonomic information
+
+    echo -e "\n#\tTaxonomic assignment"
+    echo -e "\t[sequences]\t- ${YELLOW} ${nseqOut} ${RESTORE}"
+
+### Phylogenetic tree information
+
+    echo -e "\n#\tPhylogenetic tree"
+    echo -e "\n\t${YELLOW}${output_file}.tree${RESTORE}"
+    echo -e "\t[Distances] - Jukes-Cantor"
+    echo -e "\t[Topology refinement] - maximum-likelihood with nearest-neighbor interchanges - ML-NNI (10 rounds)"
+    echo -e "\t[Topology refinement] - Subtree pruning and Regrafting - SPR (5 rounds)"
+
+    echo -e "\t[Model fitting] - Generalized Time-Reversible (GTR)"
+    echo -e "\t[Model approximation] - CAT (site heterogeneous categories) (20 rounds)"
+    echo -e "\t[Bootstrap] - ${bootstr} (default: 1000 rounds)"
+    echo -e "\t[Distance optimization] - BIONJ"
+
+### Greeting
+
+    echo -e "\n#\t${YELLOW}${user}${RESTORE}, Thanks for using ${YELLOW}\"AcetoScan/acetotree\"${RESTORE}\n\n###"
+
+### Fixing log file
+
+    #   Deleting special characters
+
+        find "${input_path}" -name "acetotree_${DATE}" -exec sed -e 's/\x1B\[[0-9;]\+[A-Za-z]//g;/Processing:/d;/ambiguous characters./,/done./{//!d};/STEP/d;/(thread/d;/Processing:/d;/Constructing a UPGMA tree/,/done./{//!d};/seconds: Top hits for/d;/Joined/d;/NNI round/d;/seconds: SPR round/d;/ML Lengths/d;/NNI round/d;/Optimizing GTR model/d;/Site likelihoods with/d;/ML split tests for/d' {} > "${input_path}/acetotree_${DATE}.tmp" \;
+
+    #   Deleting temorary file
+
+        find "${input_path}" -name "acetotree_${DATE}" -exec rm {} \;
+
+    #   Moving log file to destination
+
+        mv "${input_path}/acetotree_${DATE}.tmp" "${output_path}/acetotree_${DATE}.log"
+
+### End of script
+
+    exit 0
