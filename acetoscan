@@ -868,6 +868,10 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     find "${CDIR}" -name "acetoscan_log" -exec sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g' {} > ${WKDIR}/acetoscan_result/0_acetoscan_${DATE}.log \;
     find "${WKDIR}/acetoscan_result/" -name "0_acetoscan_${DATE}.log" -exec sed -i -e '/ambiguous characters./,/done./{//!d};/STEP/d;/(thread/d;/Processing:/d;/Constructing a UPGMA tree/,/done./{//!d};/seconds: Top hits for/d;/Joined/d;/NNI round/d;/seconds: SPR round/d;/ML Lengths/d;/NNI round/d;/Optimizing GTR model/d;/Site likelihoods with/d;/ML split tests for/d' {} \;
     find "${CDIR}" -name "acetoscan_log" -exec rm {} \;
+    
+    #   Removing the merged samples file to save disk space
+
+        find "${WKDIR}/output_data/trimmed/" -type f -name "all.fasta" -exec rm {} \;
 
 ### Greeting
 
