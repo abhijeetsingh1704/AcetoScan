@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 #   File: AcetoScan_Visualization.R
-#   Last modified: Tor, Mar 19, 2020 10:00
+#   Last modified: Tor, Mar 20, 2020 15:00
 #   Sign: Abhi
 
 otu_file <- "FTHFS_otutab.csv"
@@ -32,35 +32,42 @@ Libraries <- c("ggplot2",
 #   Load required packages with suppressed start-up messages
 suppressPackageStartupMessages(Rpackage(Libraries))
 
-######  Reading OTU file
+######  Reading OTU data
 
-OTU_data <- read.table(otu_file,
-                       sep = ",",
-                       header = TRUE,
-                       row.names = 1,
-                       check.names = FALSE)
+OTU_data_pre <- read.table(otu_file,
+                           sep = ",",
+                           header = TRUE,
+                           check.names = FALSE)
+###### Reading TAX data
 
-#   Making matrix
-OTU_data_mat <- as.matrix(as.data.frame(OTU_data))
+TAX_data_pre <- read.table(tax_file,
+                           sep = ",",
+                           header = T,
+                           stringsAsFactors = F)
+
+# merge data frames by column OTU_ID to drop mismatch rows
+OTU_TAX <- merge(OTU_data_pre, TAX_data_pre, by="OTU_ID", row.names="OTU_ID")
+
+# remove the similarity metadata info
+OTU_TAX_subset <- subset(OTU_TAX, select = -c(Subject_Accession,Percentage_identity:Query_seq))
+
+# generate the filter variable
+tax_categories <- names(OTU_TAX_subset) %in% c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+
+# Extract abundance/otu table
+OTU_data <- data.frame(OTU_TAX_subset[!tax_categories], row.names = 1)
+
+# Extract taxonomy table
+tax_data_subset <- subset(OTU_TAX_subset, select = c("OTU_ID","Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
+
+# taxonomy table with rownames 
+TAX_data_subset <- data.frame(tax_data_subset, row.names = 1)
+
+# making otu matrix
+OTU_data_mat <- as.matrix(OTU_data)
 
 #   Making phyloseq otu table
 OTU_data_mat_table <- otu_table(OTU_data_mat, taxa_are_rows = TRUE)
-
-###### Reading TAX table
-
-TAX_data1 <- read.table(tax_file,
-                       sep = ",",
-                       header = T,
-                       stringsAsFactors = F)
-
-TAX_data <- subset(TAX_data1, select = -c(Subject_Accession,Percentage_identity:Query_seq))
-
-#   subsetting the data
-TAX_data_subset <- TAX_data[, -1]
-#TAX_data_subset
-
-#   getting OTU names from otu table "OTU_data"
-rownames(TAX_data_subset) <- rownames(OTU_data_mat_table)
 
 #   making matrix of subset tax_data
 TAX_data_subset_mat <- as.matrix(TAX_data_subset)
