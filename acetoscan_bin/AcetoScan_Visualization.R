@@ -935,7 +935,7 @@ htmlwidgets::saveWidget(as_widget(tree1_), "FTHFH_OTU.tree1.html")
 #####
 
 tree2 <- plot_tree(ps,
-                   color = "Family",
+                   color = "Phylum",
                    method = "sampledodge",
                    base.spacing = 0,
                    min.abundance = 100,
@@ -952,7 +952,7 @@ tree2 <- plot_tree(ps,
   theme(legend.text=element_text(size=7, face = "bold"))+
   theme(legend.key.height = unit(0.2, "cm"), legend.key.width = unit(0.3, "cm"))+
   theme(plot.title = element_text(size = 4))
-tree2
+
 #+coord_polar(theta = "y")
 
 # saving plot in pdf
