@@ -519,7 +519,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
     #   Defining the variable paths for VSEARCH
 
-        path_Vout="${WKDIR}/output_data/trimmed/VSEARCH/"
+        path_Vout="${WKDIR}/output_data/trimmed/VSEARCH"
         path_acetobase="/home/${user}/acetoscan/acetobase/AcetoBase"
 
     #   Dereplication
