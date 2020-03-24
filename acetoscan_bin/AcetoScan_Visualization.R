@@ -198,7 +198,7 @@ ModifyTax <- function(x, ind) {
 ##  Making manual and distinctive colour palette
 colour_palette = brewer.pal.info[brewer.pal.info$category == 'qual',]
 my_colours_1 = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colour_palette)))
-my_colours <- rep(my_colours_1, times=5)
+my_colours <- rep(my_colours_1, times=50)
 
 # plot absolute abundance
 pdf(file = "Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
