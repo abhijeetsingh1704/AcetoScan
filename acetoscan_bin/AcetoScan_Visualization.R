@@ -887,7 +887,6 @@ NMDS_Sample_1 <- plot_ordination(ps, ps.ord,
   theme(legend.position = "bottom")+
   theme(legend.title=element_blank())+
   theme(legend.text = element_text(size = 5))+
-  theme(legend.key.height = unit(0.2, "cm"), legend.key.width = unit(0.2, "cm"))+
   theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
   theme(strip.text.x = element_text(margin = margin(0.025,0,0.025,0, "cm")))+
   theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8))+
