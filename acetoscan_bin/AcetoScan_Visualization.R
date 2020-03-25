@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 #   File: AcetoScan_Visualization.R
-#   Last modified: Tor, Mar 20, 2020 15:00
+#   Last modified: Tor, Mar 25, 2020 13:45
 #   Sign: Abhi
 
 otu_file <- "FTHFS_otutab.csv"
@@ -76,13 +76,18 @@ TAX_data_subset_mat <- as.matrix(TAX_data_subset)
 TAX_data_subset_mat_table <- tax_table(TAX_data_subset_mat)
 
 ###### Reading sample data
-sam_data <- read.table(sam_file,
+sam_data_1 <- read.table(sam_file,
                        sep = ",",
                        row.names = 1,
                        check.names = FALSE,
                        header = T)
 
-sam_data <- sample_data(sam_data)
+# Getting rownames from the data frame
+SAMPLE_IDs <- rownames(sam_data_1)
+# Adding sample variable "SAMPLE_IDs" from sample names = row names
+sam_data2 <- cbind(sam_data_1,SAMPLE_IDs)
+# making phyloseq sample data 
+sam_data <- sample_data(sam_data2)
 
 ### Reading phylogenetic tree
 tree_data <- read_tree(tree_file)
@@ -854,6 +859,77 @@ NMDS_Phylum_2_ <-ggplotly(NMDS_Phylum_2)
 htmlwidgets::saveWidget(as_widget(NMDS_Phylum_2_), "NMDS_Phylum_2.html")
 ######################
 
+# plot ordination sample data
+
+NMDS_Sample_1 <- plot_ordination(ps, ps.ord,
+                type="samples",
+                color = "SAMPLE_IDs")+
+  geom_point(size=2, stroke=1)+
+  geom_text(aes(label=SAMPLE_IDs),size=1.5, vjust=-1)+
+  theme(legend.title = element_text(face = "bold", size = 10))+
+  theme(axis.text.x = element_text(colour = "black", angle = 0, hjust = 1, vjust = 1, face = "bold", size = 8))+
+  theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 8, face = "bold"))+
+  theme(axis.line.y.left = element_line(colour = "black"))+
+  theme(axis.line.x.bottom = element_line(colour = "black"))+
+  theme(axis.line.x.top = element_line(colour = "black"))+
+  theme(legend.position = "bottom")+
+  theme(legend.title=element_blank())+
+  theme(legend.text = element_text(size = 5))+
+  theme(legend.key.height = unit(0.2, "cm"), legend.key.width = unit(0.2, "cm"))+
+  theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
+  theme(strip.text.x = element_text(margin = margin(0.025,0,0.025,0, "cm")))+
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8))+
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 8))
+
+# saving plot in pdf
+pdf("NMDS_Sample_1.pdf", width = 28, height = 18, paper = "a4r")
+plot(NMDS_Sample_1)
+dev.off()
+
+# save plot as image
+tiff("NMDS_Sample_1.tif", width = 12, height = 6, units = "in", res = 250)
+plot(NMDS_Sample_1)
+dev.off()
+
+# saving plot as html widget
+NMDS_Sample_1_ <-ggplotly(NMDS_Sample_1)
+htmlwidgets::saveWidget(as_widget(NMDS_Sample_1_), "NMDS_Sample_1.html")
+
+########
+NMDS_Sample_2 <- plot_ordination(ps, ps.ord,
+                                 type="samples",
+                                 color = "SAMPLE_IDs")+
+  geom_point(size=2, stroke=1)+
+  geom_text(aes(label=SAMPLE_IDs),size=1.5, vjust=-1)+
+  theme(legend.title = element_text(face = "bold", size = 10))+
+  theme(axis.text.x = element_text(colour = "black", angle = 0, hjust = 1, vjust = 1, face = "bold", size = 8))+
+  theme(axis.text.y = element_text(colour = "black", angle = 0, hjust = 1, size = 8, face = "bold"))+
+  theme(axis.line.y.left = element_line(colour = "black"))+
+  theme(axis.line.x.bottom = element_line(colour = "black"))+
+  theme(axis.line.x.top = element_line(colour = "black"))+
+  theme(legend.position = "none")+
+  # theme(legend.title=element_blank())+
+  # theme(legend.text = element_text(size = 5))+
+  # theme(legend.key.height = unit(0.2, "cm"), legend.key.width = unit(0.2, "cm"))+
+  theme(strip.text.x = element_text(size = 10, colour = "black",face = "bold"))+
+  theme(strip.text.x = element_text(margin = margin(0.025,0,0.025,0, "cm")))+
+  theme(axis.title.x = element_text(colour = "black", face = "bold", size = 8))+
+  theme(axis.title.y = element_text(colour = "black", face = "bold", size = 8))
+
+# saving plot in pdf
+pdf("NMDS_Sample_2.pdf", width = 28, height = 18, paper = "a4r")
+plot(NMDS_Sample_2)
+dev.off()
+
+# save plot as image
+tiff("NMDS_Sample_2.tif", width = 12, height = 6, units = "in", res = 250)
+plot(NMDS_Sample_2)
+dev.off()
+
+# saving plot as html widget
+NMDS_Sample_2_ <-ggplotly(NMDS_Sample_2)
+htmlwidgets::saveWidget(as_widget(NMDS_Sample_2_), "NMDS_Sample_2.html")
+########
 
 ########
 
