@@ -797,6 +797,10 @@ sink()
 NMDS_Phylum_1 <- plot_ordination(ps, ps.ord,
                                  type="taxa",
                                  color = "Phylum")+
+                                                              # making intercepts at 0
+  geom_hline(yintercept = 0, linetype="dashed",color="grey20")+
+  geom_vline(xintercept = 0, linetype="dashed",color="grey20")+
+  # plotting points
   geom_point(size=2, stroke=1)+
   theme(legend.title = element_text(face = "bold", size = 10))+
   facet_wrap(~Phylum)+
@@ -831,6 +835,10 @@ htmlwidgets::saveWidget(as_widget(NMDS_Phylum_1_), "NMDS_Phylum_1.html")
 NMDS_Phylum_2 <- plot_ordination(ps, ps.ord,
                                  type="taxa",
                                  color = "Phylum")+
+                                                              # making intercepts at 0
+  geom_hline(yintercept = 0, linetype="dashed",color="grey20")+
+  geom_vline(xintercept = 0, linetype="dashed",color="grey20")+
+  # plotting points
   geom_point(size=2, stroke=1)+
   theme(legend.title = element_text(face = "bold", size = 10))+
   theme(axis.text.x = element_text(colour = "black", angle = 0, hjust = 1, vjust = 1, face = "bold", size = 8))+
@@ -862,8 +870,12 @@ htmlwidgets::saveWidget(as_widget(NMDS_Phylum_2_), "NMDS_Phylum_2.html")
 # plot ordination sample data
 
 NMDS_Sample_1 <- plot_ordination(ps, ps.ord,
-                type="samples",
-                color = "SAMPLE_IDs")+
+                                  type="samples",
+                                  color = "SAMPLE_IDs")+
+  # making intercepts at 0
+  geom_hline(yintercept = 0, linetype="dashed",color="grey20")+
+  geom_vline(xintercept = 0, linetype="dashed",color="grey20")+
+  # plotting points
   geom_point(size=2, stroke=1)+
   geom_text(aes(label=SAMPLE_IDs),size=1.5, vjust=-1)+
   theme(legend.title = element_text(face = "bold", size = 10))+
@@ -899,6 +911,10 @@ htmlwidgets::saveWidget(as_widget(NMDS_Sample_1_), "NMDS_Sample_1.html")
 NMDS_Sample_2 <- plot_ordination(ps, ps.ord,
                                  type="samples",
                                  color = "SAMPLE_IDs")+
+  # making intercepts at 0
+  geom_hline(yintercept = 0, linetype="dashed",color="grey20")+
+  geom_vline(xintercept = 0, linetype="dashed",color="grey20")+
+  # plotting points
   geom_point(size=2, stroke=1)+
   geom_text(aes(label=SAMPLE_IDs),size=1.5, vjust=-1)+
   theme(legend.title = element_text(face = "bold", size = 10))+
