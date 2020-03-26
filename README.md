@@ -1,7 +1,7 @@
 # AcetoScan
 
 - Version: 1.0 (20200312)
-- Last modified: Tor, Mar 12, 2020 10:00
+- Last modified: Mar 26, 2020 10:00
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -27,6 +27,7 @@ AcetoScan can also process fasta sequences to filter out non-target sequences, a
 		¤ RColorBrewer 	(1.1.2)
 		¤ plyr 		(1.8.4)
 		¤ dplyr 	(0.8.0.1)
+		¤ vegan		(2.5.6)	
 ```
 
 
@@ -74,12 +75,12 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 Use `acetoscan` as follows
 
 ```
-$ acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 -e 1e-3
+$ acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 -e 1e-3 -B 1000 -P 8
 ```
 #### If installation is not as sudo/root
 
 ```
-$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 1e-3
+$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 1e-3 -B 1000 -P 8
 ```
 	
 ```
@@ -101,6 +102,10 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -
                         :default minimum cluster size = 2
         -e      E-value
                         :default evalue = 1e-3
+	-B      Bootstrap value
+                        :default bootstrap = 1000
+        -P      Parallel processes / threads
+                        :default no. of parallels = all available threads
         -h      Print help        
         -X      Print AcetoScan commands
         -v      Print AcetoScan version
@@ -135,13 +140,15 @@ $ bash /home/$user/acetoscan/acetocheck -h
 ```
 
 ```
-acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
+acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -P 8
 
 -i      Input_file
         -o      Output file
                         :default = acetocheck_<DATE>_<TIME>.fasta
         -e      E-value
                         :default evalue = 1e-3
+	-P      Parallel processes/threads
+                        :default no. of parallels = all available threads
         -h      Print help
         -X      Print AcetoScan commands        
         -v      Print AcetoScan version
@@ -150,7 +157,7 @@ acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
 
 ### Use
 ```
-acetocheck -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
+acetocheck -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3 -P 8
 ```
 #### output
 1. my_sequences.fasta
@@ -169,7 +176,7 @@ $ bash /home/$user/acetoscan/acetotax -h
 ```
 
 ```
-acetotax -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
+acetotax -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -P 8
 
         -i      Input_file
         -o      Output file
@@ -177,6 +184,8 @@ acetotax -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
                         :default = acetotax_<DATE>_<TIME>.fasta
         -e      E-value
                         :default evalue = 1e-3
+	-P      Parallel processes/threads
+                        :default no. of parallels = all available threads
         -h      Print help        
         -X      Print AcetoScan commands
         -v      Print AcetoScan version
@@ -185,7 +194,7 @@ acetotax -i /path/<input file>/ -o /path/<output file>/ -e 1e-3
 
 ### Use
 ```
-acetotax -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
+acetotax -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3 -P 8
 ```
 #### output
 1. my_sequences.fasta
@@ -205,7 +214,7 @@ $ bash /home/$user/acetoscan/acetotree -h
 ```
 
 ```
-acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000
+acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000 -P 8
 
         -i      Input_file
         -o      Output file
@@ -217,6 +226,8 @@ acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000
                         :default evalue = 1e-3
         -B      Bootstrap value
                         :default bootstrap = 1000
+	-P      Parallel processes/threads
+                        :default no. of parallels = all available threads
         -h      Print help        
         -X      Print AcetoScan commands
         -v      Print AcetoScan version
@@ -225,7 +236,7 @@ acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000
 
 ### Use
 ```
-acetotree -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3
+acetotree -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1e-3 -B 1000 -P 8
 ```
 #### output
 1. my_sequences.fasta
