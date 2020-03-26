@@ -1,6 +1,6 @@
 # AcetoScan
 
-- Version: 1.0 (20200312)
+- Version: 1.0 (20200326)
 - Last modified: Mar 26, 2020 10:00
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
