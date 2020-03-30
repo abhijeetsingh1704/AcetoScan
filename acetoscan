@@ -515,7 +515,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
         echo -e "\n#\tCreating directory\n"
         mkdir -v -p "${WKDIR}/output_data/trimmed/VSEARCH"
-        echo -e "\n#\tBegin clustering at ${LRED}$(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE}sequence similarity"
+        echo -e "\n#\tBegin clustering at ${LRED}$(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE} sequence similarity"
 
     #   Defining the variable paths for VSEARCH
 
