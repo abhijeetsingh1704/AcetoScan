@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: acetoscan
-#   Last modified: Tor, Mar 19, 2020 10:00
+#   Last modified: Mar 30, 2020 14:00
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -294,9 +294,9 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
     if [ "$cluster_threshold" == "" ]; then
         cluster_threshold="$cluster_threshold_def"
-        echo -e "\n#\tUsing default clustering threshold: ${YELLOW}${cluster_threshold_def}${RESTORE}"
+        echo -e "\n#\tUsing default clustering threshold: ${YELLOW} $(echo ${cluster_threshold_def} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE}"
     else
-        echo -e "\n#\tClustering threshold: ${YELLOW}$cluster_threshold${RESTORE}"
+        echo -e "\n#\tClustering threshold: ${YELLOW} $(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE}"
     fi
 
 ### Checking minimum clustering size
@@ -515,7 +515,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
         echo -e "\n#\tCreating directory\n"
         mkdir -v -p "${WKDIR}/output_data/trimmed/VSEARCH"
-        echo -e "\n#\tBegin clustering at ${LRED}$cluster_threshold %${RESTORE}"
+        echo -e "\n#\tBegin clustering at ${LRED}$(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE}sequence similarity"
 
     #   Defining the variable paths for VSEARCH
 
@@ -536,12 +536,24 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
             --uc "${path_Vout}/derep.uc" \
             --log "${path_Vout}/derep.log"
 
+    #   Denoising
+
+        echo -e "\n#\t${YELLOW}Performing denoising${RESTORE}\n"
+        vsearch \
+            --cluster_unoise "${path_Vout}/all.derep" \
+            --centroid "${path_Vout}/all.denoised" \
+            --sizein \
+            --sizeout \
+            --threads "${threads}" \
+            --minsize 2 \
+            --uc "${path_Vout}/denoise.uc" \
+            --log "${path_Vout}/denoise.log"
+
     #   Removing chimeras
 
         echo -e "\n#\t${YELLOW}Removing chimera${RESTORE}\n"
         vsearch \
-            --uchime_ref "${path_Vout}/all.derep" \
-            --db "${path_acetobase}.fasta" \
+            --uchime3_denovo "${path_Vout}/all.denoised" \
             --sizein \
             --sizeout \
             --threads "${threads}" \
@@ -551,18 +563,18 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
     # Clustering OTUs
 
-        echo -e "\n#\t${YELLOW}Clustering OTUs at ${cluster_threshold} (%) sequence similarity${RESTORE}\n"
+        echo -e "\n#\t${YELLOW}Clustering OTUs at$(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') % sequence similarity${RESTORE}\n"
         vsearch \
             --cluster_size "${path_Vout}/nonchimera.fasta" \
             --id "${cluster_threshold}" \
             --centroid "${path_Vout}/preOTU.tmp" \
-            --otutabout "${path_Vout}/classic_otu_table.txt" \
             --uc "${path_Vout}/clustering_result" \
             --sizein \
             --sizeout \
             --threads "${threads}" \
             --relabel 'OTU_' \
-            --biomout "${path_Vout}/OTU.biom.json"
+            --biomout "${path_Vout}/OTU.biom.json" \
+            --otutabout "${path_Vout}/cl_otutab"
 
 
 
@@ -811,7 +823,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     echo -e "\n#\t${YELLOW}Preparing graphics${RESTORE}"
     RPATH=$(which R)
 
-    echo -e "\n#\tIn case of ${LRED}execution halt${RESTORE}, access data in path \n\t${YELLOW}${path_Vout}/${RESTORE}\n"
+    echo -e "\n#\tIn case of ${LRED}execution halt${RESTORE}, access data in path \n\t${YELLOW}${path_Vout}${RESTORE}\n"
 
 ### Rscript not working
 
@@ -868,10 +880,10 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     find "${CDIR}" -name "acetoscan_log" -exec sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g' {} > ${WKDIR}/acetoscan_result/0_acetoscan_${DATE}.log \;
     find "${WKDIR}/acetoscan_result/" -name "0_acetoscan_${DATE}.log" -exec sed -i -e '/ambiguous characters./,/done./{//!d};/STEP/d;/(thread/d;/Processing:/d;/Constructing a UPGMA tree/,/done./{//!d};/seconds: Top hits for/d;/Joined/d;/NNI round/d;/seconds: SPR round/d;/ML Lengths/d;/NNI round/d;/Optimizing GTR model/d;/Site likelihoods with/d;/ML split tests for/d' {} \;
     find "${CDIR}" -name "acetoscan_log" -exec rm {} \;
-    
-    #   Removing the merged samples file to save disk space
 
-        find "${WKDIR}/output_data/trimmed/" -type f -name "all.fasta" -exec rm {} \;
+#   Removing the merged samples file to save disk space
+
+    find "${WKDIR}/output_data/trimmed/" -type f -name "all.fasta" -exec rm {} \;
 
 ### Greeting
 
