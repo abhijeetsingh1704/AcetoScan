@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: AcetoScan_software_check.sh
-#   Last modified: Tor, Mar 19, 2020 10:00
+#   Last modified: Apr 1, 2020 10:00
 #   Sign: Abhi
 
 ### User
@@ -82,13 +82,13 @@
 
         #   Formatting blast database
 
-            find /home/$user/ -type f -iname "AcetoBase.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBase.fasta
+            find /home/$user/ -type f -iname "AcetoBase.fasta" -exec cp {} /home/$user/acetoscan/acetobase/AcetoBase.fasta \;
             cd /home/$user/acetoscan/acetobase/ && makeblastdb -in AcetoBase.fasta -dbtype prot -title AcetoBase -out AcetoBase
 
         #   finding and removing temporary directory from download
 
             find /home/$user/acetoscan/acetobase/ -type d -name "tmp" -exec rm -r {} \;
-
+            find /home/$user/acetoscan/acetobase/ -name "AcetoBase_ref.tar.gz" -exec rm {} \;
     fi
 
 ### Check complete
