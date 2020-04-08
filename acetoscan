@@ -469,9 +469,10 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
         adapter_cut
 
-### Cleaning input directory links
+### Cleaning input directory links and deleting directory
 
     find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.${INfile}" -exec rm {} \;
+    find "${WKDIR}/" -maxdepth 1 -type d -name "input_data" -exec rm -r {} \;
 
 ### Preprocessing for clustering
 
