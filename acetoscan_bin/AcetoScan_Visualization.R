@@ -992,7 +992,7 @@ tree1 <- plot_tree(ps, color = "Phylum",
                   method = "sampledodge",
                   base.spacing = 0,
                   min.abundance = 100,
-                  title = "Min. abundance = 100",
+                  title = "Phylogenetic tree - Phylym level",
                   label.tips = "taxa_names",
                   justify = "jagged",
                   nodelabf=nodeplotblank,
@@ -1035,7 +1035,7 @@ tree2 <- plot_tree(ps,
                    nodelabf=nodeplotblank,
                    ladderize = "right",
                    text.size = 1,
-                   title = "Min. abundance = 100",
+                   title = "Phylogenetic tree - Phylym level",
                    plot.margin = 0)+
   scale_color_manual(values = my_colours)+
   theme(legend.position = "bottom") +
