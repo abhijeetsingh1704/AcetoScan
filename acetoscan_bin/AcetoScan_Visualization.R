@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 #   File: AcetoScan_Visualization.R
-#   Last modified: Apr 08, 2020 16:30
+#   Last modified: Apr 08, 2020 18:30
 #   Sign: Abhi
 
 otu_file <- "FTHFS_otutab.csv"
@@ -60,7 +60,7 @@ OTU_data <- data.frame(OTU_TAX_subset[!tax_categories], row.names = 1)
 # Extract taxonomy table
 tax_data_subset <- subset(OTU_TAX_subset, select = c("OTU_ID","Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
 
-# taxonomy table with rownames 
+# taxonomy table with rownames
 TAX_data_subset <- data.frame(tax_data_subset, row.names = 1)
 
 # making otu matrix
@@ -86,7 +86,7 @@ sam_data_1 <- read.table(sam_file,
 SAMPLE_IDs <- rownames(sam_data_1)
 # Adding sample variable "SAMPLE_IDs" from sample names = row names
 sam_data2 <- cbind(sam_data_1,SAMPLE_IDs)
-# making phyloseq sample data 
+# making phyloseq sample data
 sam_data <- sample_data(sam_data2)
 
 ### Reading phylogenetic tree
@@ -102,7 +102,7 @@ ps
 writeLines("\n------------------------- \t END \t-------------------------\n")
 
 # Save infor of phyloseq object
-sink("Visualization_processing_info.txt")
+sink("0_visualization_info.txt")
 writeLines("\n------------------------- \t Phyloseq object \t-------------------------\n")
 print(ps)
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -116,7 +116,7 @@ sink()
 # phylum detail
 ps_table <- table(tax_table(ps)[, "Phylum"], exclude = NULL)
 # save phylum detail
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t Phylum table \t-------------------------\n")
 print(ps_table)
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -138,7 +138,7 @@ prevalence_table <- plyr::ddply(prevalence_dataframe, "Phylum", function(df1) {
 })
 
 # #save the prevalance table as text file
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t Phylum_prevalence_table: \t-------------------------\n")
 print(prevalence_table)
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -155,7 +155,7 @@ paste("number_of_Genus: ", length(get_taxa_unique(ps, taxonomic.rank = "Genus"))
 paste("number_of_Species: ", length(get_taxa_unique(ps, taxonomic.rank = "Species")))
 writeLines("\n------------------------- \t END \t-------------------------\n")
 # Write the details of taxa to file
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t Phylum \t-------------------------\n")
 paste("number_of_Phylum: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
 get_taxa_unique(ps, taxonomic.rank = "Phylum")
@@ -206,7 +206,7 @@ my_colours_1 = unlist(mapply(brewer.pal, colour_palette$maxcolors, rownames(colo
 my_colours <- rep(my_colours_1, times=50)
 
 # plot absolute abundance
-pdf(file = "Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
+pdf(file = "7_Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
 plot_bar(ps, fill="Kingdom")+scale_fill_manual(values = my_colours)+theme(axis.text.x = element_text(colour = "black", angle = 85, hjust = 1, vjust = 1, face = "bold"))+
   theme(legend.position = "bottom")+
   guides(col = guide_legend(ncol = 4))+
@@ -263,17 +263,17 @@ Phylum_Absolute_abundance <- plot_bar(ps, fill = "Phylum") +
   theme(plot.title = element_text(size = 10, face = "bold"))
 
 # save plot as pdf
-pdf("Barplot_Phylum_Absolute_abundance.pdf", width = 28, height = 18, paper = "a4r")
+pdf("1_Phylum_abs_abundance.pdf", width = 28, height = 18, paper = "a4r")
 plot(Phylum_Absolute_abundance)
 dev.off()
 
 # save plot as image
-tiff("Barplot_Phylum_Absolute_abundance.tif", width = 12, height = 6, units = "in", res = 250)
+tiff("1_Phylum_abs_abundance.tif", width = 12, height = 6, units = "in", res = 250)
 plot(Phylum_Absolute_abundance)
 dev.off()
 
 # saving Total_Phylum_numbers_in_absolute abundance_barplot
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Total Phylum numbers in absolute abundance_barplot: ", length(get_taxa_unique(ps, taxonomic.rank = "Phylum")))
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -281,7 +281,7 @@ sink()
 
 # save plot as html widget
 Phylum_Absolute_abundance_gg <- ggplotly(Phylum_Absolute_abundance)
-htmlwidgets::saveWidget(as_widget(Phylum_Absolute_abundance_gg), "Barplot_Phylum_Absolute_abundance.html")
+htmlwidgets::saveWidget(as_widget(Phylum_Absolute_abundance_gg), "1_Phylum_abs_abundance.html")
 
 ################################################
 ########################## VISUALIZATION PART / MAKING MAIN PLOTS
@@ -333,7 +333,7 @@ plot(Phylum_level_barplot)
 dev.off()
 
 # saving Phylum number in phylum level barplot
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Phylum number in phylum level barplot: ", length(unique(phylum_level_transformed_psmelt$Phylum)))
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -394,7 +394,7 @@ plot(Class_level_barplot)
 dev.off()
 
 # saving Class numbers in Class level barplot
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Class number in Class level barplot (> 0.25 %): ", length(unique(class_level_transformed_psmelt$Class)))
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -455,7 +455,7 @@ plot(Order_level_barplot)
 dev.off()
 
 # saving Order number in order level barplot
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Order number in order level barplot (> 0.25 %): ", length(unique(order_level_transformed_psmelt$Order)))
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -516,7 +516,7 @@ plot(Family_level_barplot)
 dev.off()
 
 # saving Family number in family level barplot
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Family number in family level barplot(> 1 %): ", length(unique(family_level_transformed_psmelt$Family)))
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -616,7 +616,7 @@ plot(Genus_level_barplot)
 dev.off()
 
 # saving Genus number in genus level barplot
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Genus number in genus level barplot(> 1 %): ", length(unique(genus_level_transformed_psmelt$Genus)))
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -716,7 +716,7 @@ plot(Species_level_barplot)
 dev.off()
 
 # saving Species number in species level barplot
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Species number in species level barplot(> 5%): ", length(unique(Species_level_transformed_psmelt$Species)))
 writeLines("\n------------------------- \t END \t-------------------------\n")
@@ -767,7 +767,7 @@ htmlwidgets::saveWidget(as_widget(Species_Heatmap), "6_Species_heatmap.html")
 ######################
 
 #	Plot all relative abundance in one file
-pdf(file = "Relative_abundance.pdf", width = 28, height = 18, paper = "a4r")
+pdf(file = "8_Relative_abundance.pdf", width = 28, height = 18, paper = "a4r")
 plot(Phylum_level_barplot)
 plot(Class_level_barplot)
 plot(Order_level_barplot)
@@ -785,7 +785,7 @@ ps.ord <- ordinate(ps, "NMDS", "bray" )
 #ps.ord
 
 # saving ordination detail
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Ordination details: ")
 ps.ord
@@ -1010,18 +1010,18 @@ tree1 <- plot_tree(ps, color = "Phylum",
   #+coord_polar(theta = "y")
 
 # saving plot in pdf
-pdf("FTHFH_OTU.tree1.pdf", width = 10, height = 10, paper = "a4r")
+pdf("FTHFS_tree1.pdf", width = 10, height = 10, paper = "a4r")
 plot(tree1)
 dev.off()
 
 # save plot as image
-tiff("FTHFH_OTU.tree1.tif", width = 10, height = 10, units = "in", res = 300)
+tiff("FTHFS_tree1.tif", width = 10, height = 10, units = "in", res = 300)
 plot(tree1)
 dev.off()
 
 # saving plot as html widget
 tree1_ <-ggplotly(tree1)
-htmlwidgets::saveWidget(as_widget(tree1_), "FTHFH_OTU.tree1.html")
+htmlwidgets::saveWidget(as_widget(tree1_), "FTHFS_tree1.html")
 
 #####
 
@@ -1047,18 +1047,18 @@ tree2 <- plot_tree(ps,
 #+coord_polar(theta = "y")
 
 # saving plot in pdf
-pdf("FTHFH_OTU.tree2.pdf", width = 10, height = 10, paper = "a4r")
+pdf("FTHFS_tree2.pdf", width = 10, height = 10, paper = "a4r")
 plot(tree2)
 dev.off()
 
 # save plot as image
-tiff("FTHFH_OTU.tree2.tif", width = 10, height = 10, units = "in", res = 300)
+tiff("FTHFS_tree2.tif", width = 10, height = 10, units = "in", res = 300)
 plot(tree2)
 dev.off()
 
 # saving plot as html widget
 tree2_ <-ggplotly(tree2)
-htmlwidgets::saveWidget(as_widget(tree2_), "FTHFH_OTU.tree2.html")
+htmlwidgets::saveWidget(as_widget(tree2_), "FTHFS_tree2.html")
 ######################
 
 # Computing weighted unifrac
@@ -1098,7 +1098,7 @@ ps_unifrac.pcoa_envEF_scores <- cbind(ps_unifrac.pcoa_envEF_scores, Species = ro
 #ps_unifrac.pcoa_envEF_scores
 
 # saving ordination detail
-sink("Visualization_processing_info.txt", append = T)
+sink("0_visualization_info.txt", append = T)
 writeLines("\n------------------------- \t START \t-------------------------\n")
 paste("Weighted unifrac principal coordinate analysis details: ")
 ps_unifrac.pcoa_envEF_scores
@@ -1159,7 +1159,7 @@ htmlwidgets::saveWidget(as_widget(my_plot_), "weighted_unifrac_PCoA.html")
 
 #  plotting without legends
 my_plot2 <- ggplot()+
-  
+
   # making intercept at zero position
   geom_hline(yintercept = 0, linetype="dashed",color="grey20")+
   geom_vline(xintercept = 0, linetype="dashed",color="grey20")+
