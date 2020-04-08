@@ -75,12 +75,12 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 Use `acetoscan` as follows
 
 ```
-$ acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 -e 1e-3 -B 1000 -P 8
+$ acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -l 24 -r 1 -t 0.80 -c 2 -e 1e-3 -B 1000 -P 8
 ```
 #### If installation is not as sudo/root
 
 ```
-$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 1e-3 -B 1000 -P 8
+$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -l 24 -r 1 -t 0.80 -c 2 1e-3 -B 1000 -P 8
 ```
 	
 ```
@@ -93,6 +93,8 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -
                         :defalut min_length = 120
         -q      Quality threshold for the sequences 
                         :default quality threshold = 20
+	-l	Primer length
+			:default primer length = 24			
         -r      Read type either forward or reverse reads 
                         1 = forward reads (default)
                         2 = reverse reads
