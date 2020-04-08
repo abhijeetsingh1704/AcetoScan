@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: acetoscan
-#   Last modified: Apr 02, 2020 19:00
+#   Last modified: Apr 07, 2020 22:00
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -53,6 +53,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     max_len=""
     min_len=""
     qual=""
+    primerlen=""
     cluster_threshold=""
     cluster_size=""
     evalue=""
@@ -66,6 +67,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     max_len_def="300"
     min_len_def="120"
     qual_def="20"
+    primerlen_def="24"
     cluster_threshold_def="0.80"
     cluster_size_def="2"
     version_def="1.0"
@@ -81,14 +83,14 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     #   Function
 
         usage() {
-            echo -e "\tUsage\t: $0 -i <input directory> [-o <output directory>] [-m <max_length>] [-n <min_length>]\n\t\t[-q <quality threshold>] [-r <reads type>] [-t <clustering threshold>] [-c <min_cluster size>] [-e <E-value>]\n\t\t[-B <bootstrap value>] [-P <parallel processes/threads>]\n\n"
-            echo -e "\tExample\t: $0 -i /<input path>/ [-o /<output path>/] [-m 300] [-n 120] [-q 20] [-r 1] [-t 0.80] [-c 2] [-e 1e-3] [-B 1000] [-P 8]\n\n###" 1>&2;
+            echo -e "\tUsage\t: $0 -i <input directory> [-o <output directory>] [-m <max_length>] [-n <min_length>]\n\t\t[-q <quality threshold>] [-l <primer length>] [-r <reads type>] [-t <clustering threshold>] [-c <min_cluster size>] [-e <E-value>]\n\t\t[-B <bootstrap value>] [-P <parallel processes/threads>]\n\n"
+            echo -e "\tExample\t: $0 -i /<input path>/ [-o /<output path>/] [-m 300] [-n 120] [-q 20] [-l 24] [-r 1] [-t 0.80] [-c 2] [-e 1e-3] [-B 1000] [-P 8]\n\n###" 1>&2;
             return 1;
         }
 
     #   Flags
 
-        while getopts "i:o:m:n:q:r:t:c:e:B:P:hvCX" flags; do
+        while getopts "i:o:m:n:q:l:r:t:c:e:B:P:hvCX" flags; do
             case "${flags}" in
 
                 i)
@@ -105,6 +107,9 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
                     ;;
                 q)
                     qual=${OPTARG}
+                    ;;
+                l)
+                    primerlen=${OPTARG}
                     ;;
                 r)
                     read_type=${OPTARG}
@@ -125,12 +130,13 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
                     threads=${OPTARG}
                     ;;
                 h)
-                    echo -e "#\tExample\t: $0 -i /<input path>/ -o /<output path>/ -m 300 -n 120 -q 20 -r 1 -t 0.80 -c 2 -e 1e-3 -B 1000 -P 8\n\n"
+                    echo -e "#\tExample\t: $0 -i /<input path>/ -o /<output path>/ -m 300 -n 120 -q 20 -l 24 -r 1 -t 0.80 -c 2 -e 1e-3 -B 1000 -P 8\n\n"
                     echo -e "\t-i\tInput directory containing raw illumina data"
                     echo -e "\t-o\tOutput directory\n\t\t\t:default = /home/${user}/acetoscan/output_data"
                     echo -e "\t-m\tMaximum length of sequence after quality filtering\n\t\t\t:defalut max_length = 300"
                     echo -e "\t-n\tMinimum length of sequence after quality filtering\n\t\t\t:defalut min_length = 120"
                     echo -e "\t-q\tQuality threshold for the sequences\n\t\t\t:default quality threshold = 20"
+                    echo -e "\t-l\tPrimer length\n\t\t\t:default primer length = 24"
                     echo -e "\t-r\tRead type either forward or reverse reads\n\t\t\t1 = forward reads (default), 2 = reverse reads"
                     echo -e "\t-t\tClustering threshold\n\t\t\t:default cluster threshold = 0.80 (80 %)"
                     echo -e "\t-c\tMinimum cluster size\n\t\t\t:default minimum cluster size = 2"
@@ -281,13 +287,22 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
         echo -e "\n#\tUsing quality threshold: ${YELLOW}${qual}${RESTORE}"
     fi
 
+### Checking primer length for trimming
+
+    if [ "$primerlen" == "" ]; then
+        primerlen="$primerlen_def"
+        echo -e "\n#\tUsing default primer length: ${YELLOW}${primerlen_def}${RESTORE}"
+    else
+        echo -e "\n#\tUsing primer length: ${YELLOW}${primerlen}${RESTORE}"
+    fi
+
 ### Checking read type
 
     if [ "$read_type" == "" ]; then
         read_type="$read_type_def"
         echo -e "\n#\tUsing default: ${YELLOW}R1 / Forward reads${RESTORE}"
     else
-        echo -e "\n#\tUsing ${YELLOW}R${read_type} reads${RESTORE}"
+        echo -e "\n#\tUsing: ${YELLOW}R${read_type} reads${RESTORE}"
     fi
 
 ### Checking clustering threshold
@@ -296,7 +311,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
         cluster_threshold="$cluster_threshold_def"
         echo -e "\n#\tUsing default clustering threshold: ${YELLOW} $(echo ${cluster_threshold_def} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE}"
     else
-        echo -e "\n#\tClustering threshold: ${YELLOW} $(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE}"
+        echo -e "\n#\tClustering threshold:${YELLOW}$(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE}"
     fi
 
 ### Checking minimum clustering size
@@ -358,6 +373,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     export MaxL="${max_len}"
     export MinL="${min_len}"
     export QT="${qual}"
+    export PL="${primerlen}"
     export INfileext="${INfile}"
     export jthreads="${threads}"
 
@@ -515,7 +531,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
         echo -e "\n#\tCreating directory\n"
         mkdir -v -p "${WKDIR}/output_data/trimmed/VSEARCH"
-        echo -e "\n#\tBegin clustering at ${LRED}$(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE} sequence similarity"
+        echo -e "\n#\tBegin clustering at${LRED}$(echo ${cluster_threshold} 100 | awk '{printf "%4.0f\n",$1*$2}') %${RESTORE} sequence similarity"
 
     #   Defining the variable paths for VSEARCH
 
@@ -531,7 +547,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
             --sizeout \
             --threads "${threads}" \
             --fasta_width 0 \
-            --minuniquesize "${cluster_size}" \
+            --minuniquesize 2 \
             --relabel Unique \
             --uc "${path_Vout}/derep.uc" \
             --log "${path_Vout}/derep.log"
@@ -542,10 +558,11 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
         vsearch \
             --cluster_unoise "${path_Vout}/all.derep" \
             --centroid "${path_Vout}/all.denoised" \
+            --id "${cluster_threshold}" \
+            --minsize "${cluster_size}" \
             --sizein \
             --sizeout \
             --threads "${threads}" \
-            --minsize 2 \
             --uc "${path_Vout}/denoise.uc" \
             --log "${path_Vout}/denoise.log"
 
@@ -567,21 +584,18 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
         vsearch \
             --cluster_size "${path_Vout}/nonchimera.fasta" \
             --id "${cluster_threshold}" \
+            --mintsize "${cluster_size}" \
             --centroid "${path_Vout}/preOTU.tmp" \
             --uc "${path_Vout}/clustering_result" \
             --sizein \
             --sizeout \
             --threads "${threads}" \
-            --relabel 'OTU_' 
-            #--biomout "${path_Vout}/OTU.biom.json" \
-            #--otutabout "${path_Vout}/cl_otutab"
-
-
+            --relabel 'OTU_'
 
 ### Preparing input file for filtering of non target sequences
 
     perl -pe '/^>/ ? print "\n" : chomp' "${path_Vout}/preOTU.tmp" | \
-        sed '/^$/d' > "${path_Vout}/preOTU2.tmp"
+        sed '/^$/d;s/[atgc]//g' > "${path_Vout}/preOTU2.tmp"
 
 ### Filtering non target sequences with BlastX - NCBI Blast+ (2.8.1)
 
@@ -673,7 +687,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
             #   Call longest-best-frame script # <= external script
 
                 find "${path_Vout}" -name "fl.tmp" \
-                -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); AcetoScan_longorf.pl --filter "$f" > "otu.tmp"' \;
+                -execdir sh -c 'f="{}"; b=$(basename "${f}" .fasta); AcetoScan_longorf.pl --filter "${f}" > "otu.tmp"' \;
 
                 #    Checking if longorf-acetoscan output is not empty
 
@@ -719,7 +733,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
                     -task blastx \
                     -max_target_seqs 1 \
                     -num_threads "${threads}" \
-                    -evalue 1e-3 \
+                    -evalue ${evalue} \
                     -out "${path_Vout}/tax.tmp" \
                     -outfmt "6 qseqid saccver pident evalue qlen length bitscore qseq" 2> /dev/null
 
@@ -768,6 +782,9 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
         mafft \
             --reorder \
+            --retree 5 \
+            --maxiterate ${bootstr} \
+            --globalpair \
             --thread "${threads}" \
             FTHFS_otu.fasta > FTHFS_otu.aln
 
