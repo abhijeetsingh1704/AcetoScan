@@ -1,7 +1,7 @@
 # AcetoScan
 
 - Version: 1.0 (20200326)
-- Last modified: Apr 08, 2020 14:00
+- Last modified: Apr 13, 2020 20:30
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -44,9 +44,7 @@ $ sudo ./INSTALL
 
 For installation as local user make sure the dependency software are installed and modules are loaded (on server environment)
 ```
-chmod +x INSTALL
-
-./INSTALL
+bash INSTALL
 ```
 
 ## acetoscan binary
