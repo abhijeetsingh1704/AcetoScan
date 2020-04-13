@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: AcetoScan_cutadapt.sh
-#   Last modified: Apr 07, 2020 22:00
+#   Last modified: Apr 13, 2020 18:22
 #   Sign: Abhi
 
 ### Cutadapt script for cleaning ILLUMINA read data,
@@ -37,9 +37,12 @@
                 --maximum-length $MaxL \
                 --minimum-length $MinL \
                 -u ${PL} \
-                -j ${jthreads} \
+                --cores ${jthreads} \
                 -q ${QT} \
+                --max-ee 1 \
+                --fasta \
                 --length-tag "size=" \
+                --report full \
                 -o "${cutadapt_dir}/${FwdOut}" \
                 "${infile}" >> "${cutadapt_out}"
         fi
