@@ -14,7 +14,7 @@ AcetoScan can also process fasta sequences to filter out non-target sequences, a
 
 `AcetoScan` pipeline uses some software dependencies
 ```
-	- Cutadapt 	(>1.18-1)
+	- Cutadapt 	(>2.9)
 	- VSEARCH 	(>2.13.1)
 	- NCBI-blast+ 	(>2.5.0+)
 	- Bioperl 	(>1.7.2-3)
