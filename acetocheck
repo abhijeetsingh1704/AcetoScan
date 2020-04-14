@@ -207,6 +207,9 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
         echo -e "\t\t${YELLOW}${output_file_def}.log${RESTORE}"
     else
         echo -e "\n#\tOutput files:"
+        output_tmp1=$(basename ${output_file})
+        output_tmp2=${output_tmp1%.*}
+        output_file=${output_tmp2}
         echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
         echo -e "\t\t${YELLOW}acetocheck_${DATE}.log${RESTORE}"
     fi
