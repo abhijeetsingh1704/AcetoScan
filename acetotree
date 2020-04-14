@@ -203,6 +203,10 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     exec > >(tee -a "${input_path}/acetotree_${DATE}" )
     exec 2> >(tee -a "${input_path}/acetotree_${DATE}" >&2)
 
+### Checking output path
+
+    output_path=$(dirname "$(realpath "${output_file}")")
+
 ### Checking output file provided or using default
 
     if [ "$output_file" == "" ]; then
@@ -214,6 +218,9 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
         echo -e "\t\t${YELLOW}${output_file_def}.tree${RESTORE}"
         echo -e "\t\t${YELLOW}${output_file_def}.log${RESTORE}"
     else
+        output_tmp1=$(basename ${output_file})
+        output_tmp2=${output_tmp1%.*}
+        output_file=${output_tmp2}
         echo -e "\n#\tOutput files:"
         echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
         echo -e "\t\t${YELLOW}${output_file}.csv${RESTORE}"
@@ -221,10 +228,6 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
         echo -e "\t\t${YELLOW}${output_file}.tree${RESTORE}"
         echo -e "\t\t${YELLOW}acetotree_${DATE}.log${RESTORE}"
     fi
-
-### Checking output path
-
-    output_path=$(dirname "$(realpath "${output_file}")")
 
 ### Checking evalue
 
@@ -446,10 +449,10 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
 ### Renaming the required file to desired output file
 
-    mv "${input_path}/filt.ack" "${output_file}.fasta"
-    mv "${input_path}/taxtab.csv" "${output_file}.csv"
-    mv "${input_path}/att.aln" "${output_file}.aln"
-    mv "${input_path}/att.tree" "${output_file}.tree"
+    mv "${input_path}/filt.ack" "${output_path}/${output_file}.fasta"
+    mv "${input_path}/taxtab.csv" "${output_path}/${output_file}.csv"
+    mv "${input_path}/att.aln" "${output_path}/${output_file}.aln"
+    mv "${input_path}/att.tree" "${output_path}/${output_file}.tree"
 
 ### Removing temporary files
 
@@ -484,7 +487,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
 ### Outfile file stat
 
-    nseqOut=$(grep -c '>' "${output_file}.fasta")
+    nseqOut=$(grep -c '>' "${output_path}/${output_file}.fasta")
 
 ### Number of unspecific sequences
 
