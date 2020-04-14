@@ -49,7 +49,7 @@ bash INSTALL
 
 ## acetoscan binary
 
-`INSTALL` will create main directory `acetoscan` in `/home/user/` and sub-directories `acetoscan_bin` containing dependendencies binaries & `acetobase` contains reference database
+`INSTALL` will create main directory `acetoscan` in `/home/<user>/` and sub-directories `acetoscan_bin` containing dependendencies scripts & `acetobase` contains reference database
 
 ## acetoscan output
 
@@ -76,7 +76,7 @@ $ acetoscan -X
 
 or
 
-$ /home/$user/acetoscan/acetoscan -X 
+$ /home/<user>/acetoscan/acetoscan -X 
 ```
 
 ```
