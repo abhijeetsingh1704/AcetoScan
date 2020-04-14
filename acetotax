@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: acetotax
-#   Last modified: Tor, Mar 19, 2020 10:00
+#   Last modified: Apr 14, 2020 12:00
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -14,7 +14,7 @@
 
     set -euo pipefail
 
-### Acetotax script
+### acetotax script
 
     echo -e "${LRED}\
  __________________________________________________
@@ -29,7 +29,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 #\t${YELLOW}-acetoscan version - 1.0${RESTORE}
 "
 
-### Recording the time whent he script was started
+### Recording the time when the script was started
 
     start=$(date +%s) #start time of script
 
@@ -86,9 +86,9 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
                     threads=${OPTARG}
                     ;;
                 h)
-                    echo -e "#\tExample\t: $0 -i /path/<input file> -o /path/<output file> -e 1e-3 -P 8\n\n"
-                    echo -e "\t-i\tInput_file - multifasta file with squences"
-                    echo -e "\t-o\tOutput file\n\t\t\t:default =  acetotax_<DATE>_<TIME>.fasta\n\t\t\t:default = acetotax_<DATE>_<TIME>.csv"
+                    echo -e "#\tExample\t: $0 -i /path/<input_file> [-o /path/<output_file>] [-e 1e-3] [-P 8]\n\n"
+                    echo -e "\t-i\tInput file - multifasta file"
+                    echo -e "\t-o\tOutput file\n\t\t\t:default = acetotax_<date>_<time>.fasta\n\t\t\t:default = acetotax_<date>_<time>.csv"
                     echo -e "\t-e\tE-value\n\t\t\t:default evalue = 1e-3"
                     echo -e "\t-P\tParallel processes/threads\n\t\t\t:default no. of parallels = all available threads"
                     echo -e "\t-h\tPrint help"
