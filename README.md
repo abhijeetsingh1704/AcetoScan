@@ -86,9 +86,9 @@ $ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -
         -o      Output directory
                         :default = /home/${user}/acetoscan/output_data
         -m      Maximum length of sequence after quality filtering
-                        :defalut max_length = 300
+                        :default max_length = 300
         -n      Minimum length of sequence after quality filtering
-                        :defalut min_length = 120
+                        :default min_length = 120
         -q      Quality threshold for the sequences 
                         :default quality threshold = 20
 	-l	Primer length
@@ -140,9 +140,9 @@ $ bash /home/$user/acetoscan/acetocheck -h
 ```
 
 ```
-acetocheck -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -P 8
+acetocheck -i /path/<input_file>/ -o /path/<output_file>/ -e 1e-3 -P 8
 
--i      Input_file
+	-i      Input_file
         -o      Output file
                         :default = acetocheck_<DATE>_<TIME>.fasta
         -e      E-value
@@ -176,7 +176,7 @@ $ bash /home/$user/acetoscan/acetotax -h
 ```
 
 ```
-acetotax -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -P 8
+acetotax -i /path/<input_file>/ -o /path/<output_file>/ -e 1e-3 -P 8
 
         -i      Input_file
         -o      Output file
@@ -214,7 +214,7 @@ $ bash /home/$user/acetoscan/acetotree -h
 ```
 
 ```
-acetotree -i /path/<input file>/ -o /path/<output file>/ -e 1e-3 -B 1000 -P 8
+acetotree -i /path/<input_file>/ -o /path/<output_file>/ -e 1e-3 -B 1000 -P 8
 
         -i      Input_file
         -o      Output file
