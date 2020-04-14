@@ -169,7 +169,7 @@ $ acetotax -h
 ```
 
 ```
-acetotax -i /path/<input_file>/ -o /path/<output_file>/ -e 1e-3 -P 8
+acetotax -i /path/<input_file>/ [-o /path/<output_file>/] [-e 1e-3] [-P 8]
 
         -i      Input_file
         -o      Output file
