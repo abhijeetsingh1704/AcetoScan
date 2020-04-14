@@ -198,6 +198,10 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     exec > >(tee -a "${input_path}/acetocheck_${DATE}" )
     exec 2> >(tee -a "${input_path}/acetocheck_${DATE}" >&2)
 
+### Checking output path
+
+    output_path=$(dirname "$(realpath "${output_file}")")
+
 ### Checking output file provided or using default
 
     if [ "$output_file" == "" ]; then
@@ -206,17 +210,13 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
         echo -e "\t\t${YELLOW}${output_file_def}.fasta${RESTORE}"
         echo -e "\t\t${YELLOW}${output_file_def}.log${RESTORE}"
     else
-        echo -e "\n#\tOutput files:"
         output_tmp1=$(basename ${output_file})
         output_tmp2=${output_tmp1%.*}
         output_file=${output_tmp2}
+        echo -e "\n#\tOutput files:"
         echo -e "\t\t${YELLOW}${output_file}.fasta${RESTORE}"
         echo -e "\t\t${YELLOW}acetocheck_${DATE}.log${RESTORE}"
     fi
-
-### Checking output path
-
-    output_path=$(dirname "$(realpath "${output_file}")")
 
 ### Checking evalue
 
@@ -351,7 +351,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
 ### Renaming the required file to desired output file
 
-    mv "${input_path}/filt.ack" "${output_file}.fasta"
+    mv "${input_path}/filt.ack" "${output_path}/${output_file}.fasta"
 
 ### Removing temporary files
 
@@ -384,7 +384,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
 ### Outfile file stat
 
-    nseqOut=$(grep -c '>' "${output_file}.fasta")
+    nseqOut=$(grep -c '>' "${output_path}/${output_file}.fasta")
 
 ### Number of unspecific sequences
 
