@@ -1,7 +1,7 @@
 # AcetoScan
 
-- Version: 1.0 (20200413)
-- Last modified: Apr 13, 2020 20:30
+- Version: 1.0 (20200414)
+- Last modified: Apr 14, 2020 20:30
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -12,15 +12,15 @@ AcetoScan can also process fasta sequences to filter out non-target sequences, a
 
 ## Dependencies
 
-`AcetoScan` pipeline uses some software dependencies
+`AcetoScan` pipeline uses some software dependencies (version equals or higher)
 ```
-	- Cutadapt 	(>2.9)
-	- VSEARCH 	(>2.13.1)
-	- NCBI-blast+ 	(>2.5.0+)
-	- Bioperl 	(>1.7.2-3)
-	- MAFFT		(>7.307)
-	- Fasttree	(>2.1.9)
-	- R 		(>3.5.2), with libraries:
+	- Cutadapt 	(2.9)
+	- VSEARCH 	(2.13.1)
+	- NCBI-blast+ 	(2.5.0+)
+	- Bioperl 	(1.7.2-3)
+	- MAFFT		(7.307)
+	- Fasttree	(2.1.9)
+	- R 		(3.5.2), with libraries:
 		¤ phyloseq 	(1.24.2)
 		¤ ggplot2 	(3.1.1)
 		¤ plotly 	(4.9.0)
@@ -68,65 +68,63 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 
 3. acetoscan_result 	- containing all the final graphics, OTU table and TAX table. After successful execution of analysis, all the important data will be copies to this final directory.
 ```
-## Using acetoscan program
 
-Use `acetoscan` as follows
-
-```
-$ acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -l 24 -r 1 -t 0.80 -c 2 -e 1e-3 -B 1000 -P 8
-```
-#### If installation is not as sudo/root
-
-```
-$ bash /home/$user/acetoscan/acetoscan -i /input path/ -o /output path/ -m 300 -n 120 -q 20 -l 24 -r 1 -t 0.80 -c 2 1e-3 -B 1000 -P 8
-```
-	
-```
-	-i      Input directory containing raw illumina data
-        -o      Output directory
-                        :default = /home/${user}/acetoscan/output_data
-        -m      Maximum length of sequence after quality filtering
-                        :default max_length = 300
-        -n      Minimum length of sequence after quality filtering
-                        :default min_length = 120
-        -q      Quality threshold for the sequences 
-                        :default quality threshold = 20
-	-l	Primer length
-			:default primer length = 24			
-        -r      Read type either forward or reverse reads 
-                        1 = forward reads (default)
-                        2 = reverse reads
-        -t      Clustering threshold
-                        :default cluster threshold = 0.80 (80 %)
-        -c      Minimum cluster size
-                        :default minimum cluster size = 2
-        -e      E-value
-                        :default evalue = 1e-3
-	-B      Bootstrap value
-                        :default bootstrap = 1000
-        -P      Parallel processes / threads
-                        :default no. of parallels = all available threads
-        -h      Print help        
-        -X      Print AcetoScan commands
-        -v      Print AcetoScan version
-        -C      Print AcetoScan citation
-
-```
-## AcetoScan commands other than acetoscan, for processing of fasta sequences
+## AcetoScan commands
 
 ```
 $ acetoscan -X 
 
 or
 
-$ bash /home/$user/acetoscan/acetoscan -X 
+$ /home/$user/acetoscan/acetoscan -X 
 ```
 
 ```
-1. acetocheck      - for processing fasta sequences and filter out non-target sequences
-2. acetotax        - acetocheck + taxonomic assignments
-3. acetotree       - acetotax + phylogenetic tree generation
+
+1. acetoscan       - for complete processing of raw sequence data
+2. acetocheck      - for processing fasta sequences and filter out non-target sequences
+3. acetotax        - acetocheck + taxonomic assignments
+4. acetotree       - acetotax + phylogenetic tree generation
 ```
+
+## Using acetoscan program
+
+Use `acetoscan` as follows
+
+```
+acetoscan -i /<input path>/ [-o /<output path>/] [-m 300] [-n 120] [-q 20] [-l 24] [-r 1] [-t 0.80] [-c 2] [-e 1e-3] [-B 1000] [-P 8]
+
+
+        -i      Input directory containing raw illumina data
+        -o      Output directory
+                        :default = /home/<user>/acetoscan/output_data
+        -m      Maximum length of sequence after quality filtering
+                        :default max_length = 300
+        -n      Minimum length of sequence after quality filtering
+                        :default min_length = 120
+        -q      Quality threshold for the sequences
+                        :default quality threshold = 20
+        -l      Primer length
+                        :default primer length = 24
+        -r      Read type either forward or reverse reads
+                        1 = forward reads (default), 2 = reverse reads
+        -t      Clustering threshold
+                        :default cluster threshold = 0.80 (80 %)
+        -c      Minimum cluster size
+                        :default minimum cluster size = 2
+        -e      E-value
+                        :default evalue = 1e-3
+        -B      Bootstrap value
+                        :default bootstrap = 1000
+        -P      Parallel processes / threads
+                        :default no. of parallels = all available threads
+        -h      Print help
+        -X      Print AcetoScan commands
+        -v      Print AcetoScan version
+        -C      Print AcetoScan citation
+
+```
+
 
 ## acetocheck
 Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence
@@ -134,25 +132,23 @@ Use this command for the FTHFS fasta a sequences and filter out any unspecific /
 ```
 $ acetocheck -h 
 
-or
-
-$ bash /home/$user/acetoscan/acetocheck -h
 ```
 
 ```
-acetocheck -i /path/<input_file>/ -o /path/<output_file>/ -e 1e-3 -P 8
+acetocheck -i /path/<input_file> [-o /path/<output_file>] [-e 1e-3] [-P 8]
 
-	-i      Input_file
+
+        -i      Input file - multifasta file
         -o      Output file
-                        :default = acetocheck_<DATE>_<TIME>.fasta
+                        :default = acetocheck_<date>_<time>.fasta
         -e      E-value
                         :default evalue = 1e-3
-	-P      Parallel processes/threads
+        -P      Parallel processes/threads
                         :default no. of parallels = all available threads
         -h      Print help
-        -X      Print AcetoScan commands        
+        -X      Print AcetoScan commands
         -v      Print AcetoScan version
-        -C	Print AcetoScan citation
+        -C      Print AcetoScan citation
 ```
 
 ### Use
@@ -170,9 +166,6 @@ Use this command for the FTHFS fasta a sequences and filter out any unspecific /
 ```
 $ acetotax -h 
 
-or
-
-$ bash /home/$user/acetoscan/acetotax -h
 ```
 
 ```
@@ -208,27 +201,25 @@ Use this command for the FTHFS fasta a sequences and filter out any unspecific /
 ```
 $ acetotree -h 
 
-or
-
-$ bash /home/$user/acetoscan/acetotree -h
 ```
 
 ```
-acetotree -i /path/<input_file>/ -o /path/<output_file>/ -e 1e-3 -B 1000 -P 8
+acetotree -i /path/<input_file> [-o /path/<output_file>] [-e 1e-3] [-B 1000] [-P 8]
 
-        -i      Input_file
+
+        -i      Input file - multifasta file
         -o      Output file
-                        :default = acetotree_<DATE>_<TIME>.tree
-                        :default = acetotree_<DATE>_<TIME>.aln
-                        :default = acetotree_<DATE>_<TIME>.csv
-                        :default = acetotree_<DATE>_<TIME>.fasta
+                        :default = acetotree_<date>_<time>.fasta
+                        :default = acetotree_<date>_<time>.csv
+                        :default = acetotree_<date>_<time>.aln
+                        :default = acetotree_<date>_<time>.tree
         -e      E-value
                         :default evalue = 1e-3
         -B      Bootstrap value
                         :default bootstrap = 1000
-	-P      Parallel processes/threads
+        -P      Parallel processes/threads
                         :default no. of parallels = all available threads
-        -h      Print help        
+        -h      Print help
         -X      Print AcetoScan commands
         -v      Print AcetoScan version
         -C      Print AcetoScan citation
