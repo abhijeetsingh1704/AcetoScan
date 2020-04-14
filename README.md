@@ -173,8 +173,8 @@ acetotax -i /path/<input_file>/ [-o /path/<output_file>/] [-e 1e-3] [-P 8]
 
         -i      Input_file
         -o      Output file
-                        :default = acetotax_<DATE>_<TIME>.csv
-                        :default = acetotax_<DATE>_<TIME>.fasta
+                        :default = acetotax_<date>_<time>.csv
+                        :default = acetotax_<date>_<time>.fasta
         -e      E-value
                         :default evalue = 1e-3
 	-P      Parallel processes/threads
