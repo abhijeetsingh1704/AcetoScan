@@ -430,7 +430,11 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
     mafft \
         --reorder \
-        --thread "${threads}" "${input_path}/filt.ack" > "${input_path}/att.aln"
+        --retree 5 \
+        --maxiterate ${bootstr} \
+        --globalpair \
+        --thread "${threads}" \
+        "${input_path}/filt.ack" > "${input_path}/att.aln"
 
 ### Phylogenetic tree construction by FastTree
 
