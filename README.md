@@ -1,7 +1,7 @@
 # AcetoScan
 
-- Version: 1.0 (20200414)
-- Last modified: Apr 14, 2020 20:30
+- Version: 1.0
+- Last modified: mån  1 jun 2020 13:30:48 CEST
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -27,56 +27,66 @@ AcetoScan can also process fasta sequences to filter out non-target sequences, a
 		¤ RColorBrewer 	(1.1.2)
 		¤ plyr 		(1.8.4)
 		¤ dplyr 	(0.8.0.1)
-		¤ vegan		(2.5.6)	
+		¤ vegan		(2.5.6)
 ```
 
 
 ## Installation
 
-For installation run the following command in terminal, this will `INSTALL` all dependencies (if unavailable) and download the reference database from acetobase website. 
+For installation run the following command in terminal, this will `INSTALL` all dependencies (if unavailable) and download the reference database from acetobase website.
 ```
-$ chmod +x INSTALL
+$ chmod +x install_linux.sh OR install_mac.sh
 
-$ sudo ./INSTALL
+$ sudo ./install_linux.sh OR install_mac.sh
 ```
 
 ## Installation without sudo/ROOT
 
 For installation as local user make sure the dependency software are installed and modules are loaded (on server environment)
 ```
-bash INSTALL
+bash install_linux.sh OR install_mac.sh
 ```
 
-## acetoscan binary
+## acetoscan installation
 
-`INSTALL` will create main directory `acetoscan` in `/home/<user>/` and sub-directories `acetoscan_bin` containing dependendencies scripts & `acetobase` contains reference database
+`install_linux.sh` OR `install_mac.sh` will create main directory `acetoscan` in `$HOME` and sub-directories
 
-## acetoscan output
+```
+1. bin - containing all main AcetoScan command scripts
+2. dat - containing test
+3. db - containing reference database AcetoBase
+4. doc - containing user manual and tutorial video
+5. scripts - containing dependencies scripts
+```
 
-`acetoscan` will result in three directories
+## AcetoScan input
+```
+1. user_data_directory - containing input raw data
+```
+######			Raw data must in format "Samplename_XYZ_L001_R1_001.fastq.(gz or bz2)"
+https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/miseqreporter/miseq-reporter-generate-fastq-workflow-guide-15042322-01.pdf, page 9, FASTQ File Names
+
+## AcetoScan output
+
+`acetoscan` will result in two directories
 
 - Directories will be created `in default/destination path`
 
-```
-1. input_data 		- containing softlinked input raw data
-```
-######			Raw data must in format "Samplename_XYZ_L001_R1_001.fastq.(gz or bz2)" 
-https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/miseqreporter/miseq-reporter-generate-fastq-workflow-guide-15042322-01.pdf, page 9, FASTQ File Names
 
-```				
-2. output_data 		- containing process data will be generated and stored. In case of process failure, data can be accessed from here for further processing
+```
+1. output_data - containing process data will be generated and stored. In case of process failure, data can be accessed from here for further processing
 
-3. acetoscan_result 	- containing all the final graphics, OTU table and TAX table. After successful execution of analysis, all the important data will be copies to this final directory.
+2. acetoscan_result - containing all the final graphics, OTU table and TAX table. After successful execution of analysis, all the important data will be copies to this final directory.
 ```
 
 ## AcetoScan commands
 
 ```
-$ acetoscan -X 
+$ acetoscan -X
 
 or
 
-$ /home/<user>/acetoscan/acetoscan -X 
+$ /$HOME/acetoscan/acetoscan -X
 ```
 
 ```
@@ -97,7 +107,7 @@ acetoscan -i /<input path>/ [-o /<output path>/] [-m 300] [-n 120] [-q 20] [-l 2
 
         -i      Input directory containing raw illumina data
         -o      Output directory
-                        :default = /home/<user>/acetoscan/output_data
+                        :default = /$HOME/acetoscan/output_data
         -m      Maximum length of sequence after quality filtering
                         :default max_length = 300
         -n      Minimum length of sequence after quality filtering
@@ -130,7 +140,7 @@ acetoscan -i /<input path>/ [-o /<output path>/] [-m 300] [-n 120] [-q 20] [-l 2
 Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence
 
 ```
-$ acetocheck -h 
+$ acetocheck -h
 
 ```
 
@@ -164,7 +174,7 @@ acetocheck -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e
 Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence and taxonomic annotations of the fasta sequences
 
 ```
-$ acetotax -h 
+$ acetotax -h
 
 ```
 
@@ -179,7 +189,7 @@ acetotax -i /path/<input_file>/ [-o /path/<output_file>/] [-e 1e-3] [-P 8]
                         :default evalue = 1e-3
 	-P      Parallel processes/threads
                         :default no. of parallels = all available threads
-        -h      Print help        
+        -h      Print help
         -X      Print AcetoScan commands
         -v      Print AcetoScan version
         -C      Print AcetoScan citation
@@ -193,13 +203,13 @@ acetotax -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 1
 1. my_sequences.fasta
 2. my_sequences.csv
 3. acetotax_< Date >_< Time >.log
-	
-	
+
+
 ## acetotree
 Use this command for the FTHFS fasta a sequences and filter out any unspecific / non-FTHFS sequence and taxonomic annotations of the fasta sequences and generation of phylogenetic tree
 
 ```
-$ acetotree -h 
+$ acetotree -h
 
 ```
 
