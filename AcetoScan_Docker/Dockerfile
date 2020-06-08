@@ -1,7 +1,7 @@
 ## File: Dockerfile for AcetoScan
 ## Last modified: mån  8 jun 2020 17:04:54 CEST
-## Version: 0.1
-## Sign: JN
+## Version: 1.0
+## Sign: Abhi
 
 FROM abhijeetsingh1704/amplibase
 
@@ -14,9 +14,9 @@ RUN mkdir -p "/acetoscan/" {bin,db}
 
 WORKDIR /acetoscan/bin/
 
-COPY ./Docker_AcetoScan_Linux/bin/* /acetoscan/bin/
-COPY ./Docker_AcetoScan_Linux/scripts/* /acetoscan/bin/
-COPY ./Docker_AcetoScan_Linux/db/* /acetoscan/db/
+COPY ./bin/* /acetoscan/bin/
+COPY ./scripts/* /acetoscan/bin/
+COPY ./db/* /acetoscan/db/
 
 ENV PATH="/acetoscan/bin:${PATH}"
 
