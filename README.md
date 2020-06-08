@@ -1,7 +1,7 @@
 # AcetoScan
 
 - Version: 1.0
-- Last modified: mån  1 jun 2020 13:30:48 CEST
+- Last modified: mån  8 jun 2020 17:04:54 CEST
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -33,7 +33,7 @@ AcetoScan can also process fasta sequences to filter out non-target sequences, a
 
 ## Installation
 
-For installation run the following command in terminal, this will `INSTALL` all dependencies (if unavailable) and download the reference database from acetobase website.
+For installation run the following command in terminal, this will check all dependencies and download the reference database from acetobase website.
 ```
 $ chmod +x install_linux.sh OR install_mac.sh
 
@@ -245,3 +245,50 @@ acetotree -i /home/abhi/Desktop/seq.fasta -o /home/abhi/Desktop/my_sequences -e 
 3. my_sequences.aln
 4. my_sequences.tree
 5. acetotax_< Date >_< Time >.log
+
+# Running AcetoScan Pipelline as a Docker image/container
+
+### Mounting the local volume / connecting the files on local computer to the container
+
+
+`
+sudo docker volume create --opt type=none --opt o=bind --opt device=/PATH/to/my/DATA --name MY_CUSTOM_NAME
+`
+#### Example
+###### Here
+`--opt device=` - will have the path to your raw input data
+
+`--name` - any name according to your wish
+
+`
+sudo docker volume create --opt type=none --opt o=bind --opt device=/home/abhi/Desktop/reads --name myDockerAcetoscan 
+`
+
+### Running docker image as container
+##### NOTE: only `MY_CUSTOM_NAME` should be changed according to your `--name` flag
+
+`
+sudo docker run --rm -v MY_CUSTOM_NAME:/acetoscan/input_dir -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir
+`
+#### Example
+`
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir
+`
+###### Default program for AcetoScan pipeline is `acetoscan` command, therefore it is optional to call it with `--entrypoint` flag. But in case of `acetocheck`,`acetotax` or `acetotree`  command the code need to include `--entrypoint` flag
+
+#### Example
+##### acetoscan
+`
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetoscan -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir
+`
+##### acetocheck
+
+`
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir/input_file.fasta
+`
+
+- OR
+
+`
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir/input_file.fasta -o /acetoscan/input_dir/output_file.fasta 
+`
