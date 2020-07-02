@@ -1,11 +1,7 @@
 #!/bin/bash
 
 #   File: acetotax
-<<<<<<< HEAD
 #   Last modified: tor  2 jul 2020 14:08:50 CEST
-=======
-#   Last modified: tor  2 jul 2020 13:38:06 CEST
->>>>>>> 1273102171a9eb044005e31c4d3c2779a00901e7
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -246,12 +242,9 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     echo -e "\n#\t${YELLOW}Performing dependencies check${RESTORE}"
     export PATH="/home/${user}/acetoscan/bin/:${PATH}"
     export PATH="/home/${user}/acetoscan/scripts/:${PATH}"
-<<<<<<< HEAD
 
     # running check
 
-=======
->>>>>>> 1273102171a9eb044005e31c4d3c2779a00901e7
     AcetoScan_software_check.sh # <= External script
 
 ### Making a new temporary file
