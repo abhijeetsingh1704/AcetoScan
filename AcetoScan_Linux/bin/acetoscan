@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: acetoscan
-#   Last modified: Apr 14, 2020 12:00
+#   Last modified: tis 16 jun 2020 18:35:25 CEST
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -206,8 +206,8 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
 ### Generating logfile
 
-    exec > >(tee -a "/home/${user}/acetoscan/"acetoscan_log )
-    exec 2> >(tee -a "/home/${user}/acetoscan/"acetoscan_log >&2)
+    exec > >(tee -a "${CDIR}/acetoscan_log_${DATE}" )
+    exec 2> >(tee -a "${CDIR}/acetoscan_log_${DATE}" >&2)
 
 ### Checking input_dir
 
@@ -474,8 +474,9 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
 ### Cleaning input directory links and deleting directory
 
-    find "${WKDIR}/input_data/" -maxdepth 1 -type l -name "*_${reads}_001.fastq.${INfile}" -exec rm {} \;
-    find "${WKDIR}/" -maxdepth 1 -type d -name "input_data" -exec rm -r {} \;
+    cd "${WKDIR}"
+    find "${WKDIR}/input_data/" -type l -name "*_${reads}_001.fastq.${INfile}" -exec rm {} \;
+    rm -r "input_data"
 
 ### Preprocessing for clustering
 
@@ -899,7 +900,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 ### And removing logfile from previous initial working directory
 
     # removing the colour codes from log file
-    find "/home/${user}/acetoscan/acetoscan_log" -name "acetoscan_log" -exec sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g' {} > "${WKDIR}/acetoscan_result/0_acetoscan_${DATE}" \;
+    find "${CDIR}" -name "acetoscan_log_${DATE}" -exec sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g' {} > "${WKDIR}/acetoscan_result/0_acetoscan_${DATE}" \;
 
     # Formatting log file
     find "${WKDIR}/acetoscan_result/" -name "0_acetoscan_${DATE}" -exec sed -e '
@@ -927,7 +928,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
     # removing temperorary log files
     find "${WKDIR}/acetoscan_result/" -name "0_acetoscan_${DATE}" -exec rm {} \;
-    find "/home/${user}/acetoscan/acetoscan_log" -name "acetoscan_log" -exec rm {} \;
+    find "${CDIR}" -name "acetoscan_log_${DATE}" -exec rm {} \;
 
 #   Removing the merged samples file to save disk space
 
