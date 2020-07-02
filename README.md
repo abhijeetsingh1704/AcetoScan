@@ -1,11 +1,7 @@
 # AcetoScan
 
 - Version: 1.0
-<<<<<<< HEAD
-- Last modified: mån  1 jun 2020 13:30:48 CEST
-=======
-- Last modified: mån  8 jun 2020 17:04:54 CEST
->>>>>>> 1273102171a9eb044005e31c4d3c2779a00901e7
+- Last modified: tor  2 jul 2020 14:28:09 CEST
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -37,11 +33,8 @@ AcetoScan can also process fasta sequences to filter out non-target sequences, a
 
 ## Installation
 
-<<<<<<< HEAD
-For installation run the following command in terminal, this will `INSTALL` all dependencies (if unavailable) and download the reference database from acetobase website.
-=======
 For installation run the following command in terminal, this will check all dependencies and download the reference database from acetobase website.
->>>>>>> 1273102171a9eb044005e31c4d3c2779a00901e7
+
 ```
 $ chmod +x install_linux.sh OR install_mac.sh
 
@@ -77,7 +70,7 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 ## AcetoScan output
 
 `acetoscan` will result in two directories
-<<<<<<< HEAD
+
 
 - Directories will be created `in default/destination path`
 
@@ -85,15 +78,6 @@ https://support.illumina.com/content/dam/illumina-support/documents/documentatio
 ```
 1. output_data - containing process data will be generated and stored. In case of process failure, data can be accessed from here for further processing
 
-=======
-
-- Directories will be created `in default/destination path`
-
-
-```
-1. output_data - containing process data will be generated and stored. In case of process failure, data can be accessed from here for further processing
-
->>>>>>> 1273102171a9eb044005e31c4d3c2779a00901e7
 2. acetoscan_result - containing all the final graphics, OTU table and TAX table. After successful execution of analysis, all the important data will be copies to this final directory.
 ```
 
@@ -205,7 +189,7 @@ acetotax -i /path/<input_file>/ [-o /path/<output_file>/] [-e 1e-3] [-P 8]
                         :default = acetotax_<date>_<time>.fasta
         -e      E-value
                         :default evalue = 1e-3
-	-P      Parallel processes/threads
+        -P      Parallel processes/threads
                         :default no. of parallels = all available threads
         -h      Print help
         -X      Print AcetoScan commands
@@ -279,7 +263,7 @@ sudo docker volume create --opt type=none --opt o=bind --opt device=/PATH/to/my/
 `--name` - any name according to your wish
 
 `
-sudo docker volume create --opt type=none --opt o=bind --opt device=/home/abhi/Desktop/reads --name myDockerAcetoscan 
+sudo docker volume create --opt type=none --opt o=bind --opt device=/home/abhi/Desktop/reads --name myDockerAcetoscan
 `
 
 ### Running docker image as container
@@ -308,5 +292,5 @@ sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acet
 - OR
 
 `
-sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir/input_file.fasta -o /acetoscan/input_dir/output_file.fasta 
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir/input_file.fasta -o /acetoscan/input_dir/output_file.fasta
 `
