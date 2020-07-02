@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: acetotree
-#   Last modified: mån  8 jun 2020 16:07:35 CEST
+#   Last modified: tor  2 jul 2020 14:08:50 CEST
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -355,9 +355,13 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
             printf '' > "${input_path}/filt.ack"
             while IFS= read -r line; do
-                grep -w -A 1 "$line" "${input_path}/${tempfile1}.bst" >> "${input_path}/filt.ack"
+                grep -w -A 1 "$line" "${input_path}/${tempfile1}.bst" >> "${input_path}/filt1.ack"
             done < "${input_path}/b4fl.ack"
 
+        #   remove duplicate sequences
+
+            awk '/^>/{f=!d[$1];d[$1]=1}f' "${input_path}/filt1.ack" > "${input_path}/filt.ack"
+        
         #   Closing spinner for blastx filtering
 
             echo -ne "Done\n"
@@ -463,6 +467,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     find "${input_path}" -type f -name "${tempfile1}" -exec rm {} \;
     find "${input_path}" -type f -name "${tempfile1}.bst" -exec rm {} \;
     find "${input_path}" -type f -name "b4fl.ack" -exec rm {} \;
+    find "${input_path}" -type f -name "filt1.ack" -exec rm {} \;
     find "${input_path}" -type f -name "tax.tmp" -exec rm {} \;
     find "${input_path}" -type f -name "tax2.tmp" -exec rm {} \;
 
