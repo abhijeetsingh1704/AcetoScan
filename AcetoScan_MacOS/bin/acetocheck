@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: acetocheck
-#   Last modified: Apr 14, 2020 12:00
+#   Last modified: tor  2 jul 2020 14:08:50 CEST
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -239,7 +239,8 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 ### Checking dependencies
 
     echo -e "\n#\t${YELLOW}Performing dependencies check${RESTORE}"
-    export PATH="/Users/${user}/acetoscan/acetoscan_bin/:${PATH}"
+    export PATH="/Users/${user}/acetoscan/bin/:${PATH}"
+    export PATH="/Users/${user}/acetoscan/scripts/:${PATH}"
     AcetoScan_software_check.sh # <= External script
 
 ### Making a new temporary file
@@ -307,7 +308,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
 
     #   Defining the variable path
 
-        path_acetobase="/Users/${user}/acetoscan/acetobase/AcetoBase"
+        path_acetobase="/Users/${user}/acetoscan/db/AcetoBase"
 
     #   Defining blastx filtering function
 
