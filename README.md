@@ -1,7 +1,7 @@
 # AcetoScan
 
 - Version: 1.0
-- Last modified: tor  2 jul 2020 14:28:09 CEST
+- Last modified: Fri Aug 28 11:51:43 CEST 2020
 - Sign: Abhijeet Singh (abhijeetsingh.aau@gmail.com)
 
 ## Description
@@ -294,3 +294,7 @@ sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acet
 `
 sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir/input_file.fasta -o /acetoscan/input_dir/output_file.fasta
 `
+
+# Citation
+
+Singh A, Nylander JAA, Schnürer A, Bongcam-Rudloff E and Müller B (2020) High-Throughput Sequencing and Unsupervised Analysis of Formyltetrahydrofolate Synthetase (FTHFS) Gene Amplicons to Estimate Acetogenic Community Structure. Front. Microbiol. 11:2066. doi: 10.3389/fmicb.2020.02066
