@@ -270,29 +270,29 @@ sudo docker volume create --opt type=none --opt o=bind --opt device=/home/abhi/D
 ##### NOTE: only `MY_CUSTOM_NAME` should be changed according to your `--name` flag
 
 `
-sudo docker run --rm -v MY_CUSTOM_NAME:/acetoscan/input_dir -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir
+sudo docker run --rm -v MY_CUSTOM_NAME:/acetoscan/input_dir -it abhijeetsingh1704/acetoscan -i /acetoscan/input_dir
 `
 #### Example
 `
-sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir -it abhijeetsingh1704/acetoscan -i /acetoscan/input_dir
 `
 ###### Default program for AcetoScan pipeline is `acetoscan` command, therefore it is optional to call it with `--entrypoint` flag. But in case of `acetocheck`,`acetotax` or `acetotree`  command the code need to include `--entrypoint` flag
 
 #### Example
 ##### acetoscan
 `
-sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetoscan -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetoscan -it abhijeetsingh1704/acetoscan -i /acetoscan/input_dir
 `
 ##### acetocheck
 
 `
-sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir/input_file.fasta
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan -i /acetoscan/input_dir/input_file.fasta
 `
 
 - OR
 
 `
-sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan:1.0 -i /acetoscan/input_dir/input_file.fasta -o /acetoscan/input_dir/output_file.fasta
+sudo docker run --rm -v myDockerAcetoscan:/acetoscan/input_dir --entrypoint acetocheck -it abhijeetsingh1704/acetoscan -i /acetoscan/input_dir/input_file.fasta -o /acetoscan/input_dir/output_file.fasta
 `
 
 # Citation
