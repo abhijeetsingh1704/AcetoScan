@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: acetotree
-#   Last modified: tor  2 jul 2020 14:08:50 CEST
+#   Last modified: Thu Sep  3 12:52:30 CEST 2020
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -105,16 +105,18 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
                         ;;
                     v)
                         echo -e "#\tAcetoScan version: ${YELLOW}${version_def}${RESTORE}"
+                        echo -e "#\tVisit \"${YELLOW}https://github.com/abhijeetsingh1704/AcetoScan${RESTORE}\"###"
                         echo -e "#\tVisit \"${YELLOW}https://acetobase.molbio.slu.se/${RESTORE}\" for more information.\n\n###"
                         exit
                         ;;
                     C)
                         echo -e "#\tCitations: If you use ${YELLOW}AcetoScan pipeline${RESTORE}, please cite as:\n"
                         echo -e "#\tAcetoScan:"
-                        echo -e "\tAbhijeet Singh, Johan A. A. Nylander, Anna Schnürer, Bettina Müller"
-                        echo -e "\tHigh throughput sequencing and automated analysis of formyltetrahydrofolate"
-                        echo -e "\tsynthetase (FTHFS) gene amplicons to estimate acetogenic population dynamics,"
-                        echo -e "\t<Journal Name>, Volume <2020>, <2020>, <webadress>\n"
+                        echo -e "\tAbhijeet Singh, Johan A. A. Nylander, Anna Schnürer, Erik Bongcam-Rudloff, Bettina Müller (2020)"
+                        echo -e "\tHigh throughput sequencing and unsupervised analysis of formyltetrahydrofolate"
+                        echo -e "\tsynthetase (FTHFS) gene amplicons to estimate acetogenic community structure"
+                        echo -e "\tFront. Microbiol, Volume 11(2066), doi:10.3389/fmicb.2020.02066"
+                        echo -e "\thttps://www.frontiersin.org/articles/10.3389/fmicb.2020.02066/full\n"
 
                         echo -e "#\tAcetoBase:"
                         echo -e "\tAbhijeet Singh, Bettina Müller, Hans-Henrik Fuxelius, Anna Schnürer"
