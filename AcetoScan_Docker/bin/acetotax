@@ -107,7 +107,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
                     echo -e "#\tCitations: If you use ${YELLOW}AcetoScan pipeline${RESTORE}, please cite as:\n"
                     echo -e "#\tAcetoScan:"
                     echo -e "\tAbhijeet Singh, Johan A. A. Nylander, Anna Schnürer, Erik Bongcam-Rudloff, Bettina Müller (2020)"
-                    echo -e "\tHigh throughput sequencing and unsupervised analysis of formyltetrahydrofolate"
+                    echo -e "\tHigh-throughput sequencing and unsupervised analysis of formyltetrahydrofolate"
                     echo -e "\tsynthetase (FTHFS) gene amplicons to estimate acetogenic community structure"
                     echo -e "\tFront. Microbiol, Volume 11(2066), doi:10.3389/fmicb.2020.02066"
                     echo -e "\thttps://www.frontiersin.org/articles/10.3389/fmicb.2020.02066/full\n"
