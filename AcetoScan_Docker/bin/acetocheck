@@ -95,7 +95,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
                     ;;
                 v)
                     echo -e "#\tAcetoScan version: ${YELLOW}${version_def}${RESTORE}"
-                    echo -e "#\tVisit \"${YELLOW}https://github.com/abhijeetsingh1704/AcetoScan${RESTORE}\"\n\n###"
+                    echo -e "#\tVisit \"${YELLOW}https://github.com/abhijeetsingh1704/AcetoScan${RESTORE}\"###"
                     echo -e "#\tVisit \"${YELLOW}https://acetobase.molbio.slu.se/${RESTORE}\" for more information.\n\n###"
                     exit
                     ;;
