@@ -221,7 +221,7 @@ ${RESTORE}\n#\t${YELLOW}©Abhijeet Singh${RESTORE}
     else
         echo -e "\n#\tContents of input directory: ${YELLOW}${input_dir}${RESTORE}"
         echo -e "\n#============================================================\n"
-        INfile=$(find "${input_dir}" -iname "*_R1_001.fastq.*" | awk -F . '{print $NF}' | head -1 )
+        INfile=$(find "${input_dir}" -iname "*_R*_001.fastq.*" | awk -F . '{print $NF}' | head -1 )
         forward_read_filecount=$(find "${input_dir}" -name "*_R1_001.fastq.${INfile}" | wc -l)
         reverse_read_filecount=$(find "${input_dir}" -name "*_R2_001.fastq.${INfile}" | wc -l)
         #
