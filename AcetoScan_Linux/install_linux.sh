@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: INSTALL
-#   Last modified: tor  2 jul 2020 14:45:37 CEST
+#   Last modified: fre 13 aug 2021 16:48:37 CEST
 #   Sign: Abhi
 
 ### Setting colour variables
@@ -126,7 +126,7 @@
     #   Extracting
 
         echo -e "\n#\t${YELLOW}Extracting AcetoBase${RESTORE}\n"
-        tar xzf "/home/${user}/acetoscan/db/"AcetoBase_ref.tar.gz -C "/home/${user}/acetoscan/db/" --strip-components 1
+        tar xf "/home/${user}/acetoscan/db/"AcetoBase_ref.tar.gz -C "/home/${user}/acetoscan/db/"
         find "/home/${user}/acetoscan/db/" -name AcetoBase_ref.tar.gz -exec rm -rf {} \;
 
     #   Formatting blast database
