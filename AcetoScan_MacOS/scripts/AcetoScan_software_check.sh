@@ -69,19 +69,24 @@
 ### Checking if acetobase is formatted and accessible
 
     if [ ! -f "/Users/${user}/acetoscan/db/AcetoBase.phr" ];then
-        echo -ne "\n#\tError: Cannot access acetobase"
-        echo -ne "\n#\tTrying to Download AcetoBase"
+    
+        if [ ! -f "/Users/${user}/acetoscan/db/AcetoBase.fasta" ];then
+        
+            echo -ne "\n#\tError: Cannot access acetobase"
+            echo -ne "\n#\tTrying to Download AcetoBase"
 
-    #   Downloading
+        #   Downloading
 
-        echo -e "#\tDownloading AcetoBase\n"
-        wget --no-check-certificate -O "/Users/${user}/acetoscan/db/AcetoBase_ref.tar.gz" \
-                https://acetobase.molbio.slu.se/download/ref/1
-    #   Extracting
+            echo -e "#\tDownloading AcetoBase\n"
+            wget --no-check-certificate -O "/Users/${user}/acetoscan/db/AcetoBase_ref.tar.gz" \
+                    https://acetobase.molbio.slu.se/download/ref/1
+        #   Extracting
 
-        echo -e "\n#\tExtracting AcetoBase\n"
-        tar xvzf "/Users/${user}/acetoscan/db/"AcetoBase_ref.tar.gz -C "/Users/${user}/acetoscan/db/" --strip-components 1
-        rm "/Users/${user}/acetoscan/db/"AcetoBase_ref.tar.gz
+            echo -e "\n#\tExtracting AcetoBase\n"
+            tar xvzf "/Users/${user}/acetoscan/db/"AcetoBase_ref.tar.gz -C "/Users/${user}/acetoscan/db/" --strip-components 1
+            rm "/Users/${user}/acetoscan/db/"AcetoBase_ref.tar.gz
+            
+        fi
 
     #   Formatting blast database
 
