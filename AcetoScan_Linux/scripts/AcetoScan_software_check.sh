@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #   File: AcetoScan_software_check.sh
-#   Last modified: Apr 1, 2020 10:00
+#   Last modified: fre 27 aug 2021 12:00:08 CEST
 #   Sign: Abhi
 
 ### User
@@ -69,19 +69,24 @@
 ### Checking if acetobase is formatted and accessible
 
     if [ ! -f "/home/$user/acetoscan/db/AcetoBase.phr" ];then
-        echo -ne "\n#\tError: Cannot access acetobase"
-        echo -ne "\n#\tTrying to Download AcetoBase"
 
-    #   Downloading
+        if [ ! -f "/home/$user/acetoscan/db/AcetoBase.fasta" ];then
 
-        echo -e "#\tDownloading AcetoBase\n"
-        wget --no-check-certificate -O "/home/$user/acetoscan/db/AcetoBase_ref.tar.gz" \
-                https://acetobase.molbio.slu.se/download/ref/1
-    #   Extracting
+            echo -ne "\n#\tError: Cannot access acetobase"
+            echo -ne "\n#\tTrying to Download AcetoBase"
 
-        echo -e "\n#\tExtracting AcetoBase\n"
-        tar xvzf "/home/$user/acetoscan/db/"AcetoBase_ref.tar.gz -C "/home/$user/acetoscan/db/" --strip-components 1
-        rm "/home/${user}/acetoscan/db/"AcetoBase_ref.tar.gz
+        #   Downloading
+
+            echo -e "#\tDownloading AcetoBase\n"
+            wget --no-check-certificate -O "/home/$user/acetoscan/db/AcetoBase_ref.tar.gz" \
+                    https://acetobase.molbio.slu.se/download/ref/1
+        #   Extracting
+
+            echo -e "\n#\tExtracting AcetoBase\n"
+            tar xvzf "/home/$user/acetoscan/db/"AcetoBase_ref.tar.gz -C "/home/$user/acetoscan/db/" --strip-components 1
+            rm "/home/${user}/acetoscan/db/"AcetoBase_ref.tar.gz
+
+        fi
 
     #   Formatting blast database
 
